@@ -1,0 +1,651 @@
+html {
+	min-height: 100%;
+	box-sizing: border-box;
+	position: inherit;
+	padding: 0px;
+	margin: 0px;
+	background-color: #ffd5b6;
+	font-family: Verdana,sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+* {
+	box-sizing: border-box;
+	position: relative;
+}
+body {
+	box-sizing: border-box;
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	background-color: lightblue;
+	min-height: 100%;
+}
+#main-wrapper {
+	margin: 0px;
+	padding: 0px;
+}
+#row-1 {
+	min-height: 200px;
+	background-color: lightgreen;
+	margin: 0px;
+	padding: 0px;
+	background-attachment: fixed;
+    /* background-repeat-x: no-repeat; */
+  background-image: url(headerimage.jpg);
+}
+#row-2 {
+	min-height: 800px;
+	background-color: #ffffff;
+}
+#row-3 {
+	min-height: 120px;
+	background-color: #bbecbb;
+	background-attachment: fixed;
+    /* background-repeat-x: no-repeat; */
+  background-image: url(headerimage.jpg);
+}
+#r3-overlay {
+	height: 120px;
+	background-color: rgba(255, 255, 255, 0.48);
+}
+#row-2::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+[class*="col-"] {
+    float: left;
+    margin: 0px;
+}
+.col-1 {width: 8.33%;}
+.col-2 {width: 16.66%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.33%;}
+.col-5 {width: 41.66%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.33%;}
+.col-8 {width: 66.66%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.33%;}
+.col-11 {width: 91.66%;}
+.col-12 {width: 100%;}
+@media only screen and (max-width: 768px) {
+	 [class*="col-"] {
+        width: 100%;
+    }
+    #hor-menu {
+    	width: 100%;
+    }
+}
+@media only screen and (min-width: 1200px) {
+.col-3 {width: 16.66%;}
+.col-9 {width: 83.33%;}
+}
+
+#r1c1 {
+	min-height: 150px;
+	padding: 25px;
+}
+#r1c1 h1 {
+	margin: auto;
+	text-align: -webkit-center;
+	font-size: 6em;
+	color: forestgreen;
+	line-height: 1em;
+}
+#r1c1 h1 span {
+    letter-spacing: -23px;
+}
+
+@media only screen and (max-width: 768px) {
+	#r1c1 h1 {
+    float: left;
+    padding: 0px;
+    margin: auto;
+    text-align: left;
+    font-size: 5em;
+    color: forestgreen;
+    line-height: 1em;
+	}
+	#r1c1 {
+    min-height: 150px;
+    padding: 15px;
+	}
+	#r1c1 h1 span {
+    letter-spacing: -19px;
+	}
+}
+#r1c2 {
+  background-color: rgba(238, 238, 238, 0.71);
+	min-height: 200px;
+	padding: 0px;
+}
+#r2c1 {
+  background-color: #ffffff;;
+	min-height: 800px;
+	padding: 0px;
+}
+#r2c2 {
+	min-height: 800px;
+}
+#r2c3 {
+	background-color: #ffffff;
+	min-height: 800px;
+}
+.r2c2row {
+	min-height: 400px;
+	margin: 5px 0px;
+	padding: 0px;
+}
+.r2c1row {
+  background: linear-gradient(#e4e4e4, #5e775f);
+  border-radius: 0px 5px 5px 0px;
+}
+.r2c2row-head {
+	background: linear-gradient(gray, #ffffff);
+	padding: 5px;
+	height: 40px;
+	margin-bottom: 2px;
+}
+.r2c1row-head h2 {
+	margin: auto;
+	padding: 5px;
+}
+.r2c2row-content {
+  background-color: #ffffff;
+	margin-top: 2px;
+	min-height: 356px;
+}
+.r2c1row-head {
+	height: 40px;
+	background-color: rgba(208, 208, 208, 0);
+}
+#r1c2r1 {
+	min-height: 150px;
+	position: relative;
+}
+#min-prof {
+	min-height: 150px;
+	width: 150px;
+	margin: 0px;
+	padding: 0px;
+	position: absolute;
+	right: 0px;
+	/*background-color: rgba(34, 139, 34, 0.21);*/
+}
+#prof-pic {
+	height: 120px;
+	width: 100%;
+}
+#prof-pic-img {
+    margin: auto;
+    height: 75px;
+    width: 75px;
+}
+#prof-pic-img img {
+    border-radius: 50px;
+    height: auto;
+    width: 100%;
+    margin: auto;
+}
+#prof-pic-name {
+	height: 45px;
+	width: 100%;
+}
+#notifications {
+	height: 30px;
+	width: 100%;
+}
+#comments {
+	height: inherit;
+	width: 30px;
+	float: left;
+  background-image: url(icons/comments.png);
+  background-size: contain;
+}
+#comment-count, #order-count {
+    padding-left: 5px;
+	  height: 20px;
+    width: 20px;
+    color: white;
+    margin: 0px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    border-radius: 10px;
+}
+#orders {
+  margin-right: 15px;
+	height: inherit;
+	width: 30px;
+	float: left;
+  background-image: url(icons/cart.png);
+  background-size: contain;
+}
+
+#r1c2r2 {
+	min-height: 50px;
+}
+.item-slide {
+    width: 240px;
+    float: left;
+    margin: 10px 5px;
+    background-color: #fff;
+    padding: 0px;
+}
+.item-slide:hover {
+    box-shadow: grey 0px 0px 8px;
+}
+.item-slide-image {
+    margin: 0px;
+    height: 200px;
+    padding: 5px;
+}
+.item-slide-image img {
+    width: 100%;
+    max-height: 200px;
+}
+.item-slide-image h3  {
+    margin: auto;
+    text-align: -webkit-center;
+}
+.item-slide-content {
+    padding: 0px 5px;
+    margin: 2px;
+    font-size: 0.9em;
+}
+.item-slide-content td {
+    padding: 0px;
+}
+.item-slide-content td:nth-child(odd) {
+    text-align: left;
+}
+.item-slide-content td:nth-child(even) {
+    text-align: center;
+}
+.item-slide-content table {
+    margin: auto;
+    width: 100%;
+    border-spacing: 0px;
+}
+.r2c2row-head h3 {
+    margin: auto;
+    text-align: -webkit-center;
+}
+#hor-nav {
+	list-style-type: none;
+	display: inline-block;
+}
+#hor-menu a {
+    border-right: solid 1px white;
+    float: left;
+    margin: 0px;
+    padding: 13px 25px;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(green, #154a1b);
+}
+#hor-menu a:hover {
+	background: linear-gradient(#cccccc, black);
+	float: left;
+	margin: 0px;
+	padding: 13px 25px;
+	text-decoration: none;
+	color: black;
+}
+#hor-menu {
+	background-color: black;
+	min-height: 50px;
+	width: 100%;
+    background: linear-gradient(green, #154a1b);
+}
+#search {
+	float: left;
+	background-color: black;
+	min-height: 50px;
+	width: 22.22%;
+}
+@media only screen and (max-width: 768px) {
+    #hor-menu, #hor-menu a, #hor-menu .search, #r1c2r2 {
+    	width: 100%;
+        position: relative;
+    }
+    #row-1 {
+        display:-webkit-box;
+    }
+}
+.search {
+	display: inline-block;
+	position: absolute;
+	right: 10px;
+    margin: 5px 20px;
+	
+}
+.search input[type=text] {
+	margin: 0px;
+  width: 230px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url('searchicon.png');
+  background-position: 10px 10px; 
+  background-repeat: no-repeat;
+  padding: 10px 20px 10px 40px;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+input[type=submit] {
+    width: 80px;
+    height: 40px;
+}
+/***********************THE MODAL SIGN IN FORM*****************************************/
+/* Full-width input fields */
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Set a style for all buttons */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Extra styles for the cancel button */
+.cancelbtn {
+    width: auto;
+    padding: 10px 18px;
+    background-color: #f44336;
+}
+
+/* Center the image and position the close button */
+.imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+img.avatar {
+    width: 40%;
+    border-radius: 50%;
+}
+
+.container {
+    padding: 16px;
+}
+
+span.psw {
+    float: right;
+    padding-top: 16px;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.65); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: rgba(254, 254, 254, 0.68);
+    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    border: 1px solid #888;
+    width: 50%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button (x) */
+.close {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/* Add Zoom Animation */
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {-webkit-transform: scale(0)} 
+    to {-webkit-transform: scale(1)}
+}
+    
+@keyframes animatezoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+    span.psw {
+       display: block;
+       float: none;
+    }
+    .cancelbtn {
+       width: 100%;
+    }
+}
+/******************************************************************************/
+/***********************THE MODAL SIGNUP FORM**********************************/
+/* Full-width input fields */
+#id02 input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Set a style for all buttons */
+#id02  button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Extra styles for the cancel button */
+#id02  .cancelbtn {
+    padding: 14px 20px;
+    background-color: #f44336;
+}
+
+/* Float cancel and signup buttons and add an equal width */
+#id02  .cancelbtn,#id02  .signupbtn {float:left;width:50%}
+
+/* Add padding to container elements */
+#id02  .container {
+    padding: 16px;
+}
+
+/* The Modal (background) */
+#id02  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+/* Modal Content/Box */
+#id02  .modal-content {
+    background-color: rgba(254, 254, 254, 0.84);
+    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button (x) */
+#id02  .close {
+    line-height: 0.6em;
+    background-color: #c7c7c7;
+    position: absolute;
+    right: 35px;
+    top: 15px;
+    color: #000;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+#id02  .close:hover,
+#id02  .close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/* Clear floats */
+#id02  .clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* Change styles for cancel button and signup button on extra small screens */
+@media screen and (max-width: 300px) {
+    #id02  .cancelbtn, #id02  .signupbtn {
+       width: 100%;
+    }
+}
+/******************************************************************************/
+.warning, .error {
+	color: red;
+}
+.required {
+	background-color: rgb(255, 248, 192);
+}
+#inventory-display {
+    display: block;
+    min-height: 600px;
+    background-color: #fff;
+}
+#inventory-display .item-slide-content {
+}
+.item-slide-content th, .item-slide-content td  {
+    text-align: left;
+}
+#inventory-display .item-slide {
+    width: 250px;
+    border: solid 1px #ececec;
+    cursor: pointer;
+}
+.dash_item_name {
+    font-size:2em;
+    color: #bf9018;
+}
+#categories {
+    cursor: pointer;
+    cursor: hand;
+}
+.lvl-1, .lvl-2, .lvl-3, .lvl-4 {
+    padding: 8px 0px;
+}
+.lvl-1:hover, .lvl-2:hover, .lvl-3:hover, .lvl-4:hover {
+    color: orange;
+}
+.lvl-1 {
+    padding-left: 15px;
+    font-size: 2em;
+    color: darkslategrey;
+}
+.lvl-2 {
+    padding-left: 25px;
+}
+.lvl-3 {
+    padding-left: 35px;
+}
+.lvl-4 {
+    padding-left: 45px;
+}
+.inventory-hidden {
+    display: none;
+}
+#orderItem {
+
+}
+#oi-1 img {
+    width: 100%
+}
+#oi-11 {
+    width: 100%;
+}
+#oi-12-12 {
+    width: 100%;
+    padding: 10px;
+}
+#oi-13 {
+    width: 100%;
+    padding: 10px;
+}
+#oi-12 h3 {
+    padding: 0 5%;
+}
+.oi-table {
+    min-width: 100%;
+}
+.oi-table tr:nth-child(odd) {
+    background-color: #8d9196;
+}
+.oi-table td, .oi-table th {
+    width: 50%;
+}
+#r3-overlay {
+    background-color: black;
+}
+.footnote-col {
+    width: 33.3%;
+    padding: 10px;
+    float: left;
+    background-color: gray;
+    height: 100%;
+    font-size: 1.2em;
+}
+
+
+
+

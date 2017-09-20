@@ -1,0 +1,146 @@
+WEBSITE
+	Add ribbon showing categories of available items just like rakuten
+PHP OPERATORS
+	not equal to: <>
+	concatenation assignment: .=
+
+ARRAYS
+	making arrays: $variableName = array("item", "item", "item");
+	Counting array items: count($arrayVariableName);
+	Associative array example: $age = array("Peter"=>"35", "Ben"=>"37", "Joe"=>"43");
+
+APACHE2 TRIVIA
+	apache2ctl: to start/stop/restart apache2 with env_var or check available and
+		running modules
+	a2enmod/a2dimod: enable/disable apache2 modules
+
+PHP FORM VALIDATION
+	SANITIZATION
+	htmlspecialchars(): important php function to avert XSS to some extent
+	trim(): php function tokillunnessaryspaces.
+	stripslashes(): gets rid of \'s.
+	VALIDATION
+	preg_match(pattern, string): checks for pattern in string;
+	filter_var(): ?? and validating email addresses:
+
+DATE AND TIME
+	date(): formats a timestamp tp a more readable date and time
+	mktime(): make a date
+	strtotime(time, now): Convert human-readable time to Unix timestamp
+	include/require
+	
+FILE I/O
+	readfile(path): reads file to input buffer; returns number of bytes read
+	filesize(filename): returns file size in bytes?
+	fget(filename): reads a line and moves the pointer to the next
+	feof(filename): checks for EOF
+	fgetc(filename): get one character
+
+FILE UPLOAD REQUIREMENTS:
+	method="post"
+	enctype="multipart/form-data"
+	pathinfo(filename, options): returns an array with the elements [dirname], 
+		[basename], [extension] 
+	options = PATHINFO_DIRNAME || PATHINFO_BASENAME || PATHINFO_EXTENSION
+		When "options" is specified, pathinfo() returns a string.
+	$_FILE: $_FILE['userfile']['name'], $_FILE['userfile']['type'], $_FILE['userfile']['size']
+		$_FILE['userfile']['temp_name'], $_FILE['userfile']['error_code']
+	userfile: file upload "name"
+
+SESSIONS
+	session_start(): Start a session
+	session_unset(): Unset all session variables.
+	session_destroy(): End a session
+	print_r($_SESSION): Print all session variables.
+
+FILTERS
+	filter_list(): to list what the PHP filter extension offers
+	filter_var(): filter a variable
+	
+ERROR HANDLING
+	error_function(error_level, error_message, error_file, error_line, error_context);
+	set_error_handler(error_function): Self explanatory
+	trigger_error(): override to trigger user error manually. Returns E_USER_ERROR
+	error_log(): You can send errors to a php log file or as an email. This could 
+		be a good way to be notified of attack attempts.
+		
+PHP EXCEPTIONS
+	IDEA: Rethrowing exceptions
+	IDEA: Defining a custom exception handler.
+	set_exception_handler(handler()): Set a function (top level exception handler) to deal 
+			with all uncaught exceptions. handler is the set exception handler
+			
+MySQL DATABASE
+	MySQLi or PDO?: Two ways PHP gets to communicate with MySQL databases.
+	Prepared Statements: Protection against MySQL injection
+	mysqli($servername, $username, $password, $dbname): connect to a mysql 
+		database system/create a new mysqli object
+	mysqli->close(mysqli obj): close the connection
+	mysqli->query(string SQL_QUERY): Query a database. RETURN: Boolean
+	mysqli->mysqli_multi_query()
+	
+	PREPARED STATEMENTS
+	Prepare->Bind->Set_Parameters->Execute
+	Statement $stmt = mysql->prepare(String the statement to prepare)
+	$stmt->bind_param()
+	
+	RESULT METHODS(M) AND PROPERTIES(P)
+	(P) num_rows
+	(M) fetch_assoc()
+
+
+HOW LOGGING IN WORKS
+-The user enters a username and password
+-A script searches for and extracts the users data from the database, if the username
+	is correct.
+-The script compares the user's password to the password returned from the database
+-If the two match, session_start() is evoked
+-Pass the userID as a session variable and for each page they try to access, first check for the
+	$_SESSION['userID']. If it's set, then we have a session and can use the userID stored in the 
+	$_SESSION superglobal.
+
+	
+TODO
+-Create profile page to view and edit user profile
+-Add option to update repository
+-Create admin page to update items data
+-Upon sign up, start a session with the UserID and necessary info.
+-User this^ id as one of the parameters for executing SQL queries
+<<<<<<< HEAD
+-After a user signs in, don't let them back to the sign in or sign up pages. Redirect them to the main pages if there's a session set( if (isset($_SESSION['UserID'])))
+	
+
+
+
+
+=======
+-For now, I'll have it manually stored somewhere. Or start a session manually? Or with code. 
+	
+
+
+HOW LOGGING IN WORKS
+-The user enters a username and password
+-A script searches for and extracts the users data from the database, if the username
+	is correct.
+-The script compares the user's password to the password returned from the database
+-If the two match, session_start() is evoked
+-Pass the userID as a session variable and for each page they try to access, first check for the
+	$_SESSION['userID']. If it's set, then we have a session and can use the userID stored in the 
+	$_SESSION superglobal.
+>>>>>>> be3144fa06bb980232cb0da0ef6b9f6df498d67a
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

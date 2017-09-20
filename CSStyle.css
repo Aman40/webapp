@@ -1,0 +1,256 @@
+html {
+	min-height: 100%;
+	box-sizing: border-box;
+	position: inherit;
+	padding: 0px;
+	margin: 0px;
+}
+html, body {
+	font-family: Verdana,sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+body {
+	min-height: 100%;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	box-sizing: inherit;
+}
+.maindiv {
+	position: relative;
+	min-height: 100%;
+	padding: 0px;
+	margin: 0px;
+	border: none;
+	background-color: #b8b8d4;
+	box-sizing: inherit;
+	display: block;
+	min-width: 800px;
+}
+.headdiv { 
+	color: #aee4ae;
+	width: 100%;
+	height: 120px;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	background-color: seagreen;
+	border: none;
+	display: block;
+	box-sizing: inherit;
+}
+.headdiv h1 {
+  margin: 0px;
+  text-align: left;
+  font-size: 3.5em;
+  padding-left: 19px;
+}
+.navpane, .floating-navpane {
+  z-index: 1;
+  width: 250px;
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 120px;
+  background-color: #E5E4D7;
+  box-sizing: border-box;
+  display: block;
+  padding-top: 3px;
+  overflow-y: auto;
+  z-index: 5;
+  box-shadow: 0px 0px 10px 0px grey inset;
+}
+#navpaneid a { 
+  box-shadow: 0px 0px 5px 0px grey;
+  display: block;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: black;
+}
+#navpaneid a:hover {
+ background-color: #bbbbbb;
+}
+.navpanescroll { /*The one that's fixed from the top when we scroll*/
+	z-index: 1;
+	width: 250px;
+
+	display: block;
+	position: fixed;
+	left: 0px;
+	top: 42px;
+	background-color: #d2d6d2;
+	box-sizing: border-box;
+	display: block;
+	padding-top: 3px;
+	overflow-y: scroll;
+	z-index: 5;
+}
+.footermaindiv {
+	margin: 0;
+	padding: 0;
+	border: none;
+	background-color: black;
+	height: 100px;
+	box-sizing: border-box;
+	display: block;
+}
+.maincontentpane {
+	background-color: rgb(226, 226, 226);
+	display: block;
+	min-height: 100%;
+	box-sizing: border-box;
+	margin-left: 250px;
+	top: 120px;
+}
+.upper { /*Contains the content div and the side pane*/
+	width: 100%;
+	min-height: 100%;
+}
+.contentdiv {
+ width: 80%;
+ min-height: 100%;
+ margin: 0px;
+ padding: 0px;
+ background-color: gainsboro;
+ box-sizing: border-box;
+}
+.sidepane {
+	width: 20%; /*I will change this later. The width has to be fixed until the window size is too small. So JavaScript*/
+	min-height: 100%;
+	background-color: #f9f9f9;
+	margin:0px;
+	float: left;
+}
+.headdiv .hornavbar {
+	min-width: 800px;
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	background-color: seagreen;
+	margin: 0px;
+	padding: 0px;
+	z-index: 2;
+}
+.headdiv .hornavbarscrolled {
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	background-color: #19484e;
+	margin: 0px;
+	padding: 0px;
+	z-index: 2;
+}
+.hornavbar a {
+  display: inline-block;
+  text-decoration: none;
+  margin: 0px;
+  padding: 10px 10px;
+  color: white;
+  text-align: center;
+  min-width: 70px;
+  box-shadow: 0px 0px 8px 2px darkslategrey;
+  border-radius: 10px;
+}
+.hornavbar a:hover {
+ background-color: #405f5f;
+}
+.hornavbarscrolled a {
+	display: inline-block;
+	text-decoration: none;
+	margin: 0px;
+	padding: 10px 10px;
+	color: white;
+	text-align: center;
+	min-width: 70px;
+}
+.hornavbarscrolled a:hover {
+ background-color: #405f5f;
+}
+.content {/*Styling for content cards*/
+	min-height: 800px;
+	margin: 0px auto;
+	padding: 10px;
+	background-color: white;
+}
+#reveal-navpane {
+	display: inline-block;
+	visibility: visible;
+	min-width: 40px;
+	height: 100%;
+	margin-bottom: -13px;
+	padding: 0px 7px;
+}
+#reveal-navpane:hover {
+	background-color: #405f5f;
+}
+
+.floating-navpane {
+	position: fixed;
+	left: 0px;
+	display: block;
+}
+.nphidden{
+	display: none;
+}
+.image_container {
+	width: 150px;
+	height: 150px;
+	display: inline-block;
+}	
+.cpnarrow {
+	margin: 0px;
+	width: 100%;
+	background-color: rgb(226, 226, 226);
+	display: block;
+	min-height: 100%;
+	box-sizing: border-box;
+	top: 120px;
+}
+.options {
+	padding: 20px;
+	background-color: white;
+}
+.item {
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+  background-color: floralwhite;
+  border: solid 1px black;
+  margin: 4px;
+}
+.headdiv span {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
