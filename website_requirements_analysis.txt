@@ -236,7 +236,10 @@ CATALOGUE MANAGER FUNCTIONS//BASICALLY THE ITEMS TABLE ONLY
 PICKUP FROM
 --write a new "displaymodal()" function for the inventory items with its own modal.
  Currently it looks like the add-to-repository modal.
+--finish up the inventoryItemDetails() function
 
+FIXES
+--After adding item to repository, close the modal
 
 
 

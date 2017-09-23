@@ -759,7 +759,7 @@ include "include.php";
 </body>
 </html>
 
-<!--Average length < H + 1 report -->
+<!--Average length < H + 1 report. Fuck this! Right? Yup! -->
 <!--Now create the onclick() function to instantiate the modal "classes"-->
 <!--Remember to clear itemNodeList when user leaves pages to avoid conflict with similarly
     named variable on sister page(s)-->

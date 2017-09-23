@@ -54,7 +54,7 @@ function _searchdb(str) {
                             html+="</tr>";
                             html+="</table>";**/
                             html+="<div id='addToRep'>";//ID means 'Add to repository'
-                            html+="<button indexno="+i+" onclick='displaymodal("+this+", \"itemNodeList\")'><i class='fa fa-plus-square-o'></i> Add Item</button>";
+                            html+="<button onclick='displaymodal("+i+")'><i class='fa fa-plus-square-o'></i> Add an Item</button>";
                             html+="</div>";
                             html+="</div><!--item-slide-header-->"
                             html+="</div>";
@@ -80,8 +80,8 @@ function _searchdb(str) {
 }
 
 var itemNodeListr;
-function _getInventory() {
-    //This function
+function _getInventory() {//Retrieves items in the users inventory using the user's UID.
+                        //This function calls the inventoryItemsDetails() function to display the details of each item
     console.log("The function is running");
     var xmlhttpr = new XMLHttpRequest();
     xmlhttpr.responseType = "document";
@@ -122,7 +122,7 @@ function _getInventory() {
                         elmt.classList.add("item-slide");
                         elmt.indexno = i;
                         elmt.addEventListener("click", function () {
-                            inventoryItemDetails(this, itemNodeListr)
+                            inventoryItemDetails(this, itemNodeListr) //Display each inventory item in detail.
                         }, true) //Display Modal. Using only item's info. Seller is self
 
                         var img = "";
@@ -174,29 +174,45 @@ function getValue(nodeList, index, tagName) { //This function is just to make th
     var value = nodeList[index].getElementsByTagName(tagName)[0].childNodes[0].nodeValue
     return value;
 }
-function displaymodal(elmt, nodelist) { //This function sets the data in the modal. i identifies the item
-    var i = elmt.indexno; //Carries the number of the item.
+function displaymodal(i) { //This function displays the item details from the catalogue search. i identifies the item
+    //Initially, I wanted to use the same function to display the item details for the user inventory search, but... Epic Fail!
     var html=""; //in the itemNodeList
     html="<div width=100%>";
-    html+="<img src='"+getValue(nodelist, i, 'ImageURI')+"'>";
+    html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";
     html+="</div>";
     document.getElementById("eAI-11").innerHTML=html;
     html="<div width=100%>";
-    html+="<font size=6em position='center'>"+getValue(nodelist, i, 'ItemName')+"</font>";
-    html+="<br>Other names:\t"+getValue(nodelist, i, 'Aliases');
-    html+="<br>Description:\t"+getValue(nodelist, i, 'Description');
+    html+="<span size=6em position='center'>"+getValue(itemNodeList, i, 'ItemName')+"</span>";
+    html+="<br>Other names:\t"+getValue(itemNodeList, i, 'Aliases');
+    html+="<br>Description:\t"+getValue(itemNodeList, i, 'Description');
     html+="</div>";
     document.getElementById("item_submit_button").innerHTML="<button type='submit' onclick='submit_add_form("+i+")'><i class='fa fa-plus-square-o'></i>  Add to repository</button>";
     document.getElementById("eAI-12").innerHTML=html;
     document.getElementById("editAddItem").style.display="block";
 }
+
 function inventoryItemDetails(elmt, nodelist) {
+    //This function is called when an item in the user's inventory is clicked.
+    //The function shows the details of the item
+    console.log(nodelist);
     var i = elmt.indexno;
     var modal = document.createElement('div');
     modal.width = "100%";
     modal.classList.add("modal");
+    modal.id = "inventory_item_details_id";
     var modal_content = document.createElement('div'); //width: 100%
     modal.appendChild(modal_content);
+    //Add add an X inside a span to close the modal
+    var closeButton = document.createElement('span'); //INCOMPLETE: STYLE THE CLOSE BUTTON OR REMOVE IT
+    closeButton.innerHTML = "X";
+    //Add an event listener to the span
+    closeButton.onclick = function (event) {
+        modal.style.display = "none";
+    }
+    modal.onclick = function (event) {//Event listener to close the modal if user clicks anywhere outside the modal content
+        modal.style.display = "none";
+    }
+    modal.appendChild(closeButton);
     modal_content.classList.add("modal-content");
     var imgDiv = document.createElement('div'); //width: inherit
     modal_content.appendChild(imgDiv);
@@ -217,50 +233,51 @@ function inventoryItemDetails(elmt, nodelist) {
                 var otherNamesRow = document.createElement('tr');
                 tbody.appendChild(otherNamesRow);
                     var data = document.createElement('th');
-                        data.innerHTML="Alias";
+                        data.innerHTML="Alias:";
                     otherNamesRow.appendChild(data);
                     data = document.createElement('td');
-                        data.innerHTML="";
+                        data.innerHTML=getValue(nodelist, i, "aliases");
                     otherNamesRow.appendChild(data);
                 var descriptionRow = document.createElement('tr');
                 tbody.appendChild(descriptionRow);
                     var data = document.createElement('th');
-                        data.innerHTML="Description";
+                        data.innerHTML="Description:";
                     descriptionRow.appendChild(data);
                     data = document.createElement('td');
-                        data.innerHTML="";
+                        data.innerHTML=getValue(nodelist, i, "defaultdescription");
+                        data.innerHTML+=getValue(nodelist, i, "description");
                     descriptionRow.appendChild(data);
                 var quantityRow = document.createElement('tr');
                 tbody.appendChild(quantityRow);
                     var data = document.createElement('th');
-                        data.innerHTML="Quantity";
+                        data.innerHTML="Quantity:";
                     quantityRow.appendChild(data);
                     data = document.createElement('td');
-                        data.innerHTML="";
+                        data.innerHTML=getValue(nodelist, i, "quantity");
                     quantityRow.appendChild(data);
                 var priceRow = document.createElement('tr');
                 tbody.appendChild(priceRow);
                     var data = document.createElement('th');
-                        data.innerHTML="Price";
+                        data.innerHTML="Price:";
                     priceRow.appendChild(data);
                     data = document.createElement('td');
-                        data.innerHTML = "";
+                        data.innerHTML = getValue(nodelist, i, "unitprice")+"/"+getValue(nodelist, i, "units");
                     priceRow.appendChild(data);
                 var dateRow = document.createElement('tr');
                 tbody.appendChild(dateRow);
                     var data = document.createElement('th');
-                        data.innerHTML="Date Added";
+                        data.innerHTML="Date Added:";
                     dateRow.appendChild(data);
                     data = document.createElement('td');
-                        data.innerHTML="";
+                        data.innerHTML=getValue(nodelist, i, "dateadded");
                     dateRow.appendChild(data);
                 var deliverRow = document.createElement('tr');
                 tbody.appendChild(deliverRow);
                     var data = document.createElement('th');
-                        data.innerHTML="Delivery";
+                        data.innerHTML="Delivery:";
                     deliverRow.appendChild(data);
                     data = document.createElement('td');
-                        data.innerHTML="";
+                        data.innerHTML=getValue(nodelist, i, "deliverableareas");
                     deliverRow.appendChild(data);
     document.getElementsByTagName("body")[0].appendChild(modal);
     modal.style.display="block";

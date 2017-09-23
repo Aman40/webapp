@@ -37,7 +37,7 @@ include "../include.php";
                 </div><!--r1c1-->
 
             </div><!--r1c2r1-->
-            <div class="full-width" id="r1c2r2"><!--Insert an unorered list here for the menu-->
+            <div class="full-width" id="r1c2r2"><!--Insert an unordered list here for the menu-->
                 <div id="hor-menu">
                     <div class="full-width">
                         <a href="../fmh.php">Feed</a>
@@ -487,10 +487,10 @@ function _selected($var) {
             </div>
         </div>
     </form>
-</div>
+</div> <!--This is the form for editing the user info-->
 <!--Script4-->
 <iframe name="hidden_iframe" style="display:none"></iframe>
-<div class="modal" id="editAddItem">
+<div class="modal" onclick="this.style.display='none'" id="editAddItem">
     <span onclick="document.getElementById('editAddItem').style.display='none'" class="close" title="Close Modal">×</span>
     <div id="eAI-1" class="modal-content animate">
         <div id="eAI-11">
