@@ -80,7 +80,8 @@ function _searchdb(str) {
 }
 
 var itemNodeListr;
-function _getInventory() {//Retrieves items in the users inventory using the user's UID.
+function _getInventory() {
+    //Retrieves items in the users inventory using the user's UID.
                         //This function calls the inventoryItemsDetails() function to display the details of each item
     console.log("The function is running");
     var xmlhttpr = new XMLHttpRequest();
@@ -142,11 +143,11 @@ function _getInventory() {//Retrieves items in the users inventory using the use
                         elmt3 = document.createElement("div");
                         elmt3.classList.add('item-slide-content');
                         elmt3.id="itemNo"+i;
-                        var spanElmt = "";
-                        spanElmt = document.createElement("span");
-                        spanElmt.classList.add("dash_item_name");
-                        spanElmt.innerHTML = getValue(itemNodeListr, i, 'ItemName');
-                        elmt3.appendChild(spanElmt);
+                        var h3Elmt = "";
+                        h3Elmt = document.createElement("h3");
+                        h3Elmt.classList.add("dash_item_name");
+                        h3Elmt.innerHTML = getValue(itemNodeListr, i, 'ItemName');
+                        elmt3.appendChild(h3Elmt);
                         elmt.appendChild(elmt3);
                         document.getElementById("inventory-display").appendChild(elmt);
                     }
@@ -174,7 +175,8 @@ function getValue(nodeList, index, tagName) { //This function is just to make th
     var value = nodeList[index].getElementsByTagName(tagName)[0].childNodes[0].nodeValue
     return value;
 }
-function displaymodal(i) { //This function displays the item details from the catalogue search. i identifies the item
+function displaymodal(i) {
+    //This function displays the item details from the catalogue search. i identifies the item
     //Initially, I wanted to use the same function to display the item details for the user inventory search, but... Epic Fail!
     var html=""; //in the itemNodeList
     html="<div width=100%>";
@@ -219,6 +221,7 @@ function inventoryItemDetails(elmt, nodelist) {
     var contentDiv = document.createElement('div');
     modal_content.appendChild(contentDiv);
         var table = document.createElement('table');
+        table.classList.add("rep_item_details");
         contentDiv.appendChild(table);
             var tbody = document.createElement('tbody');
             table.appendChild(tbody);

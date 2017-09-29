@@ -149,7 +149,7 @@ include "../include.php";
                                     <div class="full-width" id="searchdiv">
                                         <form class="search">
                                             <input type="text" id="search-input" onkeydown="_checkenterkey(event)" name="search" placeholder="Search..">
-                                            <input id="uglyButton" style="display: none;" type="button" onclick="_searchdb(document.getElementById('inventory-search').value)" value="Search">
+                                            <input id="uglyButton" style="display: none;" type="button" onclick="_searchdb(document.getElementById('search-input').value)" value="Search">
                                             <span id="beaut">Go</span>
                                             <script>
                                                 var ugly = document.getElementById("uglyButton");
@@ -544,7 +544,7 @@ function _selected($var) {
     </div>
 
 </div>
-
+<!--Below is the orders div-->
 
 <!--Script5-->
 <!--*************************************************************************-->

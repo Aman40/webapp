@@ -413,7 +413,7 @@ span.psw {
 /* Modal Content/Box */
 .modal-content {
     background-color: rgba(254, 254, 254, 0.68);
-    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    margin: 50% auto 50% auto;
     border: 1px solid #888;
     width: 100%; /* Could be more or less, depending on screen size */
 }
@@ -624,9 +624,8 @@ span.psw {
 }
 #edit-prof-data {
     padding: 5px 15px;
-    position: absolute;
     top: 10px;
-    right: 10px;
+    left: 10px;
     background-color: green;
     border-radius: 2px;
 }
@@ -838,9 +837,24 @@ span.psw {
     border-radius: 5px;
     cursor: pointer;
 }
-
-
-
+.rep_item_details {
+    width: 100%;
+}
+.rep_item_details th {
+    text-align: right;
+}
+.rep_item_details tr:nth-child(odd) {
+    background-color: bisque;
+}
+h3.dash_item_name {
+    color: darkcyan;
+    font-size: 2em;
+    margin: 5px;
+}
+.orders-col {
+    min-height: 600px;
+    background-color: #fff;
+}
 
 
 

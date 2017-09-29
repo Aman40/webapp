@@ -198,11 +198,11 @@ SCENARIOS (EVENTS)
 
 Functionality goals for fmh.php
 -Add funcion to probe the database for available items and display some of them to the user - CHECK
--Set the funciton to run as soon as the website loads
+-Set the funciton to run as soon as the website loads CHECK
 -Write shell script or php to access the database and update the urls of the items. 
 -Or just use phpmyadmin
 -Create a web page to manage the database
--Come back here and create new tasks
+-Come back here and create new tasks DONE
 
 CURRENT PROBLEMS AS OF 2017/05/16 - SOLVED
 When the user is not logged in, it doesn't matter which "table" it is, the xhttp.php
@@ -234,12 +234,15 @@ CATALOGUE MANAGER FUNCTIONS//BASICALLY THE ITEMS TABLE ONLY
 -Allow user to define size of item boxes to as far as tables. Dynamic display type
 
 PICKUP FROM
---write a new "displaymodal()" function for the inventory items with its own modal.
- Currently it looks like the add-to-repository modal.
---finish up the inventoryItemDetails() function
+--finish up the inventoryItemDetails() function. Add the whole picture to the displayed info.
 
 FIXES
---After adding item to repository, close the modal
+--After adding item to repository, close the modal DONE
+
+IMMEDIATE ADDITION
+--Order/request for unavailable items
+--Allow users (with accounts?) to place orders in the open and allow capable sellers to bid/provide.
+
 
 
 

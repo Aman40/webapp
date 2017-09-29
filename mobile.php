@@ -59,24 +59,39 @@ include "include.php";
                     </form>
                 </div>
             </div><!--r1c2r1-->
-            <div class="full-width" id="r1c2r2"><!--Insert an unorered list here for the menu-->
+            <div class="full-width" id="r1c2r2"><!--Insert an unordered list here for the menu-->
                 <div id="hor-menu">
                     <div class="full-width" id="mob-menu">
-                        <a href="#">Feed</a>
+                        <a href="#" id="feedtab" onclick="showOrdersDiv(this)">Feed</a>
                         <?php
                         if($session_exists) {
                             echo "<a href='Profiles/mprofile.php'>Home</a>";
                         }
                         ?>
                         <a href="#">About Us</a>
-                        <a href="#">Order Item</a>
+                        <a href="#" id="orderitemtab" onclick="showOrdersDiv(this)">Order Item</a>
+                        <script>
+                            //upon clicking Order Item, hide the main panel and display the other.
+                            function showOrdersDiv(elmt){
+                                console.log("Checkpoint 1")
+                                var row2 = document.getElementById('row-2');
+                                var roworders = document.getElementById('row-orders');
+                                if(elmt.id==="feedtab") {
+                                    row2.style.display='block';
+                                    roworders.style.display='none';
+                                } else {
+                                    row2.style.display='none';
+                                    roworders.style.display='block';
+                                }
+                            }
+                        </script>
                         <a href="#">More stuff</a>
                         <?php //If the user logs in (session_exists=true) hide the following
                         if(!$session_exists) {
                             echo "
-							<a href=\"javascript:void(0)\" onclick=
+							<a href=\"void(0)\" onclick=
 							\"document.getElementById('id01').style.display='block'\">Sign In</a>
-							<a href=\"javascript:void(0)\" onclick=
+							<a href=\"void(0)\" onclick=
 							\"document.getElementById('id02').style.display='block'\">Sign up</a>
 								";
                         }
@@ -96,7 +111,7 @@ include "include.php";
                 <div style="background-color: gray; width: 40%; height: 40%; margin: 5%"></div>
                 <div style="background-color: gray; width: 40%; height: 40%; margin: 5%"></div>
             </div>
-            <div class="fa fa-angle-double-up" onclick="change_class(this)" style="height: 100%; color: grey; float: left; font-size: 3em; padding: 0px 10px;"></div>
+            <div class="fa fa-angle-double-down" onclick="change_class(this)" style="height: 100%; color: grey; float: left; font-size: 3em; padding: 0px 10px;"></div>
             <script>
                 function change_class(element) {
                     var categories = document.getElementById("categories");
@@ -119,7 +134,7 @@ include "include.php";
         </div>
         <div class="col-3" id="categories" class="cat-slide-in"> <!--search by category-->
             <div class="col-12" id="inventory-crops">
-                <div class="col-12 lvl-1" onclick="javascript:hide_show('inventory-crops')">
+                <div class="col-12 lvl-1" onclick="hide_show('inventory-crops')">
                     <i class="fa fa-caret-right"></i>
                     Crops
                 </div>
@@ -127,7 +142,7 @@ include "include.php";
                 <div class="col-12 inventory-hidden">
 
                     <div class="col-12" id="inventory-food">
-                        <div class="col-12 lvl-2" onclick="javascript:hide_show('inventory-food')">
+                        <div class="col-12 lvl-2" onclick="hide_show('inventory-food')">
                             <i class="fa fa-caret-right	"></i>
                             Food crops
                         </div>
@@ -141,7 +156,7 @@ include "include.php";
                                         var arrow = element.getElementsByTagName("i")[0];
                                         element = element.getElementsByClassName('inventory-hidden')[0];
                                         //if it's hidden show it. If it's visible, hide it.
-                                        if(element.style.display=="none" || element.style.display=="") {
+                                        if(element.style.display==="none" || element.style.display==="") {
                                             element.style.display="block";
                                             arrow.className="fa fa-caret-down";
                                         } else {
@@ -154,7 +169,7 @@ include "include.php";
                                         var y=document.getElementById('inventory-update');
                                         console.log(x.style.display);
                                         console.log(y.style.display);
-                                        if(x.style.display=='block' && y.style.display=='none') {
+                                        if(x.style.display==='block' && y.style.display==='none') {
                                             console.log("Conditions fulfilled");
                                             x.style.display='none';
                                             y.style.display='block';
@@ -171,13 +186,13 @@ include "include.php";
                                         xmlhttp.responseType = "document";
                                         xmlhttp.onreadystatechange = function() {
                                             //Check the return status for success/failure
-                                            if(this.readyState==4 && this.status==200) {
+                                            if(this.readyState===4 && this.status===200) {
                                                 var xmlDoc = this.responseXML;
                                                 console.log(xmlDoc);
                                                 var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-                                                if(return_status==0) { //Success. Rerun the _srchdb() function
+                                                if(return_status===0) { //Success. Rerun the _srchdb() function
                                                     alert("Item Deleted");
-                                                } else if(return_status==1) {
+                                                } else if(return_status===1) {
                                                     alert("A problem occurred");
                                                 } else {
                                                     console.log(return_status);
@@ -197,7 +212,7 @@ include "include.php";
                                     }
                                 </script>
 
-                                <div class="col-12 lvl-3" onclick="javascript:hide_show('starchy')">
+                                <div class="col-12 lvl-3" onclick="hide_show('starchy')">
                                     <i class="fa fa-caret-right	"></i>
                                     Starchy foods
                                 </div>
@@ -220,7 +235,7 @@ include "include.php";
                                 </div>
                             </div><!--starchy-->
                             <div class="col-12" id="fruits">
-                                <div class="col-12 lvl-3" onclick="javascript:hide_show('fruits')">
+                                <div class="col-12 lvl-3" onclick="hide_show('fruits')">
                                     <i class="fa fa-caret-right	"></i>
                                     Fruits
                                 </div>
@@ -252,7 +267,7 @@ include "include.php";
                                 </div>
                             </div><!--fruits-->
                             <div class="col-12" id="veggies">
-                                <div class="col-12 lvl-3" onclick="javascript:hide_show('veggies')">
+                                <div class="col-12 lvl-3" onclick="hide_show('veggies')">
                                     <i class="fa fa-caret-right	"></i>
                                     Vegetables
                                 </div>
@@ -275,7 +290,7 @@ include "include.php";
                                 </div>
                             </div><!--veggies-->
                             <div class="col-12" id="legumes">
-                                <div class="col-12 lvl-3" onclick="javascript:hide_show('legumes')">
+                                <div class="col-12 lvl-3" onclick="hide_show('legumes')">
                                     <i class="fa fa-caret-right	"></i>
                                     Legumes
                                 </div>
@@ -303,7 +318,7 @@ include "include.php";
                     </div><!--inventory-food-->
 
                     <div class="col-12" id="inventory-cash">
-                        <div class="lvl-2" onclick="javascript:hide_show('inventory-cash')">
+                        <div class="lvl-2" onclick="hide_show('inventory-cash')">
                             <i class="fa fa-caret-right	"></i>
                             Cash Crops
                         </div>
@@ -325,7 +340,7 @@ include "include.php";
             </div><!--inventory-crops-->
 
             <div class="col-12" id="inventory-animals">
-                <div class="col-12 lvl-1" onclick="javascript:hide_show('inventory-animals')">
+                <div class="col-12 lvl-1" onclick="hide_show('inventory-animals')">
                     <i class="fa fa-caret-right	"></i>
                     Animals
                 </div>
@@ -343,7 +358,7 @@ include "include.php";
             </div><!--inventory-animals-->
 
             <div class="col-12" id="inventory-poultry">
-                <div class="col-12 lvl-1" onclick="javascript:hide_show('inventory-poultry')">
+                <div class="col-12 lvl-1" onclick="hide_show('inventory-poultry')">
                     <i class="fa fa-caret-right	"></i>
                     Poultry
                 </div>
@@ -361,7 +376,7 @@ include "include.php";
             </div><!--inventory-animals-->
 
             <div class="col-12" id="inventory-fish">
-                <div class="col-12 lvl-1" onclick="javascript:hide_show('inventory-fish')">
+                <div class="col-12 lvl-1" onclick="hide_show('inventory-fish')">
                     <i class="fa fa-caret-right	"></i>
                     Fish
                 </div>
@@ -390,7 +405,7 @@ include "include.php";
                 </div><!--r2c2row-content col-12-->
                 <script>
                     function _checkenterkey(event) {
-                        if(event.key=='Enter') { //If it's the enter key, call the _searchdb function
+                        if(event.key==='Enter') { //If it's the enter key, call the _searchdb function
                             //The _searchdb function will extract the info, call the appropriate
                             //div by id and display the data.
                             event.preventDefault(); //Prevents the defaul of submitting the form + refreshing
@@ -401,15 +416,17 @@ include "include.php";
                     var itemNodeList;
                     //TODO: Edit _searchdb function to allow to send a different table (dashboard?) with the query
                     function _searchdb(str) {
+                        //This function searches the database table, Repository for All items.
                         var xhttp = new XMLHttpRequest();
                         xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
                         xhttp.onreadystatechange = function() { //If we get a reply from the server
-                            if(this.readyState==4 && this.status==200) { //Check the status and readystate
+                            if(this.readyState===4 && this.status===200) { //Check the status and readystate
                                 if(this.responseXML!=null) { //Do we have any meaningful response other than null?
                                     var xmlDoc = this.responseXML;
                                     console.log(xmlDoc);
                                     var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-                                    if(returnStatus==0) {
+                                    returnStatus = parseInt(returnStatus); //Convert the string to an int
+                                    if(returnStatus===0) {
                                         //get an itemNodeList object
                                         itemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
                                         //Purge the 'html' variable of previous search data
@@ -431,7 +448,7 @@ include "include.php";
                                                 var elmt2 = "";
                                                 elmt2 = document.createElement("div");
                                                 elmt2.classList.add("item-slide-image");
-                                                if(getValue(itemNodeList, i, 'ImageURI') == 'None') {
+                                                if(getValue(itemNodeList, i, 'ImageURI') === 'None') {
                                                     img.src = 'icons/placeholder.png'
                                                 }
                                                 else {
@@ -454,14 +471,16 @@ include "include.php";
                                         } else {
                                             console.log("0 results were found");
                                         }
-                                    } else if(returnStatus==1) { //returnStatus (defined in the php). 1=No results found.
+                                    } else if(returnStatus===1) { //returnStatus (defined in the php). 1=No results found.
                                         console.log("No matching results were found");
-                                    } else if(returnStatus==2) { //2=Problem with the mysql query
+                                    } else if(returnStatus===2) { //2=Problem with the mysql query
                                         console.log("There was a problem with the mysql query")
-                                    } else if(returnStatus==3) { //3=couldn't connect to the database
+                                    } else if(returnStatus===3) { //3=couldn't connect to the database
                                         console.log("There was a problem connecting to the database");
-                                    } else if(returnStatus==11) {
+                                    } else if(returnStatus===11) {
                                         window.alert("Please log in");
+                                    } else {
+                                        console.log("AND NOW WHAT?!");
                                     }
                                 } else { //For some weird reason, no XML, null returned.
                                     console.log("The is no response XML");
@@ -476,8 +495,9 @@ include "include.php";
                     function getValue(nodeList, index, tagName) { //This function is just to make things shorter ^
                         return nodeList[index].getElementsByTagName(tagName)[0].childNodes[0].nodeValue
                     } //It's called in _searchdb() to shorten code
-                    function displaymodal(i) { //This function sets the data in the modal. i identifies the item
-
+                    function displaymodal(i) {
+                        //This function sets the data in the modal template. i identifies the item's index in the
+                        //itemNodeList array.
                         var html=""; //in the itemNodeList
                         html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";//Get image URI from node list
                         document.getElementById('oi-11').innerHTML = html; //Insert image
@@ -568,7 +588,8 @@ include "include.php";
                     //What lays below is read as the page loads, hence displaying the inventory
                     _searchdb(""); //Pre-load the "dashboard" with db items when the page loads
                     //Define a function to access the database and extract the user information
-                    function _getUserInfo(elmt) { //Uses the index no of the item to get the user (seller) info
+                    function _getUserInfo(elmt) { 
+                        //Uses the index no of the item to get the user (seller) info
                         //incomplete
                         console.log(elmt.indexno);
                         var i = elmt.indexno; //get the index number
@@ -576,12 +597,12 @@ include "include.php";
                         var xmlhttp = new XMLHttpRequest();
                         xmlhttp.responseType = "document";
                         xmlhttp.onreadystatechange = function() {
-                            if(this.readyState==4 && this.status==200) {
+                            if(this.readyState===4 && this.status===200) {
                                 if(this.responseXML!=null) { //OK
                                     var doc = this.responseXML;
                                     var returnStatus = doc.getElementsByTagName('status')[0].childNodes[0].nodeValue;
 
-                                    if(returnStatus==0) { //Success
+                                    if(returnStatus===0) { //Success
                                         //get an item node list object
                                         userInfoNode = doc.getElementsByTagName("userdata")[0];
                                         displaymodal(i)
@@ -602,6 +623,61 @@ include "include.php";
                         xmlhttp.open("GET", "Profiles/xhttp.php?table=sellerdata&UserID="+userid, true);
                         xmlhttp.send();
                     }
+                    function _searchCatalog(str) {
+                        //This function searches the db table Items for item templates for users to define the items
+                        //they want to order. It's used by the orders div. It's almost exactly the same as the _searchdb()
+                        //function in Profiles/index.
+                        console.log("Is the function even called?!")
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
+                        xhttp.onreadystatechange = function() { //If we get a reply from the server
+                            if(this.readyState==4 && this.status==200) { //Check the status and readystate
+                                if(this.responseXML!=null) { //Do we have any meaningful response other than null?
+                                    var xmlDoc = this.responseXML;
+                                    console.log(xmlDoc);
+                                    var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+                                    if(returnStatus==0) {
+                                        //get an itemNodeList object
+                                        itemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
+                                        //Purge the 'html' variable of previous search data
+                                        document.getElementById("display-search-results").innerHTML="";
+
+                                        if(itemNodeList.length>0) {
+                                            var html="";
+                                            var i=0;
+                                            for(i=0;i<itemNodeList.length;i++) {
+                                                html="<div class='item-slide'>";
+                                                html+="<div class='item-slide-image'>";
+                                                html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";
+                                                html+="</div><!--item-slide-header-->"
+                                                html+="<div class='item-slide-content' id='itemNo"+i+"'>"
+                                                html+="<div id='addToRep'>";//ID means 'Add to repository'
+                                                html+="<button onclick='displaymodal("+i+")'><i class='fa fa-plus-square-o'></i> Add an Item</button>";
+                                                html+="</div>";
+                                                html+="</div><!--item-slide-header-->"
+                                                html+="</div>";
+                                                document.getElementById("display-search-results").innerHTML+=html;
+                                            }
+                                        } else {
+                                            console.log("0 results were found");
+                                        }
+                                    } else if(returnStatus==1) { //returnStatus (defined in the php). 1=No results found.
+                                        console.log("No matching results were found");
+                                    } else if(returnStatus==2) { //2=couldn't connect to the database
+                                        console.log("There was a problem connecting to the database");
+                                    } else if(returnStatus==11) {
+                                        window.alert("Please log in");
+                                    } else {
+                                        console.log("Weird!");
+                                    }
+                                } else { //For some weird reason, no XML, null returned.
+                                    console.log("There is no response XML");
+                                }
+                            }
+                        }
+                        xhttp.open("GET", "Profiles/xhttp.php?table=Items&q="+str, true);
+                        xhttp.send();
+                    }
                 </script>
 
             </div>
@@ -609,6 +685,239 @@ include "include.php";
         </div><!--r2c2-->
 
     </div><!--row-2-->
+    <div id="row-orders" style="display: none">
+        <div class="col-12" id="orders-update" style="display: block;">
+            <div class="col-4" id="orders-browse"><!--invisible until user clicks add-->
+                <div class="col-12" id="orders-search">
+                    <div class="full-width" id="orders-searchdiv">
+                        <form class="search">
+                            <input type="text" id="search-input" onkeydown="_checkenterkey(event, 'orders')" name="search" placeholder="Search..">
+                            <input id="orders-uglyButton" style="display: none;" type="button" onclick="_searchCatalog(document.getElementById('search-input').value)" value="Search">
+                            <span id="orders-beaut">Go</span>
+                            <script>
+                                var ugly = document.getElementById("uglyButton");
+                                var beaut = document.getElementById("beaut");
+                                beaut.onclick = function () {
+                                    ugly.click();
+                                }
+                            </script>
+
+                        </form>
+                    </div>
+
+                    <!--Script1-->
+                </div><!--Search by search-->
+                <div class="col-12" id="orders-categories"> <!--search by category-->
+                    <div class="col-12" id="orders-crops">
+                        <div class="col-12 lvl-1" onclick="hide_show('orders-crops')">
+                            <i class="fa fa-caret-right"></i>
+                            Crops
+                        </div>
+
+                        <div class="col-12 inventory-hidden">
+
+                            <div class="col-12" id="orders-food">
+                                <div class="col-12 lvl-2" onclick="hide_show('orders-food')">
+                                    <i class="fa fa-caret-right	"></i>
+                                    Food crops
+                                </div>
+                                <div class="col-12 inventory-hidden"><!--Group starts here-->
+                                    <div class="col-12" id="orders-starchy">
+                                        <!--Script2-->
+
+                                        <div class="col-12 lvl-3" onclick="hide_show('orders-starchy')">
+                                            <i class="fa fa-caret-right	"></i>
+                                            Starchy foods
+                                        </div>
+                                        <div class="col-12 inventory-hidden">
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Bananas')">
+                                                Bananas/Matooke
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Cassava')">
+                                                Cassava
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Rice')">
+                                                Rice
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Sweet Potatoes')">
+                                                Sweet Potatoes
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Irish Potatoes')">
+                                                Irish Potatoes
+                                            </div>
+                                        </div>
+                                    </div><!--starchy-->
+                                    <div class="col-12" id="orders-fruits">
+                                        <div class="col-12 lvl-3" onclick="hide_show('orders-fruits')">
+                                            <i class="fa fa-caret-right	"></i>
+                                            Fruits
+                                        </div>
+                                        <div class="col-12 inventory-hidden">
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Yellow Bananas')">
+                                                Yellow Bananas
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Passion Fruits')">
+                                                Passion Fruits
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Tomatoes')">
+                                                Tomatoes
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Avocadoes')">
+                                                Avocadoes
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Egg Plant')">
+                                                Egg Plant
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Plantain')">
+                                                Plantain/Gonja
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Paprika')">
+                                                Paprika
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Mangoes')">
+                                                Mangoes
+                                            </div>
+                                        </div>
+                                    </div><!--fruits-->
+                                    <div class="col-12" id="orders-veggies">
+                                        <div class="col-12 lvl-3" onclick="hide_show('orders-veggies')">
+                                            <i class="fa fa-caret-right	"></i>
+                                            Vegetables
+                                        </div>
+                                        <div class="col-12 inventory-hidden">
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Cabbage')">
+                                                Cabbage
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Amaranthus')">
+                                                Dodo/Amaranthus
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Nakati')">
+                                                Nakati
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Sukuma Wiki')">
+                                                Sukuma Wiki
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Lettuce')">
+                                                Lettuce
+                                            </div>
+                                        </div>
+                                    </div><!--veggies-->
+                                    <div class="col-12" id="orders-legumes">
+                                        <div class="col-12 lvl-3" onclick="hide_show('orders-legumes')">
+                                            <i class="fa fa-caret-right	"></i>
+                                            Legumes
+                                        </div>
+                                        <div class="col-12 inventory-hidden">
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Beans')">
+                                                Beans
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Ground Nuts')">
+                                                Ground Nuts/Pea Nuts
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Peas')">
+                                                Peas
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Lentils')">
+                                                Lentils
+                                            </div>
+                                            <div class="col-12 lvl-4" onclick="_searchCatalog('Soy Beans')">
+                                                Soy Beans
+                                            </div>
+                                        </div><!--hidden-->
+                                    </div><!--legumes-->
+
+                                </div><!--Group ends here-->
+
+                            </div><!--inventory-food-->
+
+                            <div class="col-12" id="orders-cash">
+                                <div class="lvl-2" onclick="hide_show('orders-cash')">
+                                    <i class="fa fa-caret-right	"></i>
+                                    Cash Crops
+                                </div>
+                                <div class="col-12 inventory-hidden">
+                                    <div class="lvl-3" onclick="_searchCatalog('Coffee')">
+                                        Coffee
+                                    </div>
+                                    <div class="lvl-3" onclick="_searchCatalog('Cotton')">
+                                        Cotton
+                                    </div>
+                                    <div class="lvl-3" onclick="_searchCatalog('Tea')">
+                                        Tea
+                                    </div>
+                                </div>
+                            </div><!--inventory-cash-->
+
+                        </div>
+
+                    </div><!--inventory-crops-->
+
+                    <div class="col-12" id="orders-animals">
+                        <div class="col-12 lvl-1" onclick="hide_show('orders-animals')">
+                            <i class="fa fa-caret-right	"></i>
+                            Animals
+                        </div>
+                        <div class="col-12 inventory-hidden">
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Cows')">
+                                Cows
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Goats')">
+                                Goats
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Sheep')">
+                                Sheep
+                            </div>
+                        </div>
+                    </div><!--inventory-animals-->
+
+                    <div class="col-12" id="orders-poultry">
+                        <div class="col-12 lvl-1" onclick="hide_show('orders-poultry')">
+                            <i class="fa fa-caret-right	"></i>
+                            Poultry
+                        </div>
+                        <div class="col-12 inventory-hidden">
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Chicken')">
+                                Chicken
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Ducks')">
+                                Ducks
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Turkeys')">
+                                Turkeys
+                            </div>
+                        </div>
+                    </div><!--inventory-animals-->
+
+                    <div class="col-12" id="orders-fish">
+                        <div class="col-12 lvl-1" onclick="hide_show('orders-fish')">
+                            <i class="fa fa-caret-right	"></i>
+                            Fish
+                        </div>
+                        <div class="col-12 inventory-hidden">
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Tilapia')">
+                                Tilapia
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Cat Fish')">
+                                Cat Fish
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Mud Fish')">
+                                Mud Fish
+                            </div>
+                            <div class="col-12 lvl-2" onclick="_searchCatalog('Nile Perch')">
+                                Nile Perch
+                            </div>
+                        </div>
+                    </div><!--inventory-animals-->
+
+                </div><!--search by category-->
+            </div><!--inventory-browse-->
+
+            <div class="col-8" id="display-search-results">
+                <!--Display results here-->
+
+            </div><!--display-search-results-->
+        </div>
+    </div>
     <div id="row-3"> <!--This will contain the footer-->
         <div id="r3-overlay"><!--Totally empty!-->
             <div class="footnote-col">&copy; Farmer's Marketting Hub 2017</div>
@@ -735,7 +1044,7 @@ include "include.php";
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-        if (event.target == modalup) {
+        if (event.target === modalup) {
             console.log("It's the modalup");
             modalup.style.display = "none";
         } else if (event.target === modalin) {
