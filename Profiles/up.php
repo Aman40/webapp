@@ -23,4 +23,3 @@ if(isset($_FILES['myfile'])) {
 } else {
     echo "The file wasn't received";
 }
-?>

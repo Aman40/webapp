@@ -217,7 +217,8 @@ FUTURE FUNCTIONALITY
 --Image processing script for uploaded images
 --Make the "Category" drop downs dynamically generated in the html
 --Allow users to upload real pictures for their items.
---
+--Write garbage collection bot to clear unwanted accounts and data. Run bot routinely.
+
 CATALOGUE MANAGER FUNCTIONS//BASICALLY THE ITEMS TABLE ONLY
 -Add/remove items
 -Procedure
@@ -237,11 +238,13 @@ PICKUP FROM
 --finish up the inventoryItemDetails() function. Add the whole picture to the displayed info.
 
 FIXES
---After adding item to repository, close the modal DONE
+
 
 IMMEDIATE ADDITION
---Order/request for unavailable items
---Allow users (with accounts?) to place orders in the open and allow capable sellers to bid/provide.
+--Order/request for unavailable items //SAME AS BELOW
+--Allow users (with accounts?) to place orders in the open and allow capable sellers to bid/provide. //IN PROGRESS
+--Finish dbeditor
+
 
 
 

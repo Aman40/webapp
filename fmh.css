@@ -645,7 +645,12 @@ span.psw {
     height: 100%;
     font-size: 1.2em;
 }
-
+#dbeditor_form{
+    width:800px;
+    background-color: lightblue;
+    min-height: 100%;
+    margin:5px auto;
+}
 
 
 

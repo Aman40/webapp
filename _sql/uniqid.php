@@ -1,8 +1,8 @@
 <?php
 $count=0;
-while($count<100) {
-$unique = uniqid("I");
-echo "(".$unique.", , , , , ),\n";
+while($count<20) {
+$unique = uniqid("N");
+echo "('".$unique."', '', '', '', , , , ),\n";
 $count++;
 usleep(100000);
 }

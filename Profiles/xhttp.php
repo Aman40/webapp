@@ -8,7 +8,7 @@ if(isset($_SESSION['UserID'])) { //The User is logged in
 
     $table = filter($_REQUEST['table']);
 //Access the database in search for item var
-    _searchCatalog($table);
+    _searchCatalog($table, $UserID);
 }
 else { //User is not logged in. I.e the fmh main dashboard.
     //Search the database for given item or all where q=""
@@ -73,7 +73,6 @@ function _search_all_db($str)
 					TempTable.Aliases AS Aliases,
 					TempTable.Category AS Category,
 					TempTable.Description AS DefaultDescription,
-					TempTable.ImageURI AS ImageURI,
 					Repository.RepID AS RepID,
 					Repository.Quantity AS Quantity,
 					Repository.Units AS Units,
@@ -100,7 +99,7 @@ function _search_all_db($str)
                     $Aliases = setdefault($row['Aliases'], "None");
                     $Category = $row['Category'];
                     $DefaultDescription = setdefault($row['DefaultDescription'], "None");
-                    $ImageURI =	setdefault($row['ImageURI'], "None");
+                    $ImageURI =	"None";
                     $RepID = $row['RepID'];
                     $Quantity = $row['Quantity'];
                     $Units = $row['Units'];
@@ -138,8 +137,10 @@ function _search_all_db($str)
             } else { //No results were found
                 echo "<status>1</status>";
             }
-        } else { //There was a problem with the query
+        }
+        else { //There was a problem with the query
             echo "<status>2</status>";
+            echo "<errormsg>$conn->error</errormsg>";
         }
         $conn->close(); //Close the connection
     } else { //connection failed
@@ -187,7 +188,7 @@ function _getuserinfo($userid) { //SHOULD IT ECHO TO OUTPUT OR RETURN TO CALLING
     }
     //END HERE
 }
-function _searchCatalog($table) {
+function _searchCatalog($table, $UserID) {
     $servername = "localhost"; //This is bound  change when I upload to the real website.
     $username = "aman";
     $password = "password";
@@ -199,7 +200,7 @@ function _searchCatalog($table) {
             //Get the query
             $var = filter($_REQUEST['q']);
 
-            $sql = "select ItemID, ItemName, Aliases, Category, Description, ImageURI 
+            $sql = "select ItemID, ItemName, Aliases, Category, Description 
                     from Items 
                     where ItemName like '%".$var."%' 
                     or Aliases like '%".$var."%'";
@@ -213,7 +214,7 @@ function _searchCatalog($table) {
                         $Aliases = setdefault($row['Aliases'], "empty");
                         $Category = $row['Category'];
                         $Description = setdefault($row['Description'], "No description");
-                        $ImageURI = setdefault($row['ImageURI'], "../icons/placeholder.png");
+                        $ImageURI = "../icons/placeholder.png";
                         //Convert to XML
                         $reply=$reply."<Item><ItemID>".$ItemID."</ItemID><ItemName>".$ItemName."</ItemName><Aliases>".$Aliases."</Aliases><Category>".$Category."</Category><Description>".$Description."</Description><ImageURI>".$ImageURI."</ImageURI></Item>";//Build the XML
                     }
@@ -227,6 +228,7 @@ function _searchCatalog($table) {
 
             } else { //There's a problem with excecution of the query
                 echo "<status>2</status>"; //No results found
+                echo "<errormsg>.$conn->error.</errormsg>";
             }
             $conn->close(); //Close the connection
         }
@@ -236,7 +238,6 @@ function _searchCatalog($table) {
 					Items.Aliases AS Aliases,
 					Items.Category AS Category,
 					Items.Description AS DefaultDescription,
-					Items.ImageURI AS ImageURI,
 					TempTable.RepID AS RepID,
 					TempTable.Quantity AS Quantity,
 					TempTable.Units AS Units,
@@ -259,7 +260,7 @@ function _searchCatalog($table) {
                         $Aliases = setdefault($row['Aliases'], "None");
                         $Category = $row['Category'];
                         $DefaultDescription = setdefault($row['DefaultDescription'], "None");
-                        $ImageURI =	setdefault($row['ImageURI'], "None");
+                        $ImageURI =	"None";
                         $RepID = $row['RepID'];
                         $Quantity = $row['Quantity'];
                         $Units = $row['Units'];
@@ -295,6 +296,7 @@ function _searchCatalog($table) {
 
             } else {//A problem occured during execution of the query
                 echo "<status>2</status>";
+                echo "<errormsg>.$conn->error.</errormsg>";
             }
         }
         else if($table=='delete_item') { //Particular logged in user deleting repository item

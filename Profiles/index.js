@@ -354,9 +354,6 @@ function rem_rep_item(i) {
     xmlhttp.open("GET", "xhttp.php?table=delete_item&RepID="+RepID, true);
     xmlhttp.send();
 }
-function update_rep_item(i) {
-    itemID = getValue(itemNodeListr, i, 'itemID');
-}
 //Script4
 // Get the modal
 // When the user clicks anywhere outside of the modal, close it
@@ -411,14 +408,14 @@ function place_order() {
 }
 function change_prof_pic(event) {
     event.preventDefault();
-    var file_input = document.getElementById("uploadprofpic");
-    file_input.click();
+    var file_input = document.getElementById("uploadprofpic"); //The real input button (hidden)
+    file_input.click(); //This opens the file browser for image selection.
     //No need for the submit button
     //Create custom submit button to send canvas data to the webserver DONE
     //1. click the profile pic. click triggers the change_prof_pic() function which redirects click to input button DONE
     //2. select a file. input button has onchange event that calls edit_image
 }
-function edit_image(file_input) {
+function edit_image(file_input) { //Function is triggered by onchange event listener
     //1. Get input element
     //2. get file
     var imagefile = file_input.files[0];
@@ -503,6 +500,109 @@ function change_view() {
     }
 }
 
-function useless_function() {
-    console.log("I'm a fucking useless function");
+function display_item_images (input_elmt) {
+    //trigger this function with onchange event handler on input button
+    //This funciton displays the images and upon clicking on each of the images, editing should be possible. //LATER
+    var file_array = input_elmt.files;
+    var imgs_container = document.getElementById('up_imgs_container')
+    recursive_image_loader(0, file_array, imgs_container);
+
+}
+function recursive_image_loader(indx, file_array, imgs_container) {
+    //This is used in the display_item_images function recursively
+    //get the images one by one from the array
+    //read the image data using fileReader
+    var file_reader = new FileReader;
+    file_reader.onload = function () {
+        var img = document.createElement('img');
+        img.src = file_reader.result;
+        img.onload = function () {
+            showImageInCanvas(img, imgs_container);
+        }
+
+        if(indx<(file_array.length-1)) {
+            recursive_image_loader(indx+1, file_array, imgs_container);
+        }
+    }
+    file_reader.readAsDataURL(file_array[indx]);
+    //append the dataURL to an img elmt src
+}
+function showImageInCanvas(img, imgs_container) {
+    //Show the scaled version of the image in a canvas
+    //By now the image is already loaded into an img element. Put it in a canvas and display it.
+    var canvas2d = document.createElement('canvas');
+    //set dimensions of canvas. max is 200px
+    var MAX_HEIGHT = 200;
+    var MAX_WIDTH = 200;
+
+    if(img.height>img.width) {//if the image height is greater than the width scale it to the maximum height
+        img.width *= MAX_HEIGHT/img.height;
+        img.height = MAX_HEIGHT;
+    } else {//if the image width is greater than the height, scale it to the maximum width
+        img.height *= MAX_WIDTH/img.width;
+        img.width = MAX_WIDTH;
+    }
+    //Insert image in canvas
+    var canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    imgs_container.appendChild(canvas);
+    //Get the image from the canvas and upload it. Nah. Do it in a different function to upload everything at once
+}
+function uploadCanvasImages() {
+    //This function gets all the selected images and uploads them at once
+    //Get canvas array
+    //Get form data as well and append it to the FormData object and send it
+
+    var itemName = document.getElementById("itemname").value;
+    var otherNames = document.getElementById("othernames").value;
+    var category = document.getElementById("category").value;
+    var description = document.getElementById("description").value
+    var fd = new FormData();
+    console.log(fd);
+    console.log("itemName: "+itemName);
+    console.log("otherNames: "+otherNames);
+    console.log("category: "+category);
+    console.log("description: "+description);
+
+    fd.append("ItemName", itemName);
+    fd.append("OtherNames", otherNames);
+    fd.append("Category", category);
+    fd.append("Description", description);
+
+    var canvasArray = document.getElementById("up_imgs_container").getElementsByTagName("canvas");
+    var index = 0;
+    //recursively append the images to fd
+    canvasArray[index].toBlob(function (blob) {
+        recursiveBlobCallback(canvasArray, index, fd, blob);
+    }, "image/jpeg", 0.4);
+
+
+
+}
+function recursiveBlobCallback(canvasArray, index, fd, blob) {
+    fd.append("myFile[]", blob, "pic"+index+".jpg");
+    console.log("Just appended file number: "+index);
+
+    if(index<(canvasArray.length-1)) {
+        //There are still files in the array
+        canvasArray[index+1].toBlob(function (blob) {
+            recursiveBlobCallback(canvasArray, index+1, fd, blob);
+        }, "image/jpeg", 1);
+    } else {
+        //Appending is done. Now send the files by AJAX
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if(this.readyState==4 && this.status==200) {
+                console.log("Upload was successful. Yay!");
+                console.log("The server says "+this.responseText);
+            } else {
+                console.log("readyState = " + this.readyState + "and status = "+this.status);
+            }
+        }
+        xhr.open("POST", "upload.php", true);
+        xhr.send(fd);
+    }
 }

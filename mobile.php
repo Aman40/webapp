@@ -45,7 +45,7 @@ include "include.php";
                 </div><!--r1c1-->
                 <div class="full-width" id="searchdiv">
                     <form class="search">
-                        <input type="text" id="inventory-search" onkeydown="_checkenterkey(event)" name="search" placeholder="Search..">
+                        <input type="text" id="inventory-search" onkeydown="_checkenterkey(event, 'feed')" name="search" placeholder="Search..">
                         <input id="uglyButton" style="display: none;" type="button" onclick="javascript:_searchdb(document.getElementById('inventory-search').value)" value="Search">
                         <span id="beaut">Go</span>
                         <script>
@@ -77,8 +77,12 @@ include "include.php";
                                 var row2 = document.getElementById('row-2');
                                 var roworders = document.getElementById('row-orders');
                                 if(elmt.id==="feedtab") {
+                                    //Clicked element is the feed tab. Show the feed, then reload the items in there because
+                                    //itemNodeList is being shared by two functions [_searchdb() and _searchCatalog()]
                                     row2.style.display='block';
                                     roworders.style.display='none';
+                                    _searchdb("");
+                                    console.log("itemNodeList has been refreshed")
                                 } else {
                                     row2.style.display='none';
                                     roworders.style.display='block';
@@ -89,9 +93,9 @@ include "include.php";
                         <?php //If the user logs in (session_exists=true) hide the following
                         if(!$session_exists) {
                             echo "
-							<a href=\"void(0)\" onclick=
+							<a href=\"javascript:void(0)\" onclick=
 							\"document.getElementById('id01').style.display='block'\">Sign In</a>
-							<a href=\"void(0)\" onclick=
+							<a href=\"javascript:void(0)\" onclick=
 							\"document.getElementById('id02').style.display='block'\">Sign up</a>
 								";
                         }
@@ -398,22 +402,29 @@ include "include.php";
 
         </div><!--search by category-->
 
-        <div class="col-9" id="r2c2" class="slide-container-view-grid">
+        <div class="col-9 slide-container-view-list" id="r2c2">
             <div class="r2c2row col-12">
                 <div class="r2c2row-content col-12" id="inventory-display">
                     <!--Replaced with code to extract available items from database. Populated using id-->
                 </div><!--r2c2row-content col-12-->
                 <script>
-                    function _checkenterkey(event) {
+                    function _checkenterkey(event, func_name) {
                         if(event.key==='Enter') { //If it's the enter key, call the _searchdb function
                             //The _searchdb function will extract the info, call the appropriate
                             //div by id and display the data.
                             event.preventDefault(); //Prevents the defaul of submitting the form + refreshing
-                            _searchdb(document.getElementById('inventory-search').value);
+                            if(func_name === 'orders') {
+                                _searchCatalog(document.getElementById('search-input').value);
+                            }
+                            else {
+                                _searchdb(document.getElementById('inventory-search').value);
+                            }
+
                         }
                     }
 
-                    var itemNodeList;
+                    var itemNodeList; //Holds item nodes from the repository search for when the user is nonlogged. The
+                                        //items held are thus those added by the registered sellers.
                     //TODO: Edit _searchdb function to allow to send a different table (dashboard?) with the query
                     function _searchdb(str) {
                         //This function searches the database table, Repository for All items.
@@ -585,6 +596,60 @@ include "include.php";
                         //Display the whole modal
                         document.getElementById("orderItem").style.display="block";
                     }
+                    function catalogItem(i){
+                        //This displays a modal with the item's details when the user clicks on one of the search
+                        //results from the catalog search
+                        console.log("catalogItem check")
+                        var html=""; //in the itemNodeList
+                        html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";//Get image URI from node list
+                        document.getElementById('oi-11').innerHTML = html; //Insert image
+                        html="<h3>"+getValue(itemNodeList, i, 'ItemName')+"</h3>";//Get item name
+                        document.getElementById('oi-12').innerHTML = html; //Insert item name
+
+                        //Add the product and seller details to oi-13
+                        var oi_13 = document.getElementById('oi-13');
+                        oi_13.innerHTML = "";
+                        var table = newElmt("table");
+                        table.classList.add('oi-table');
+                        var tr = newElmt("tr");
+                        var th = newElmt("th");
+                        var td = newElmt("td");
+                        th.innerHTML = "Description";
+                        td.innerHTML = getValue(itemNodeList,i,'description');
+                        tr.appendChild(th);
+                        tr.appendChild(td);
+                        table.appendChild(tr);
+                        oi_13.appendChild(table);
+
+                        //Create and append form
+                        var form = newElmt('form');
+                            oi_13.appendChild(form);
+                        var label = newElmt('label');
+                            form.appendChild(label);
+                            label.innerHTML="Quantity:"
+                            form.appendChild(newElmt('br'));
+                        var input = newElmt('input');
+                            form.appendChild(input);
+                            input.type='text';
+                            //Another input
+
+
+                        //Create and append button
+                        var button = newElmt("button");
+                        button.indexno = i;
+                        button.type = 'submit';
+                        button.innerHTML = "Place Open Order";
+                        button.onclick = function () {
+                            place_open_order(this.indexno);
+                        }
+                        var icon = newElmt("i");
+                        icon.classList.add('fa'); //set class part 1
+                        icon.classList.add('fa-plus-square-o'); //set class part 2
+                        button.appendChild(icon); //Append the i to the button
+                        oi_13.appendChild(button);
+                        //Display the whole modal
+                        document.getElementById("orderItem").style.display="block";
+                    }
                     //What lays below is read as the page loads, hence displaying the inventory
                     _searchdb(""); //Pre-load the "dashboard" with db items when the page loads
                     //Define a function to access the database and extract the user information
@@ -600,12 +665,12 @@ include "include.php";
                             if(this.readyState===4 && this.status===200) {
                                 if(this.responseXML!=null) { //OK
                                     var doc = this.responseXML;
-                                    var returnStatus = doc.getElementsByTagName('status')[0].childNodes[0].nodeValue;
-
+                                    var returnStatus = doc.getElementsByTagName('status')[0].childNodes[0].nodeValue; //This is a string. Cast it into an integer
+                                        returnStatus = parseInt(returnStatus);
                                     if(returnStatus===0) { //Success
                                         //get an item node list object
                                         userInfoNode = doc.getElementsByTagName("userdata")[0];
-                                        displaymodal(i)
+                                        displaymodal(i);
                                     }
                                     else {
                                         //later
@@ -614,6 +679,7 @@ include "include.php";
                                 }
                                 else { //No xml
                                     //later
+                                    console.log("No xml");
                                 }
                             }
                             else { //request not fulfilled. Print readyState & status to console
@@ -636,7 +702,8 @@ include "include.php";
                                     var xmlDoc = this.responseXML;
                                     console.log(xmlDoc);
                                     var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-                                    if(returnStatus==0) {
+                                        returnStatus = parseInt(returnStatus); //Parse it as an int
+                                    if(returnStatus===0) {
                                         //get an itemNodeList object
                                         itemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
                                         //Purge the 'html' variable of previous search data
@@ -646,7 +713,7 @@ include "include.php";
                                             var html="";
                                             var i=0;
                                             for(i=0;i<itemNodeList.length;i++) {
-                                                html="<div class='item-slide'>";
+                                                html="<div class='item-slide' onclick='catalogItem("+i+")'>";
                                                 html+="<div class='item-slide-image'>";
                                                 html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";
                                                 html+="</div><!--item-slide-header-->"
@@ -678,6 +745,16 @@ include "include.php";
                         xhttp.open("GET", "Profiles/xhttp.php?table=Items&q="+str, true);
                         xhttp.send();
                     }
+                    function place_open_order(i){
+                        //This function will get the item by the index from itemsNodeList
+                        //Get the info the user intered in the form in the modal
+                        //Open an xhttp request and place the order
+                        console.log("Index No.:"+i);
+                    }
+                    function newElmt(elmt) {
+                        //This creates an element whose name is specified in the parameter
+                        return document.createElement(elmt);
+                    }
                 </script>
 
             </div>
@@ -695,8 +772,8 @@ include "include.php";
                             <input id="orders-uglyButton" style="display: none;" type="button" onclick="_searchCatalog(document.getElementById('search-input').value)" value="Search">
                             <span id="orders-beaut">Go</span>
                             <script>
-                                var ugly = document.getElementById("uglyButton");
-                                var beaut = document.getElementById("beaut");
+                                var ugly = document.getElementById("orders-uglyButton");
+                                var beaut = document.getElementById("orders-beaut");
                                 beaut.onclick = function () {
                                     ugly.click();
                                 }
