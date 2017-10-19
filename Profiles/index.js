@@ -82,7 +82,7 @@ function _searchdb(str) {
 var itemNodeListr;
 function _getInventory() {
     //Retrieves items in the users inventory using the user's UID.
-                        //This function calls the inventoryItemsDetails() function to display the details of each item
+    //This function calls the inventoryItemsDetails() function to display the details of each item
     console.log("The function is running");
     var xmlhttpr = new XMLHttpRequest();
     xmlhttpr.responseType = "document";
@@ -91,7 +91,8 @@ function _getInventory() {
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(returnStatus==0) {//Results were found
+            if(returnStatus==0) {
+                //Results were found
                 //get an itemNodeList object
                 itemNodeListr = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
                 //Purge the 'html' variable of previous search data
@@ -105,19 +106,6 @@ function _getInventory() {
                     var i = 0;
                     var html="";
                     for(i=0;i<itemNodeListr.length; i++) {
-                        //html="<div class='item-slide'>";
-                        //html+="<div class='item-slide-image'>";
-                        //html+="<img src='"+getValue(itemNodeListr, i, 'ImageURI')+"'>";
-                        //html+="</div><!--item-slide-header-->"
-                        //html+="<div class='item-slide-content' id='itemid"+i+"'>"
-                        //html+="</div><!--item-slide-header-->"
-                        //html+="<div id='addToRep'>";//ID means 'Add to repository'
-                        //html+="<button onclick='void(0)'><i class='fa fa-edit'></i> Edit</button>";
-                        //html+="</div>";
-                        //html+="<span onclick='rem_rep_item("+i+")' id='rem-rep-item"+i+"' class='close' title='Delete Item'>×</span>";
-                        //html+="</div>";
-                        //document.getElementById("inventory-display").innerHTML+=html;
-                        //From here
                         var elmt = "";
                         elmt = document.createElement("div");
                         elmt.classList.add("item-slide");
@@ -327,7 +315,7 @@ function add_to_inventory() { //Hide inventory data onclick
 }
 function rem_rep_item(i) {
     //Extract the node's itemID
-    var RepID = getValue(itemNodeListr, i, 'RepID'); //Assuming the iremNodeListr object still exists
+    var RepID = getValue(itemNodeListr, i, 'RepID'); //Assuming the itemNodeListr object still exists
     //Access the db and delete the node;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.responseType = "document";
@@ -415,7 +403,8 @@ function change_prof_pic(event) {
     //1. click the profile pic. click triggers the change_prof_pic() function which redirects click to input button DONE
     //2. select a file. input button has onchange event that calls edit_image
 }
-function edit_image(file_input) { //Function is triggered by onchange event listener
+function edit_image(file_input) {
+    //Function is triggered by onchange event listener
     //1. Get input element
     //2. get file
     var imagefile = file_input.files[0];
@@ -528,7 +517,8 @@ function recursive_image_loader(indx, file_array, imgs_container) {
     //append the dataURL to an img elmt src
 }
 function showImageInCanvas(img, imgs_container) {
-    //Show the scaled version of the image in a canvas
+    //Show the scaled version of the image in a canvas.
+    //It's triggered by after choosing files.
     //By now the image is already loaded into an img element. Put it in a canvas and display it.
     var canvas2d = document.createElement('canvas');
     //set dimensions of canvas. max is 200px
@@ -552,37 +542,41 @@ function showImageInCanvas(img, imgs_container) {
     //Get the image from the canvas and upload it. Nah. Do it in a different function to upload everything at once
 }
 function uploadCanvasImages() {
-    //This function gets all the selected images and uploads them at once
+    //This function gets all the data and selected images and uploads them at once
     //Get canvas array
     //Get form data as well and append it to the FormData object and send it
 
+    //Get input data
     var itemName = document.getElementById("itemname").value;
     var otherNames = document.getElementById("othernames").value;
     var category = document.getElementById("category").value;
     var description = document.getElementById("description").value
-    var fd = new FormData();
-    console.log(fd);
-    console.log("itemName: "+itemName);
-    console.log("otherNames: "+otherNames);
-    console.log("category: "+category);
-    console.log("description: "+description);
+    var fd = new FormData(); //Create form data element
 
+    //Append the input data to the Form Data object
     fd.append("ItemName", itemName);
     fd.append("OtherNames", otherNames);
     fd.append("Category", category);
     fd.append("Description", description);
 
+    //Get the images and append them recursively one after another
     var canvasArray = document.getElementById("up_imgs_container").getElementsByTagName("canvas");
     var index = 0;
-    //recursively append the images to fd
-    canvasArray[index].toBlob(function (blob) {
-        recursiveBlobCallback(canvasArray, index, fd, blob);
-    }, "image/jpeg", 0.4);
-
-
-
+    //Check if there are any images
+    if(canvasArray.length!==0) {
+        //There are some images
+        //recursively append the images to fd
+        canvasArray[index].toBlob(function (blob) {
+            recursiveBlobCallback(canvasArray, index, fd, blob);
+        }, "image/jpeg", 0.4);
+    }
+    else {
+        //There are no images. Upload just the form data
+        sendformdata(fd);
+    }
 }
 function recursiveBlobCallback(canvasArray, index, fd, blob) {
+    //This function appends the images to fd recursively
     fd.append("myFile[]", blob, "pic"+index+".jpg");
     console.log("Just appended file number: "+index);
 
@@ -593,16 +587,229 @@ function recursiveBlobCallback(canvasArray, index, fd, blob) {
         }, "image/jpeg", 1);
     } else {
         //Appending is done. Now send the files by AJAX
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if(this.readyState==4 && this.status==200) {
-                console.log("Upload was successful. Yay!");
-                console.log("The server says "+this.responseText);
-            } else {
-                console.log("readyState = " + this.readyState + "and status = "+this.status);
-            }
-        }
-        xhr.open("POST", "upload.php", true);
-        xhr.send(fd);
+
+        sendformdata(fd);
     }
 }
+function sendformdata(fd) {
+    //Sends form data to the server
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "document";
+    xhr.onreadystatechange = function () {
+        if(this.readyState==4 && this.status==200) {
+            //Return xml from the server instead INCOMPLETE LATER
+            //This way, it's easier to judge the completion status of the queries and determine success/failure
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            //Values of returnStatus range from 1 ~ 7. Each is defined in upload.php
+            var returnStatus = xmlDoc.getElementsByTagName('returnstatus')[0].childNodes[0].nodeValue;
+            returnStatus = parseInt(returnStatus);
+            //Split into (up to 7) cases.
+            if(returnStatus===0) {
+                //Everything went fine! Reload the page
+                console.log("Everything went fine!");
+                location.reload();
+            } else if(returnStatus===1) {
+                //A connection to the database couldn't be established
+                window.alert("A connection to the database could not be established. Please try again later");
+            } else if(returnStatus===2) {
+                window.alert("Some required fields are empty. Please submit all required data.");
+            } else if(returnStatus===5) {
+                //Illegal file type. Unlikely
+                window.alert("Unacceptable file type");
+            } else if(returnStatus===6){
+                //Oversize file
+                window.alert("One of the files you're trying to upload is bigger than 7 MB.");
+            } else {
+                console.log(returnStatus);
+                window.alert("There was a technical error with the server. Please try again later");
+            }
+        } else {
+            console.log("readyState = " + this.readyState + "and status = "+this.status);
+        }
+    }
+    xhr.open("POST", "upload.php", true);
+    xhr.send(fd);
+}
+function switch_panes (elmt) {
+    var dbeditor_form = document.getElementById("dbeditor_form");
+    var db_display = document.getElementById("db_display");
+
+    //if the add div is hidden, show it and hide the edit div
+    if(db_display.style.display=="none" || db_display.style.display=="") {
+        db_display.style.display="block";
+        dbeditor_form.style.display="none";
+        elmt.innerHTML="Add";
+    } else {
+        db_display.style.display="none";
+        dbeditor_form.style.display="block";
+        elmt.innerHTML="Edit";
+    }
+}
+var nodeList; //This way, other functions can access items using only the index appended to the html elements to look up
+//The item's data in the nodeList array
+function srch_dbfor_nondistinct_items() {
+    var query = document.getElementById("srch_div_input").value;
+    console.log("Query= "+query);
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "document";
+    xhr.onreadystatechange = function () {
+        if(this.readyState==4 && this.status==200) {
+            //Everything set
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+            if(return_status==0) { //Success.
+                //Extract the data from the document.
+                nodeList = xmlDoc.getElementsByTagName('Items')[0].getElementsByTagName('Item');
+                var display_div = document.getElementById('dsp_div'); //Container where the items will be put
+                display_div.innerHTML = "";
+                var count = 0;
+                for(count=0;count<nodeList.length;count++) {
+                    console.log(nodeList.length);
+                    console.log("Count: "+count);
+                    var elmt = document.createElement('div');
+                    elmt.class="dbedit_elmt";
+                    elmt.classList.add('item-slide');
+                    //click event listener to open modal
+                    elmt.onclick = function () { display_modal(this);  };
+                    elmt.index = count;
+                    var elmt2 = document.createElement('div');
+                    elmt2.class = "dsp_img";
+                    var img = document.createElement('img');
+                    img.src = nodeList[count].getElementsByTagName('images')[0].getElementsByTagName('imagedata')[0].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
+                    elmt2.appendChild(img);
+                    elmt.appendChild(elmt2);
+                    elmt2 = document.createElement('div');
+                    elmt2.class = "dsp_item_data";
+                    //Insert the itemdata in elmt2
+                    //Use a string
+                    //Start of table
+                    var innerhtml = "";
+                    innerhtml = "<table>";
+                    innerhtml += "<tr>"; //Row starts
+                    innerhtml += "<th>Item name: </th>";
+                    innerhtml += "<td>"+nodeList[count].getElementsByTagName('itemdata')[0].getElementsByTagName('itemname')[0].childNodes[0].nodeValue+"</td>";
+                    innerhtml += "</tr>"; //Row ends
+                    innerhtml += "<tr>"; //Row starts
+                    innerhtml += "<th>Other names: </th>";
+                    innerhtml += "<td>"+nodeList[count].getElementsByTagName('itemdata')[0].getElementsByTagName('aliases')[0].childNodes[0].nodeValue+"</td>";
+                    innerhtml += "</tr>"; //Row ends
+                    innerhtml += "<tr>"; //Row starts
+                    innerhtml += "<th>Category: </th>";
+                    innerhtml += "<td>"+nodeList[count].getElementsByTagName('itemdata')[0].getElementsByTagName('category')[0].childNodes[0].nodeValue+"</td>";
+                    innerhtml += "</tr>"; //Row ends
+                    innerhtml += "<tr>"; //Row starts
+                    innerhtml += "<th>Description: </th>";
+                    try {
+                        innerhtml += "<td>"+nodeList[count].getElementsByTagName('itemdata')[0].getElementsByTagName('description')[0].childNodes[0].nodeValue+"</td>";
+                    } catch (err) {
+                        innerhtml += "<td>No description</td>";
+                        console.log(err.message);
+                    }
+                    //PICKUP: Add onclick event to items to open edit modal
+                    innerhtml += "</tr>"; //Row ends
+                    innerhtml += "</table>";
+                    //End of table
+                    elmt2.innerHTML = innerhtml;
+                    elmt.appendChild(elmt2);
+                    display_div.appendChild(elmt);
+                }
+            } else if(return_status==1) {
+                console.log("No results were found");
+            }
+            else {
+                console.log("A problem occured. Details comin' up.");
+                console.log(return_status);
+            }
+        } else {
+            //Houston, we have a problem
+            console.log("readystate: "+this.readyState);
+            console.log("status :"+this.status);
+        }
+    }
+    xhr.open("POST", "Profiles/xhttp.php?table=editItems&q="+query, true);
+    xhr.send();
+}
+
+function getunits(itemID) {
+    //Function accesses database to retrieve all the Units associated with an item
+    //Returns an array with the units or null if no units at all
+    //Returns an xmlDoc array with units or FALSE otherwise
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "document";
+    xhr.onreadystatechange = function () {
+        if(this.readyState=4 && this.status==200) {
+            //Everything set
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+            if(return_status==0) { //Success.
+                //Extract the data from the document.
+                return xmlDoc;
+            } else if(return_status==1) {
+                console.log("No results were found");
+                return FALSE;
+            }
+            else {
+                console.log("A problem occured. Details comin' up.");
+                console.log(return_status);
+                return FALSE;
+            }
+        } else {
+            //Houston, we have a problem
+            console.log("readystate: "+this.readyState);
+            console.log("status :"+this.status);
+            return FALSE;
+        }
+    }
+    xhr.open("POST", "Profiles/xhttp.php?table=getUnits&ItemID="+itemID, true);
+    xhr.send();
+}
+function display_modal(elmt) {
+    //Fill in the data in the form in the modal using the nodeList array and the item's index
+    var index = elmt.index;
+    var modal = document.getElementById('db_modal');
+    //Put the info into the modal first
+    var elmt = document.getElementById('modal-content');
+    var db_image = document.getElementById('db_image');
+    var db_info = document.getElementById('db_info');
+    var db_units = document.getElementById('db_units');
+    var img = document.createElement('img');
+    var db_itemname = document.getElementById('db_itemname');
+    var db_othernames = document.getElementById('db_othernames');
+    var db_category = document.getElementById('db_category');
+    var db_description = document.getElementById('db_description');
+    //Insert the image into the modal
+    img.src = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata')[0].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
+    db_image.appendChild(img);
+    //Insert the data into the form elemnts' value
+    db_itemname.value = nodeList[index].getElementsByTagName('itemdata')[0].getElementsByTagName('itemname')[0].childNodes[0].nodeValue;
+    db_othernames.value = nodeList[index].getElementsByTagName('itemdata')[0].getElementsByTagName('aliases')[0].childNodes[0].nodeValue;
+    db_category.value = nodeList[index].getElementsByTagName('itemdata')[0].getElementsByTagName('category')[0].childNodes[0].nodeValue;
+    try {
+        db_description.value = nodeList[index].getElementsByTagName('itemdata')[0].getElementsByTagName('description')[0].childNodes[0].nodeValue;
+    } catch (err) {
+        db_description.value = "";
+    }
+    //Put images. All of them.
+    //First: get the images node array
+    var imgNodeList = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata');
+    var db_images = document.getElementById('db_images');
+    for(i=0;i<imgNodeList.length;i++) {
+        img = document.createElement('img');
+        img.src = imgNodeList[i].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
+        db_images.appendChild(img);
+    }
+    //Add a div for uploading more pictures
+    var db_img_upload = document.getElementById('db_img_up');
+    //PICKUP
+    //Display the modal
+    modal.style.display="block";
+}
+//Caution:
+//I've used a about 3 different node list arrays, all with global scope. Hope they don't get mixed up.
+//PROGRESS TAGS
+//1. LATER
+//2. INCOMPLETE
+//3. PICKUP. Tags function being worked upon until its completion

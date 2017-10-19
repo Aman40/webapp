@@ -645,12 +645,54 @@ span.psw {
     height: 100%;
     font-size: 1.2em;
 }
-#dbeditor_form{
+#dbeditor_form, #db_display, #dbinfo form {
     width:800px;
     background-color: lightblue;
     min-height: 100%;
-    margin:5px auto;
+    margin:0px auto;
+    padding: 10px;
 }
+#dbinfo form
 
-
+#db_display {
+    display: block;
+}
+#ctrl_div {
+    display: block;
+}
+#srch_div {
+    display: block;
+    margin: 0px 10px;
+}
+#srch_div input {
+    display: inline-block;
+    width:80%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    height: 43px;
+}
+#srch_div button {
+    display: inline-block;
+    width: 18%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+#dsp_div {
+    display: block;
+    padding: 10px;
+}
+.dbedit_elmt {
+    background-color: darkgray;
+}
+.dsp_item_data {
+    display: block;
+}
+#db_modal .modal-content {
+    width: 80%;
+}
+#db_image img {
+    margin: 0px auto;
+}
 

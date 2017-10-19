@@ -490,7 +490,7 @@ function _selected($var) {
 </div> <!--This is the form for editing the user info-->
 <!--Script4-->
 <iframe name="hidden_iframe" style="display:none"></iframe>
-<div class="modal" onclick="this.style.display='none'" id="editAddItem">
+<div class="modal" id="editAddItem">
     <span onclick="document.getElementById('editAddItem').style.display='none'" class="close" title="Close Modal">×</span>
     <div id="eAI-1" class="modal-content animate">
         <div id="eAI-11">

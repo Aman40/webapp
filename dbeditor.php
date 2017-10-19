@@ -33,7 +33,7 @@ include "include.php";
             </div><!--r1c2r1-->
             <div id="r1c2r2"><!--Insert an unorered list here for the menu-->
                 <div id="hor-menu">
-
+                    <a id="itm_add" href="#" onclick="switch_panes(this)">Add</a>
                 </div><!--hor-menu-->
 
             </div><!--r1c2r2-->
@@ -61,10 +61,18 @@ include "include.php";
 
             </div>
         </div>
-        <script>
-
-
-        </script>
+        <div id="db_display"><!--This displays all the items by default. Select a disired item to edit in a modal-->
+            <!--Or search for item name or group name to edit in modal-->
+            <div id="ctrl_div"><!--The control with the search button and display controls, if any-->
+                <div id="srch_div">
+                    <input id="srch_div_input" type="text" placeholder="Search the catalog...">
+                    <button onclick="srch_dbfor_nondistinct_items()">Search</button>
+                </div>
+            </div>
+            <div id="dsp_div"><!--The display div where the items are displayed. The real editing happens in a modal-->
+                Display here
+            </div>
+        </div>
     </div> <!--row-2-->
     <div id="row-3"> <!--This will contain the footer-->
         <div id="r3-overlay"><!--Totally empty!-->
@@ -74,6 +82,37 @@ include "include.php";
         </div>
     </div><!--row-3-->
 </div><!--Main wrapper-->
+<div id="db_modal" class="modal">
+    <div class="modal-content">
+        <span class="close">X</span>
+        <div id="db_image"><!--This is for the image-->
+
+        </div>
+        <div id="db_info"><!--This is for the info-->
+            <form>
+                <label>Item name:</label><br>
+                <input type="text" name="ItemName" id="db_itemname"><br>
+                <label>Other names:</label>
+                <input type="text" name="OtherNames" id="db_othernames">
+                <label>Category</label>
+                <input type="text" name="Category" id="db_category">
+                <label>Description:</label>
+                <input type="text" name="Description" id="db_description">
+            </form>
+
+        </div id="db_units">
+        <div><!--For the units-->
+
+        </div>
+        <div id="db_images"><!--Display all the item's images here and add an option for adding more images-->
+
+        </div>
+        <div id="db_img_up">
+            <label>Images:</label><br>
+            <input type="file" id="db_imgs_up" multiple onchange="display_item_images(this)">
+        </div>
+    </div>
+</div>
 
 <!--*************************************************************************-->
 <script src="Profiles/index.js"></script>
@@ -93,6 +132,16 @@ include "include.php";
             modalin.style.display = "none";
         } else if (event.target === modalOrder){
             modalOrder.style.display = "none";
+        }
+    }
+    function editdiv() {
+        var row2 = document.getElementById('row-2');
+        var row22 = document.getElementById('row-22');
+        if(row2.style.display == "none" || row2.style.display == "") {
+            row2.style.display = "block";
+            row22.style.display = "none";
+        } else {
+            row22.style.display = "";
         }
     }
 </script>

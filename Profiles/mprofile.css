@@ -855,7 +855,10 @@ h3.dash_item_name {
     min-height: 600px;
     background-color: #fff;
 }
-
+#profile_table {
+    width: 100%;
+    margin: 0 auto;
+}
 
 
 

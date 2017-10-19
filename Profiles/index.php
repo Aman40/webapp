@@ -32,7 +32,7 @@ include "../include.php";
                                             echo '<img src="../icons/profile-pic-male.jpg">';
                                         }
                                     ?>
-								</div><!--prof-picimg-->
+								</div><!--prof-pic-img-->
 								<div id="prof-pic-name">
 									<?php
 										if($session_exists) {
