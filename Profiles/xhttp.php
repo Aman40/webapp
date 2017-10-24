@@ -38,6 +38,9 @@ else { //User is not logged in. I.e the fmh main dashboard.
     else if($table=="editItems") {
         _searchCatalog($table, "");
     }
+    else if($table=="allUnits") {
+        _searchCatalog($table, "");
+    }
     else {
         echo "<status>11</status>";
     }
@@ -378,7 +381,7 @@ function _searchCatalog($table, $UserID) {
             }
             _getuserinfo($userid);
         }
-        else if ($table='editItems') { //table
+        else if ($table=='editItems') { //table
             //Fetch multiple rows. Each item with its own units and images and put them all in one XML
             //Get the query
             $var = filter($_REQUEST['q']);
@@ -416,9 +419,8 @@ function _searchCatalog($table, $UserID) {
                 echo "<status>2</status>"; //No results found
                 echo "<errormsg>.$conn->error.</errormsg>";
             }
-            $conn->close(); //Close the connection
         }
-        else if($table='getUnits') {
+        else if($table=='getUnits') {
             //Should return the set of units for a particular item
             //First, get the ItemID for the Item
             if(isset($_REQUEST['ItemID'])) {
@@ -472,7 +474,47 @@ function _searchCatalog($table, $UserID) {
                 echo "<status>2</status>";
             }
         }
-        //There's no problem in trying to close an already closed connection
+        else if($table=='allUnits') {
+            //Should return all the units in the Units table for matching with Items
+            $sql = "SELECT
+            * FROM Units
+            ";
+            $result = $conn->query($sql);
+            if($result!=FALSE) {
+                //Query was successful
+                //Extract and XML encode
+                $reply = "<Units>";
+                if($result->num_rows>0) {
+                    //Found some results
+                    echo "<status>0</status>";
+                    while($row = $result->fetch_assoc()) {
+                        $reply.="<Unit>";
+                        $reply.="<UnitID>".$row['UnitID']."</UnitID>";
+                        $reply.="<UnitName>".$row['Name']."</UnitName>";
+                        $reply.="<NamePlural>".$row['NamePlural']."</NamePlural>";
+                        $reply.="<Symbol>".$row['Symbol']."</Symbol>";
+                        $reply.="<Minimum>".$row['Minimum']."</Minimum>";
+                        $reply.="<Maximum>".$row['Maximum']."</Maximum>";
+                        $reply.="<Fractions>".$row['Fractions']."</Fractions>";
+                        $reply.="<SI>".$row['SI']."</SI>";
+                        $reply.="</Unit>";
+                    }
+                    //close reply and send
+                    $reply.="</Units>";
+                    echo $reply;
+
+                } else {
+                    //No results found
+                    //Return appropriate return status
+                    echo "<status>1</status>";
+                }
+            } else {
+                //Query failed
+                //Return corresponding return status in xml
+                echo "<status>2</status>";
+            }
+        }
+        //There's no problem in trying to close an already closed connection. It generates an error but that's all.
         $conn->close();
     }
     else {

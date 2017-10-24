@@ -100,8 +100,15 @@ include "include.php";
                 <input type="text" name="Description" id="db_description">
             </form>
 
-        </div id="db_units">
-        <div><!--For the units-->
+        </div >
+
+        <div id="db_units"><!--For the units-->
+            <div id="db_units_all">
+                <!--Displays all the current units-->
+            </div>
+            <div id="db_units_selected">
+                <!--Displays the units selected for the item being edited-->
+            </div>
 
         </div>
         <div id="db_images"><!--Display all the item's images here and add an option for adding more images-->

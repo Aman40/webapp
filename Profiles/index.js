@@ -597,8 +597,6 @@ function sendformdata(fd) {
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
         if(this.readyState==4 && this.status==200) {
-            //Return xml from the server instead INCOMPLETE LATER
-            //This way, it's easier to judge the completion status of the queries and determine success/failure
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             //Values of returnStatus range from 1 ~ 7. Each is defined in upload.php
@@ -707,7 +705,6 @@ function srch_dbfor_nondistinct_items() {
                         innerhtml += "<td>No description</td>";
                         console.log(err.message);
                     }
-                    //PICKUP: Add onclick event to items to open edit modal
                     innerhtml += "</tr>"; //Row ends
                     innerhtml += "</table>";
                     //End of table
@@ -739,7 +736,7 @@ function getunits(itemID) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState=4 && this.status==200) {
+        if(this.readyState==4 && this.status==200) {
             //Everything set
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
@@ -760,7 +757,6 @@ function getunits(itemID) {
             //Houston, we have a problem
             console.log("readystate: "+this.readyState);
             console.log("status :"+this.status);
-            return FALSE;
         }
     }
     xhr.open("POST", "Profiles/xhttp.php?table=getUnits&ItemID="+itemID, true);
@@ -768,13 +764,14 @@ function getunits(itemID) {
 }
 function display_modal(elmt) {
     //Fill in the data in the form in the modal using the nodeList array and the item's index
+    //Then display the modal and call the listunits() function
     var index = elmt.index;
     var modal = document.getElementById('db_modal');
     //Put the info into the modal first
     var elmt = document.getElementById('modal-content');
     var db_image = document.getElementById('db_image');
     var db_info = document.getElementById('db_info');
-    var db_units = document.getElementById('db_units');
+    var db_units_all = document.getElementById('db_units_all');
     var img = document.createElement('img');
     var db_itemname = document.getElementById('db_itemname');
     var db_othernames = document.getElementById('db_othernames');
@@ -803,9 +800,159 @@ function display_modal(elmt) {
     }
     //Add a div for uploading more pictures
     var db_img_upload = document.getElementById('db_img_up');
-    //PICKUP
     //Display the modal
     modal.style.display="block";
+    listunits();
+}
+var allUnitsList;
+function listunits() {
+    //Accesses the database from the xhttp script using table="allUnits"
+    //Then lists the Units' names and symbols in the div id-d "db_units_all" for selection
+    var db_units_all = document.getElementById('db_units_all');
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "document";
+    xhr.onreadystatechange = function () {
+        if(this.readyState==4 && this.status==200) {
+            //Everything set
+            var xmlDoc = this.responseXML;
+            console.log("Units:");
+            console.log(xmlDoc);
+            var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+            if(return_status==0) { //Success.
+                //Extract the data from the document and build the table
+                var db_units_all = document.getElementById('db_units_all');
+                allUnitsList = xmlDoc.getElementsByTagName('Unit');
+                //Create an html table in a string and post it into a div in db_units_all
+                var html = "";
+                html="<table>";
+                html+="<tr>";
+                html+="<th>Unit Name</th><th>Symbol</th>";
+                html+="</tr>";
+                for(i=0;i<allUnitsList.length;i++) {
+                    html+="<tr onclick='selectunit("+i+")'>"; //Each row in the table is tagged with its index in the units array
+                    //INCOMPLETE until I write the selectunit(index) function to select the unit for the item;
+                    html+="<td>";
+                    html+=allUnitsList[i].getElementsByTagName("NamePlural")[0].childNodes[0].nodeValue;
+                    html+="</td>";
+                    html+="<td>";
+                    try {
+                        html+=allUnitsList[i].getElementsByTagName("Symbol")[0].childNodes[0].nodeValue;
+                    } catch (err) {
+                        console.log(err.message);
+                        html+="N/A";
+                    }
+                    html+="</td>";
+                    html+="</tr>";
+                }
+                html+="</table>";
+                db_units_all.innerHTML = html;
+            } else if(return_status==1) {
+                console.log("No results were found");
+            }
+            else {
+                console.log("A problem occured. Details comin' up.");
+                console.log(return_status);
+            }
+        } else {
+            //Houston, we have a problem
+            console.log("readystate: "+this.readyState);
+            console.log("status :"+this.status);
+        }
+
+    }
+    xhr.open("POST", "Profiles/xhttp.php?table=allUnits");
+    xhr.send();
+}
+//Global array to hold the indices of the selected Units
+var selectedUnits = [];
+function selectunit(index) {
+    //This function is called when a user clicks on one of the units to select it for an item
+    //the single parameter, index is an integer representing the unit's index in the global array allUnitsList
+    //Check first if the index is already in the array before adding
+    if(!selectedUnits.contains(index)) {
+        //If it doesn't contain the index. Add it.
+        selectedUnits.push(index);
+        //Reload the table in the db_units_selected
+        var db_units_selected = document.getElementById('db_units_selected');
+        //Create an html table in a string and post it into a div in db_units_all
+        var html = "";
+        html="<table>";
+        html+="<tr>";
+        html+="<th>Unit Name</th><th>Symbol</th>";
+        html+="</tr>";
+        for(i=0;i<selectedUnits.length;i++) {
+            html+="<tr onclick='unselectunit("+i+")'>"; //Each row in the table is tagged with its index in the units array
+            //INCOMPLETE until I write the selectunit(index) function to select the unit for the item;
+            html+="<td>";
+            html+=allUnitsList[selectedUnits[i]].getElementsByTagName("NamePlural")[0].childNodes[0].nodeValue;
+            html+="</td>";
+            html+="<td>";
+            try {
+                html+=allUnitsList[selectedUnits[i]].getElementsByTagName("Symbol")[0].childNodes[0].nodeValue;
+            } catch (err) {
+                console.log(err.message);
+                html+="N/A";
+            }
+            html+="</td>";
+            html+="</tr>";
+        }
+        html+="</table>";
+        db_units_selected.innerHTML = html;
+    }
+}
+function unselectunit(index) {
+    //This function is called when the user clicks on
+    //Check if the index is in the array selectedUnits[]. Remove it. Reload the table.
+    if(selectedUnits.contains(selectedUnits[index])) {
+        //Remove the value from the array. Prototype an Array() function for that
+        selectedUnits = selectedUnits.remove(index);
+        //Reload the db_units_selected div
+        var db_units_selected = document.getElementById('db_units_selected');
+        //Create an html table in a string and post it into a div in db_units_all
+        var html = "";
+        html="<table>";
+        html+="<tr>";
+        html+="<th>Unit Name</th><th>Symbol</th>";
+        html+="</tr>";
+        for(i=0;i<selectedUnits.length;i++) {
+            html+="<tr onclick='unselectunit("+i+")'>"; //Each row in the table is tagged with its index in the units array
+            //INCOMPLETE until I write the selectunit(index) function to select the unit for the item;
+            html+="<td>";
+            html+=allUnitsList[selectedUnits[i]].getElementsByTagName("NamePlural")[0].childNodes[0].nodeValue;
+            html+="</td>";
+            html+="<td>";
+            try {
+                html+=allUnitsList[selectedUnits[i]].getElementsByTagName("Symbol")[0].childNodes[0].nodeValue;
+            } catch (err) {
+                console.log(err.message);
+                html+="N/A";
+            }
+            html+="</td>";
+            html+="</tr>";
+        }
+        html+="</table>";
+        db_units_selected.innerHTML = html;
+    }
+}
+//Adding a method to the Array object to check if a certain value is in the array
+Array.prototype.contains = function (value) { //Checks whether the array contains the given value
+    for(i=0;i<this.length;i++) {
+        if(this[i]==value) {
+            return true;
+        }
+    }
+    return false;
+}
+Array.prototype.remove = function (index) { //removes the value corresponding to the given index and returns a new array
+    console.log(index);
+    var arr = []; //New temporary array
+    for(i=0;i<this.length;i++) {
+        if(i!=index) {
+            //Move to the new array
+            arr.push(this[i]);
+        }
+    }
+    return arr;
 }
 //Caution:
 //I've used a about 3 different node list arrays, all with global scope. Hope they don't get mixed up.
@@ -813,3 +960,9 @@ function display_modal(elmt) {
 //1. LATER
 //2. INCOMPLETE
 //3. PICKUP. Tags function being worked upon until its completion
+
+//GLOBAL VARIABLES
+//1. allUnitsList
+//2. itemNodeList
+//3. itemNodeListr
+//4. selectedUnits Contains indices of seleced units

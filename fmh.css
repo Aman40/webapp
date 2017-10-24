@@ -655,7 +655,7 @@ span.psw {
 #dbinfo form
 
 #db_display {
-    display: block;
+    display: none;
 }
 #ctrl_div {
     display: block;
@@ -691,8 +691,41 @@ span.psw {
 }
 #db_modal .modal-content {
     width: 80%;
+    padding: 5px;
 }
 #db_image img {
     margin: 0px auto;
 }
-
+#db_units table tr {
+    cursor: hand;
+}
+#db_units table {
+    width: 100%;
+}
+#db_units table tr:hover {
+    background-color: gray;
+}
+#db_units {
+    display: flex;
+}
+#db_units_all, #db_units_selected {
+    box-shadow: inset 0px 0px 5px grey;
+    width: 49%;
+    padding: 5px;
+    background-color: antiquewhite;
+    min-height: 380px;
+    display: inline-block;
+    margin:auto;
+}
+#db_units_selected {
+    height: inherit;
+}
+#db_images {
+    padding: 5px;
+}
+#db_img_up {
+    min-height: 400px;
+}
+#db_info {
+    padding: 10px;
+}
