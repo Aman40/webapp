@@ -578,7 +578,12 @@ function cmp_itemid($reply, $result, $row1) {
         return $reply;
     }
 }
-
+//Return Statuses summary
+//0. Query was successful, results were found
+//1. Query was successful, results not found
+//2. Query was unsuccessful
+//3. Connection to database failed
+//11. Context "table" not set. Programmer error
 //Flags for improvement and completion
 //1. INCOMPLETE
 //2. LATER

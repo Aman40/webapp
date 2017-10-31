@@ -4,11 +4,7 @@ function _checkenterkey(event) {
         event.preventDefault();
         try {
             _searchdb(document.getElementById('srchdemo').value);
-            console.log("Desktop version accessing the function.");
         } catch(err) {
-            console.log(err.message);
-            console.log("Mobile version accessing the function.")
-            console.log(document.getElementById('search-input'));
             _searchdb(document.getElementById('search-input').value);
         }
     }
@@ -489,11 +485,20 @@ function change_view() {
     }
 }
 
-function display_item_images (input_elmt) {
+function display_item_images (input_elmt, context) {
     //trigger this function with onchange event handler on input button
     //This funciton displays the images and upon clicking on each of the images, editing should be possible. //LATER
+    //Context is the string that tells whether the function is called during adding or editing of an item
+    //This determines the div in which we draw the canvas images
     var file_array = input_elmt.files;
-    var imgs_container = document.getElementById('up_imgs_container')
+    if(context==='add') {
+        //Adding an Item
+        var imgs_container = document.getElementById('up_imgs_container');
+    } else {
+        //Editing
+        var imgs_container = document.getElementById('db_img_up_dsp');
+    }
+
     recursive_image_loader(0, file_array, imgs_container);
 
 }
@@ -543,8 +548,9 @@ function showImageInCanvas(img, imgs_container) {
 }
 function uploadCanvasImages() {
     //This function gets all the data and selected images and uploads them at once
-    //Get canvas array
-    //Get form data as well and append it to the FormData object and send it
+    //It's used when adding an element
+    //1. Get form data as well and append it to the FormData object and send it
+    //2. Get canvas array
 
     //Get input data
     var itemName = document.getElementById("itemname").value;
@@ -567,15 +573,76 @@ function uploadCanvasImages() {
         //There are some images
         //recursively append the images to fd
         canvasArray[index].toBlob(function (blob) {
-            recursiveBlobCallback(canvasArray, index, fd, blob);
+            recursiveBlobCallback(canvasArray, index, fd, blob, "add");
         }, "image/jpeg", 0.4);
     }
     else {
         //There are no images. Upload just the form data
-        sendformdata(fd);
+        sendformdata(fd, "add");
     }
 }
-function recursiveBlobCallback(canvasArray, index, fd, blob) {
+function editUploadCanvasImages(index) {
+    //This function gets all the data and selected images and uploads them at once
+    //It's used when editing an element
+    //Get form data as well and append it to the FormData object and send it
+    //Get canvas array
+
+    //Get input data
+    var itemName = document.getElementById("db_itemname").value;
+    var otherNames = document.getElementById("db_othernames").value;
+    var category = document.getElementById("db_category").value;
+    var description = document.getElementById("db_description").value
+    console.log(index);
+    console.log("NodeList");
+    console.log(nodeList[index].getElementsByTagName("itemid")[0]);
+    var itemID = nodeList[index].getElementsByTagName("itemid")[0].childNodes[0].nodeValue;
+    console.log(itemID);
+    var fd = new FormData(); //Create form data element
+
+    //Append the input data to the Form Data object
+    fd.append("ItemName", itemName);
+    fd.append("OtherNames", otherNames);
+    fd.append("Category", category);
+    fd.append("Description", description);
+    fd.append("ItemID", itemID);
+
+    //Get the Units data and append it to the fd. INCOMPLETE until I modify the upload.php script to accept the Units data
+    //Get the Units data from two arrays: 1. The selectedUnits array which contains the indices of the selected Units
+    //In the allUnitsList - an array that contains XML objects with Units' details
+    var obj = {};
+    var arr = [];
+    if(selectedUnits.length>0) {
+        //Some Units have been selected for an given Item. Append them to a JS Object
+
+        for(i=0;i<selectedUnits.length;i++) {
+            //Read the units into an array. JS object, then parse the object into a JSON string.
+            arr.push(allUnitsList[selectedUnits[i]].getElementsByTagName('unitid')[0].childNodes[0].nodeValue);
+        }
+
+    }
+    //Append the array into an object and stringify it into JSON to append to the form
+    obj["unitsarr"] = arr;
+    var jsn = JSON.stringify(obj);
+    console.log(typeof (jsn)+jsn);
+    fd.append("units", jsn);
+
+    //Get the images and append them recursively one after another
+    var canvasArray = document.getElementById("db_img_up_dsp").getElementsByTagName("canvas");
+    var index = 0;
+    //Check if there are any images
+    if(canvasArray.length!==0) {
+        //There are some images
+        //recursively append the images to fd
+        canvasArray[index].toBlob(function (blob) {
+            recursiveBlobCallback(canvasArray, index, fd, blob, "edit");
+        }, "image/jpeg", 0.4);
+    }
+    else {
+        //There are no images. Upload just the form data
+        sendformdata(fd, "edit");
+    }
+}
+function recursiveBlobCallback(canvasArray, index, fd, blob, context) {
     //This function appends the images to fd recursively
     fd.append("myFile[]", blob, "pic"+index+".jpg");
     console.log("Just appended file number: "+index);
@@ -583,15 +650,18 @@ function recursiveBlobCallback(canvasArray, index, fd, blob) {
     if(index<(canvasArray.length-1)) {
         //There are still files in the array
         canvasArray[index+1].toBlob(function (blob) {
-            recursiveBlobCallback(canvasArray, index+1, fd, blob);
+            recursiveBlobCallback(canvasArray, index+1, fd, blob, context);
         }, "image/jpeg", 1);
     } else {
         //Appending is done. Now send the files by AJAX
 
-        sendformdata(fd);
+        sendformdata(fd, context);
     }
 }
-function sendformdata(fd) {
+function sendformdata(fd, context) {
+    //context tells which function is accessing the serverside script so that it
+    //knows what functions to call. Two contexts exist so far. "add" for when the function is called to add an item to
+    // the database and "edit" for when the funciton is called to edit an already existing item
     //Sends form data to the server
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
@@ -618,7 +688,8 @@ function sendformdata(fd) {
             } else if(returnStatus===6){
                 //Oversize file
                 window.alert("One of the files you're trying to upload is bigger than 7 MB.");
-            } else {
+            }
+            else {
                 console.log(returnStatus);
                 window.alert("There was a technical error with the server. Please try again later");
             }
@@ -626,7 +697,7 @@ function sendformdata(fd) {
             console.log("readyState = " + this.readyState + "and status = "+this.status);
         }
     }
-    xhr.open("POST", "upload.php", true);
+    xhr.open("POST", "upload.php?context="+context, true);
     xhr.send(fd);
 }
 function switch_panes (elmt) {
@@ -777,6 +848,11 @@ function display_modal(elmt) {
     var db_othernames = document.getElementById('db_othernames');
     var db_category = document.getElementById('db_category');
     var db_description = document.getElementById('db_description');
+    //Get the span element and add to it an onclick event with the elmt as a parameter
+    var up_btn = document.getElementById("db_up_btn");
+    up_btn.addEventListener("click", function () {
+        editUploadCanvasImages(index);
+    })
     //Insert the image into the modal
     img.src = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata')[0].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
     db_image.appendChild(img);
@@ -960,9 +1036,14 @@ Array.prototype.remove = function (index) { //removes the value corresponding to
 //1. LATER
 //2. INCOMPLETE
 //3. PICKUP. Tags function being worked upon until its completion
+//4. URGENT. The code might not work without fixing this and I'm forgetful
 
 //GLOBAL VARIABLES
 //1. allUnitsList
 //2. itemNodeList
 //3. itemNodeListr
 //4. selectedUnits Contains indices of seleced units
+//5. nodeList: Nodes for when searching to edit the items
+
+//URGENT: When the user clicks editUploadCanvasImages(), get the the so far available units
+//And update the selectedUnits variable

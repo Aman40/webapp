@@ -1,14 +1,93 @@
 <?php
 include "customErrorHandler.php";
 set_error_handler("customErrorHandler");
-$itemName = get_if_set('ItemName');
-$otherNames = get_if_set('OtherNames');
-$category = get_if_set('Category');
-$description = get_if_set('Description');
-add_item_details($itemName, $otherNames, $category, $description);
-echo "<msg>....FILES has ".count($_FILES)." files</msg>";
-echo "<msg>POST has ".count($_POST)." files....</msg>";
+//Get context above all
+if(isset($_REQUEST['context'])) {
+    $context = $_REQUEST['context'];
+} else {
+    //WTF is happening?
+    echo "<msg>Context wasn't set</msg>";
+    die("<returnstatus>9</returnstatus>");
+}
+//Now check if the value is coherent with what's expected
+if($context=="add") {
+    //Trying to add item to db
+    //Get the item details
+    $itemName = get_if_set('ItemName');
+    $otherNames = get_if_set('OtherNames');
+    $category = get_if_set('Category');
+    $description = get_if_set('Description');
+    add_item_details($itemName, $otherNames, $category, $description);
+} else if($context=="edit") {
+    //Trying to edit already existing item
+    $itemName = get_if_set('ItemName');
+    $otherNames = get_if_set('OtherNames');
+    $category = get_if_set('Category');
+    $description = get_if_set('Description');
+    $itemID = get_if_set('ItemID');
+    echo "<msg>The ItemID=".$itemID."</msg>";
+    edit_item_details($itemID, $itemName, $otherNames, $category, $description); //Then call upload_units() here
+    //or in after success of edit_item_details?
+} else {
+    die("<returnstatus>9</returnstatus>");
+}
 
+//Add a function to upload the units
+function upload_units($ItemID) {
+    //Get the units from the $_REQUEST global. Problem is, their number is uncertain
+    //Extract the units from the array by parsing the JSON string.
+    //$_POST has one more key, "units" whose value is the JSON
+    //The JSON has one key, "unitsarr", an array containing all the units for the item,
+    //Or an empty string if no units were selected. In that case, add nothing to the db.
+    //JavaScript your way out of that.
+    if(isset($_POST["units"])) {
+        //It's hard coded, so it almost certainly should be set, except in an attempt to break the system
+        if($_POST["units"]!="") {
+            //Some units are appended
+            $json = json_decode($_POST["units"], true);
+            //Now we have an assoc array with one key, "unitsarr" whose value is an indexed array
+            //Get the indexed array into $arr
+            $arr = $json["unitsarr"];
+            //Open connection. Remember to close it later
+            $servername = "localhost";
+            $username = "aman";
+            $dbname = "test";
+            $passwd = "password";
+            $conn = new mysqli($servername, $username, $passwd, $dbname);
+            if(!$conn->connect_error) {
+                //Connection successful. Proceed
+                echo "<itemid>".$ItemID."</itemid>";
+                for($i=0;$i<count($arr);$i++) {
+                    $sql = "INSERT INTO UnitsJunct (ItemID, UnitID) VALUES ('".$ItemID."', '".$arr[$i]."')";
+                    $result = $conn->query($sql);
+                    echo "<err>".$conn->error."</err>";
+                    echo "<err>".$result."</err>";
+                    if(!$result) {
+                        //If any of the queries fails.
+                        //Unlikely but what to do if only one of the queries fails? Roll back everything? LATER
+                        //Report how many of the queries completed and die
+                        echo "<msg>Only ".$i." of the ".count($arr)." queries completed successfully.</msg>";
+                        die("<returnstatus>8</returnstatus>"); //End the script here
+                    }
+                }
+                //At this point, all the queries have completed successfully. Return the appropriate status
+                echo "<msg>Units inserted successfully.</msg>";
+                echo "<returnstatus>0</returnstatus>";
+            } else {
+                //Connection failed. Return appropriate status in XML
+                echo "<returnstatus>1</returnstatus>";
+            }
+            $conn->close();
+        } else {
+            //Empty string. No units. End here
+            echo "<msg>No units to append. Finished successfully.</msg>";
+            echo "<returnstatus>0</returnstatus>";
+        }
+
+    } else {
+        die ("<returnstatus>9</returnstatus>");
+    }
+}
 function add_item_details($itemName, $otherNames, $category, $description) {
     $servername = "localhost";
     $username = "aman";
@@ -27,6 +106,9 @@ function add_item_details($itemName, $otherNames, $category, $description) {
             if(count($_FILES)!==0){
                 //Check that any files are appended. If yes, upload them
                 upload_pics($itemID);
+                //If there's any error, the function won't return and will kill the script. Function doesn't return
+                // returnstatus 0
+                echo "<returnstatus>0</returnstatus>";
             } else {
                 //Else, end it here returning a 0 return status.
                 echo "<msg>Successfully completed. No files appended.</msg>";
@@ -48,6 +130,48 @@ function add_item_details($itemName, $otherNames, $category, $description) {
     }
     $conn->close();
 }
+function edit_item_details($itemID, $itemName, $otherNames, $category, $description) {
+    $servername = "localhost";
+    $username = "aman";
+    $dbname = "test";
+    $passwd = "password";
+
+    $conn = new mysqli($servername, $username, $passwd, $dbname);
+    if(!$conn->connect_error) {
+        //Successfully connected
+        $sql = "UPDATE Items
+                SET ItemName='".$itemName."', 
+                Aliases='".$otherNames."', 
+                Category='".$category."', 
+                Description='".$description."'
+                WHERE ItemID='".$itemID."'";
+        if($conn->query($sql)===TRUE) {
+            //The query successfully completed. Now let's upload the files, if any
+            echo "<msg>The item was successfully added to the database.</msg>";
+            //Add files. And maybe the units?
+            if(count($_FILES)!==0){
+                //Check that any files are appended. If yes, upload them
+                upload_pics($itemID);
+                upload_units($itemID);
+            } else {
+                //Else, end it here returning a 0 return status.
+                echo "<msg>Successfully completed. No files appended.</msg>";
+                upload_units($itemID);
+            }
+        }
+        else {
+            //The query was unsuccessful
+            echo "<msg>The query was unsuccessful.</msg>";
+            die("<returnstatus>4</returnstatus>");
+        }
+    }
+    else {
+        //Problems with connection LATER. INCOMPLETE
+        echo "<msg>There was a problem connecting to the database</msg>";
+        die("<returnstatus>1</returnstatus>");
+    }
+    $conn->close();
+}
 function upload_pics($ItemID) {
     $directory = "/var/www/html/HTML/uploads";
     for ($i=0; $i<count($_FILES['myFile']['name']); $i++) {
@@ -58,20 +182,16 @@ function upload_pics($ItemID) {
         if($extension!="jpg" && $extension!="gif" && $extension!="png") {
             $uploadOK = 0;
             if($extension=="sh") {
-                echo "<msg>Fuck off! Nobody's falling for that!;</msg>";
-                trigger_error("Intrusion attempt detected");
+                die("<msg>Fuck off! Nobody's falling for that!</msg>");
             } else {
                 echo "<msg>Illegal file type.</msg>";
                 echo "<returnstatus>5</returnstatus>";
-                trigger_error("Illegal file type");
             }
         }
         //check it's the right size
         if ($_FILES['myFile']['size'][$i] >= 7000000) {
-            $uploadOK = 0;
             echo "<msg>Oversized file.</msg>";
-            echo "<returnstatus>6</returnstatus>";
-            trigger_error("Oversized file");
+            die("<returnstatus>6</returnstatus>");
         }
         //upload
         if($uploadOK == 1) {
@@ -82,16 +202,14 @@ function upload_pics($ItemID) {
 
                 add_to_db($ItemID, $ImageID, "/HTML/uploads/".$ImageID.".jpg"); //MACHINE SPECIFIC
                 echo "<msg>Your file has been uploaded successfully;</msg>";
-                echo "<returnstatus>0</returnstatus>"; //File successfully uploaded
             } else {
                 //File couldn't be moved
                 echo "<msg>File couldn't be moved from temporary location. Permission or ownership crap!</msg>";
-                echo "<returnstatus>7</returnstatus>";
-                trigger_error("The file couldn't be moved");
+                die("<returnstatus>7</returnstatus>");
             }
         } else {
-            echo "<msg>There was an error uploading your file;</msg>";
-            trigger_error("The file couldn't meet the required specifications");
+            echo "<msg>There was an unspecified error uploading your file;</msg>";
+            die("<returnstatus>11</returnstatus>");
         }
     }
 }
@@ -129,9 +247,7 @@ function get_if_set($var) {
     if(isset($_REQUEST[$var])) {
         return filter($_REQUEST[$var]);
     } else {
-        echo "<returnstatus>3</returnstatus>";
-        trigger_error($var." is not set!"); //There sure is a better way. INCOMPLETE; LATER.
-        return null;
+        die("<returnstatus>3</returnstatus>");
     }
 }
 function filter($entry) {
@@ -141,7 +257,6 @@ function filter($entry) {
     $entry = stripslashes($entry);
     return $entry; //Sanitized input
 }
-
 //Summary of returnStatus
 //0 File upload successful. Both queries successful.
 //1 connection to the database could not be established
@@ -151,3 +266,6 @@ function filter($entry) {
 //5 Illegal file type
 //6 Oversize file
 //7 Couldn't move file perhaps due to permission issues.
+//8 One or more queries on the UnitsJunct table failed
+//9 Active attempted system malice because missing value is hard-coded and shouldn't be missing or other than expected
+//11 There was an unspecified error uploading the file.

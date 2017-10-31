@@ -52,7 +52,7 @@ include "include.php";
                 <label>Description:</label>
                 <input type="text" name="Description" id="description">
                 <label>Images:</label><br>
-                <input type="file" id="upload_item_images" multiple onchange="display_item_images(this)">
+                <input type="file" id="upload_item_images" multiple onchange="display_item_images(this, 'add')">
             </form>
             <div id="show_progress">
                 <span onclick="uploadCanvasImages()" style="height:30px; background-color: burlywood; cursor:pointer;">Click to upload</span>
@@ -115,8 +115,15 @@ include "include.php";
 
         </div>
         <div id="db_img_up">
-            <label>Images:</label><br>
-            <input type="file" id="db_imgs_up" multiple onchange="display_item_images(this)">
+            <div id="db_img_up_ctr">
+                <label>Images:</label><br>
+                <input type="file" id="db_imgs_up" multiple onchange="display_item_images(this, 'edit')">
+                <span id="db_up_btn" style="height:30px; background-color: burlywood; cursor:pointer;">Click to upload</span>
+            </div>
+            <div id="db_img_up_dsp">
+
+            </div>
+
         </div>
     </div>
 </div>
