@@ -41,6 +41,9 @@ else { //User is not logged in. I.e the fmh main dashboard.
     else if($table=="allUnits") {
         _searchCatalog($table, "");
     }
+    else if ($table=="getUnits") {
+        _searchCatalog($table, "");
+    }
     else {
         echo "<status>11</status>";
     }
@@ -435,11 +438,11 @@ function _searchCatalog($table, $UserID) {
             NamePlural,
             Symbol,
             Minimum,
-            Maximum
+            Maximum,  
             Fractions,
             SI
             FROM (SELECT * FROM UnitsJunct WHERE UnitsJunct.ItemID = '".$itemID."')
-            AS Transient LEFT JOIN Units ON Transient.ItemID = Units.ItemID
+            AS Transient LEFT JOIN Units ON Transient.UnitID = Units.UnitID
             ";
             $result = $conn->query($sql);
             if($result!=FALSE) {
@@ -450,6 +453,7 @@ function _searchCatalog($table, $UserID) {
                     //Found some results
                     echo "<status>0</status>";
                     while($row = $result->fetch_assoc()) {
+                        $reply.="<Unit>";
                         $reply.="<UnitID>".$row['UnitID']."</UnitID>";
                         $reply.="<UnitName>".$row['UnitName']."</UnitName>";
                         $reply.="<NamePlural>".$row['NamePlural']."</NamePlural>";
@@ -458,6 +462,7 @@ function _searchCatalog($table, $UserID) {
                         $reply.="<Maximum>".$row['Maximum']."</Maximum>";
                         $reply.="<Fractions>".$row['Fractions']."</Fractions>";
                         $reply.="<SI>".$row['SI']."</SI>";
+                        $reply.="</Unit>";
                     }
                     //close reply and send
                     $reply.="</Units>";
@@ -471,6 +476,7 @@ function _searchCatalog($table, $UserID) {
             } else {
                 //Query failed
                 //Return corresponding return status in xml
+                echo "<err>".trigger_error($conn->error)."</err>";
                 echo "<status>2</status>";
             }
         }

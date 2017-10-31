@@ -803,7 +803,7 @@ function srch_dbfor_nondistinct_items() {
 function getunits(itemID) {
     //Function accesses database to retrieve all the Units associated with an item
     //Returns an array with the units or null if no units at all
-    //Returns an xmlDoc array with units or FALSE otherwise
+    //Returns an xmlDoc array with units or false otherwise
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
@@ -814,15 +814,15 @@ function getunits(itemID) {
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
             if(return_status==0) { //Success.
                 //Extract the data from the document.
-                return xmlDoc;
+                return xmlDoc.getElementsByTagName("Unit"); //Return a node list of the Units
             } else if(return_status==1) {
                 console.log("No results were found");
-                return FALSE;
+                return false;
             }
             else {
                 console.log("A problem occured. Details comin' up.");
                 console.log(return_status);
-                return FALSE;
+                return false;
             }
         } else {
             //Houston, we have a problem
@@ -833,9 +833,12 @@ function getunits(itemID) {
     xhr.open("POST", "Profiles/xhttp.php?table=getUnits&ItemID="+itemID, true);
     xhr.send();
 }
+var imgNodeList;
 function display_modal(elmt) {
     //Fill in the data in the form in the modal using the nodeList array and the item's index
     //Then display the modal and call the listunits() function
+    //Use the getUnits() function to fill in the selectedUnits array.
+
     var index = elmt.index;
     var modal = document.getElementById('db_modal');
     //Put the info into the modal first
@@ -867,21 +870,103 @@ function display_modal(elmt) {
     }
     //Put images. All of them.
     //First: get the images node array
-    var imgNodeList = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata');
+    imgNodeList = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata');
     var db_images = document.getElementById('db_images');
     for(i=0;i<imgNodeList.length;i++) {
         img = document.createElement('img');
         img.src = imgNodeList[i].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
+        img.class = "db_images_class";
+        img.index = i; //This will be like the pointer to the imgNodeList
+        img.addEventListener("click", function () {
+            markOrUnmarkImgForDeletion(this);
+        })
         db_images.appendChild(img);
     }
     //Add a div for uploading more pictures
     var db_img_upload = document.getElementById('db_img_up');
     //Display the modal
     modal.style.display="block";
-    listunits();
+    listunits(index); //Search and display all the available Units
+}
+function initialize_available_units_list(index) {
+    //After listing all the available Units, search for the units for the clicked item element in an array
+    var itemID = nodeList[index].getElementsByTagName('itemdata')[0].getElementsByTagName('itemid')[0].childNodes[0].nodeValue;
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "document";
+    xhr.onreadystatechange = function () {
+        if(this.readyState==4 && this.status==200) {
+            //Everything set
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+            if(return_status==0) { //Success.
+                //Extract the data from the document.
+                //Initialize the selectedUnits array with the indices of the units in the allUnitsList array. Yeah. it's a bit complicated
+                var tmp1;
+                var tmp2;
+                var selected_units_list = xmlDoc.getElementsByTagName("Unit");
+                for(i=0;i<selected_units_list.length;i++) {
+                    //For each of the units in the returned node list
+                    //Find the index in the allUnitsList and "push" it to the selectedUnitsList array
+                    tmp1 = selected_units_list[i].getElementsByTagName("UnitID")[0].childNodes[0].nodeValue;
+                    for(j=0;j<allUnitsList.length;j++) {
+                        tmp2 = allUnitsList[j].getElementsByTagName("UnitID")[0].childNodes[0].nodeValue;
+                        if(tmp1==tmp2) {
+                            //Then add j to the selected units' list
+                            selectedUnits.push(j);
+                            //Easy peasy. I only have to do this once, luckily to initialize the selectedUnits array.
+                        }
+                    }
+                }
+                //Display the Units inside the assigned div
+                var db_units_all = document.getElementById('db_units_all');
+                //Create an html table in a string and post it into a div in db_units_all. LATER: Create a function for thi
+                //Reload the db_units_selected div
+                var db_units_selected = document.getElementById('db_units_selected');
+                //Create an html table in a string and post it into a div in db_units_all
+                var html = "";
+                html="<table>";
+                html+="<tr>";
+                html+="<th>Unit Name</th><th>Symbol</th>";
+                html+="</tr>";
+                for(i=0;i<selectedUnits.length;i++) {
+                    html+="<tr onclick='unselectunit("+i+")'>"; //Each row in the table is tagged with its index in the units array
+                    //INCOMPLETE until I write the selectunit(index) function to select the unit for the item;
+                    html+="<td>";
+                    html+=allUnitsList[selectedUnits[i]].getElementsByTagName("NamePlural")[0].childNodes[0].nodeValue;
+                    html+="</td>";
+                    html+="<td>";
+                    try {
+                        html+=allUnitsList[selectedUnits[i]].getElementsByTagName("Symbol")[0].childNodes[0].nodeValue;
+                    } catch (err) {
+                        console.log(err.message);
+                        html+="N/A";
+                    }
+                    html+="</td>";
+                    html+="</tr>";
+                }
+                html+="</table>";
+                db_units_selected.innerHTML = html;
+            } else if(return_status==1) {
+                console.log("No results were found");
+                return false;
+            }
+            else {
+                console.log("A problem occured. Details comin' up.");
+                console.log(return_status);
+                return false;
+            }
+        } else {
+            //Houston, we have a problem
+            console.log("readystate: "+this.readyState);
+            console.log("status :"+this.status);
+        }
+    }
+    xhr.open("POST", "Profiles/xhttp.php?table=getUnits&ItemID="+itemID, true);
+    xhr.send();
 }
 var allUnitsList;
-function listunits() {
+function listunits(index) {
     //Accesses the database from the xhttp script using table="allUnits"
     //Then lists the Units' names and symbols in the div id-d "db_units_all" for selection
     var db_units_all = document.getElementById('db_units_all');
@@ -922,6 +1007,8 @@ function listunits() {
                 }
                 html+="</table>";
                 db_units_all.innerHTML = html;
+                //Display the units the item alredy has in the appropriate assigned div
+                initialize_available_units_list(index);
             } else if(return_status==1) {
                 console.log("No results were found");
             }
@@ -945,9 +1032,10 @@ function selectunit(index) {
     //This function is called when a user clicks on one of the units to select it for an item
     //the single parameter, index is an integer representing the unit's index in the global array allUnitsList
     //Check first if the index is already in the array before adding
+    //Instead of storing the item indices, store the UnitIDs
     if(!selectedUnits.contains(index)) {
-        //If it doesn't contain the index. Add it.
-        selectedUnits.push(index);
+        //If it doesn't contain the index. Add it. Instead of the index, use the UnitIDs
+        selectedUnits.push(index); //How about pushing the index
         //Reload the table in the db_units_selected
         var db_units_selected = document.getElementById('db_units_selected');
         //Create an html table in a string and post it into a div in db_units_all
@@ -1020,7 +1108,6 @@ Array.prototype.contains = function (value) { //Checks whether the array contain
     return false;
 }
 Array.prototype.remove = function (index) { //removes the value corresponding to the given index and returns a new array
-    console.log(index);
     var arr = []; //New temporary array
     for(i=0;i<this.length;i++) {
         if(i!=index) {
@@ -1029,6 +1116,37 @@ Array.prototype.remove = function (index) { //removes the value corresponding to
         }
     }
     return arr;
+}
+Array.prototype.delete = function (value) { //Deletes all the values corresponding to 'value' and returns a new array
+    var arr = []; //New temporary array
+    for(i=0;i<this.length;i++) {
+        if(this[i]!=value) {
+            //Move to the new array
+            arr.push(this[i]);
+        }
+    }
+    return arr;
+}
+var imgs_for_deletion = []; //An array with images marked for deletion
+function markOrUnmarkImgForDeletion(img) {
+    //This maintains the imgs_for_deletion array, which will be sent with the form data
+    //To delete the images
+    //Also visually make marked images stand out with CSS
+    //1. Get the element's index
+    var index = img.index;
+    var imgID = imgNodeList[index].getElementsByTagName("imageid")[0].childNodes[0].nodeValue;
+    if(!imgs_for_deletion.contains(imgID)) {
+        //Add the image id
+        imgs_for_deletion.push(imgID);
+        //Mark the image with css
+        img.style.opacity = 0.5;
+    }
+    else {
+        //Remove the image from the list
+        imgs_for_deletion = imgs_for_deletion.delete(imgID);
+        //Unmark the image with css
+        img.style.opacity = 1.0;
+    }
 }
 //Caution:
 //I've used a about 3 different node list arrays, all with global scope. Hope they don't get mixed up.
@@ -1043,7 +1161,7 @@ Array.prototype.remove = function (index) { //removes the value corresponding to
 //2. itemNodeList
 //3. itemNodeListr
 //4. selectedUnits Contains indices of seleced units
-//5. nodeList: Nodes for when searching to edit the items
+//5. nodeList: Item nodes for when searching to edit the items
 
 //URGENT: When the user clicks editUploadCanvasImages(), get the the so far available units
 //And update the selectedUnits variable

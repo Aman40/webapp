@@ -28,6 +28,8 @@ if($context=="add") {
     echo "<msg>The ItemID=".$itemID."</msg>";
     edit_item_details($itemID, $itemName, $otherNames, $category, $description); //Then call upload_units() here
     //or in after success of edit_item_details?
+} else if($context=="getUnits") {
+
 } else {
     die("<returnstatus>9</returnstatus>");
 }
@@ -56,6 +58,12 @@ function upload_units($ItemID) {
             $conn = new mysqli($servername, $username, $passwd, $dbname);
             if(!$conn->connect_error) {
                 //Connection successful. Proceed
+                //First delete all the existing units belonging to the Item before re-adding
+                $sql = "DELETE FROM UnitsJunct WHERE ItemID='".$ItemID."'";
+                $result = $conn->query($sql);
+                if(!$result) {
+                    die("<returnstatus>12</returnstatus>"); //End the script here
+                }
                 echo "<itemid>".$ItemID."</itemid>";
                 for($i=0;$i<count($arr);$i++) {
                     $sql = "INSERT INTO UnitsJunct (ItemID, UnitID) VALUES ('".$ItemID."', '".$arr[$i]."')";
@@ -269,3 +277,4 @@ function filter($entry) {
 //8 One or more queries on the UnitsJunct table failed
 //9 Active attempted system malice because missing value is hard-coded and shouldn't be missing or other than expected
 //11 There was an unspecified error uploading the file.
+//12 Couldn't delete the Units in the db
