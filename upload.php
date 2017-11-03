@@ -64,7 +64,7 @@ function upload_units($ItemID) {
                 if(!$result) {
                     die("<returnstatus>12</returnstatus>"); //End the script here
                 }
-                echo "<itemid>".$ItemID."</itemid>";
+                //Then insert the new images
                 for($i=0;$i<count($arr);$i++) {
                     $sql = "INSERT INTO UnitsJunct (ItemID, UnitID) VALUES ('".$ItemID."', '".$arr[$i]."')";
                     $result = $conn->query($sql);
@@ -114,12 +114,19 @@ function add_item_details($itemName, $otherNames, $category, $description) {
             if(count($_FILES)!==0){
                 //Check that any files are appended. If yes, upload them
                 upload_pics($itemID);
+                echo "<itemname>".$itemName."</itemname>";
+                echo "<function>add</function>"; //This empasizes that it's the add_item_details() function that just
+                //returned to sendformdata() in the javascript script. In this case, call display_modal();
+                //In the case it's the edit_item_details function(), reurn "edit" and don't call the display_modal()
+                //function again unless there was a failure and corrections are necessary.
                 //If there's any error, the function won't return and will kill the script. Function doesn't return
                 // returnstatus 0
                 echo "<returnstatus>0</returnstatus>";
             } else {
                 //Else, end it here returning a 0 return status.
                 echo "<msg>Successfully completed. No files appended.</msg>";
+                echo "<function>add</function>";
+                echo "<itemname>".$itemName."</itemname>";
                 echo "<returnstatus>0</returnstatus>";
             }
         }
@@ -160,10 +167,15 @@ function edit_item_details($itemID, $itemName, $otherNames, $category, $descript
             if(count($_FILES)!==0){
                 //Check that any files are appended. If yes, upload them
                 upload_pics($itemID);
-                upload_units($itemID);
+                upload_units($itemID); //This is the last function to run always.
+                echo "<function>edit</function>";
+                //Return a separate status for when adding and when editing to determine whether to call the
+                //display_modal() function or not
+                //Forexample when there are errors, display the function to allow corrections
             } else {
                 //Else, end it here returning a 0 return status.
                 echo "<msg>Successfully completed. No files appended.</msg>";
+                delete_pictures ();
                 upload_units($itemID);
             }
         }
@@ -219,6 +231,50 @@ function upload_pics($ItemID) {
             echo "<msg>There was an unspecified error uploading your file;</msg>";
             die("<returnstatus>11</returnstatus>");
         }
+    }
+}
+function delete_pictures (){
+    //Get the list of pictures
+    if(isset($_POST["delImgs"])) {
+
+        if($_POST["delImgs"]!="") {
+            //There is an array appended
+            $assoc = json_decode($_POST["delImgs"], true);
+            $arr = $assoc["imgids"];
+            $servername = "localhost";
+            $username = "aman";
+            $dbname = "test";
+            $passwd = "password";
+            $conn = new mysqli($servername, $username, $passwd, $dbname);
+            if(!$conn->connect_errno) {
+                for($i=0;$i<count($arr); $i++) {
+                    //Delete the record from the db first, then the physical file on the disk
+                    $sql = "DELETE FROM ItemImages WHERE ImgID='".$arr[$i]."'";
+                    $result = $conn->query($sql);
+                    if(!$result) {
+                        //Do something. Kill the script if of the queries failed
+                        die("<returnstatus>12</returnstatus>"); //End the script here
+                    }
+                    //Then delete the image from the physical drive
+                    if(!unlink("/var/www/html/HTML/uploads/".$arr[$i].".jpg")) {
+                        //Deletion failed. Write the name of the file in some file for manual deletion
+                        //LATER
+                        //Kill the script
+                        echo "<msg>Couldn't delete a file because ".$conn->error."</msg>";
+                        die("<returnstatus>13</returnstatus>");
+                    }
+
+                }
+                $conn->close();
+            } else {
+                //Do something. Connection to the database failed.
+                echo "<returnstatus>1</returnstatus>";
+            }
+
+        }
+
+    } else {
+        die ("<returnstatus>9</returnstatus>");
     }
 }
 function add_to_db($ItemID, $ImageID, $ImageURI)
@@ -278,3 +334,4 @@ function filter($entry) {
 //9 Active attempted system malice because missing value is hard-coded and shouldn't be missing or other than expected
 //11 There was an unspecified error uploading the file.
 //12 Couldn't delete the Units in the db
+//13 Couldn't delete a file because of reasons.

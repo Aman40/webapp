@@ -55,7 +55,7 @@ include "include.php";
                 <input type="file" id="upload_item_images" multiple onchange="display_item_images(this, 'add')">
             </form>
             <div id="show_progress">
-                <span onclick="uploadCanvasImages()" style="height:30px; background-color: burlywood; cursor:pointer;">Click to upload</span>
+                <span onclick="uploadCanvasImages()" style="height:30px; background-color: burlywood; cursor:pointer;">Next</span>
             </div>
             <div id="up_imgs_container">
 
@@ -65,7 +65,7 @@ include "include.php";
             <!--Or search for item name or group name to edit in modal-->
             <div id="ctrl_div"><!--The control with the search button and display controls, if any-->
                 <div id="srch_div">
-                    <input id="srch_div_input" type="text" placeholder="Search the catalog...">
+                    <input id="srch_div_input" type="text" placeholder="Search the catalog..." onkeydown="_checkenterkey2(event)">
                     <button onclick="srch_dbfor_nondistinct_items()">Search</button>
                 </div>
             </div>
@@ -132,30 +132,11 @@ include "include.php";
 <script src="Profiles/index.js"></script>
 <script>
     // Get the modal
-    var modalin = document.getElementById('id01'); //The signin modal
-    var modalup = document.getElementById('id02'); //The signup modal
-    var modalOrder = document.getElementById('orderItem');
-
-    // When the user clicks anywhere outside of the modal, close it
+    var modal = document.getElementById("db_modal");
+    // When the user clicks anywhere outside of the modal content yet inside the modal, close it
     window.onclick = function(event) {
-        if (event.target == modalup) {
-            console.log("It's the modalup");
-            modalup.style.display = "none";
-        } else if (event.target === modalin) {
-            console.log("It's the modalin");
-            modalin.style.display = "none";
-        } else if (event.target === modalOrder){
-            modalOrder.style.display = "none";
-        }
-    }
-    function editdiv() {
-        var row2 = document.getElementById('row-2');
-        var row22 = document.getElementById('row-22');
-        if(row2.style.display == "none" || row2.style.display == "") {
-            row2.style.display = "block";
-            row22.style.display = "none";
-        } else {
-            row22.style.display = "";
+        if(event.target == modal) {
+            modal.style.display="none";
         }
     }
 </script>

@@ -1,5 +1,7 @@
 //Script1
 function _checkenterkey(event) {
+    //This is solely for the "srchdemo" input and
+    //"search-input" input elements. There's a separate one for the  srch_div_input
     if(event.key=='Enter') { //If it's the enter key, call the _searchdb function
         event.preventDefault();
         try {
@@ -9,9 +11,23 @@ function _checkenterkey(event) {
         }
     }
 }
+function _checkenterkey2(event) {
+    //This is solely for the "srch_div_input" input element
+    if(event.key=='Enter') { //If it's the enter key, call the _searchdb function
+        event.preventDefault();
+        try {
+            //Do here what the clicking search should've done.
+            srch_dbfor_nondistinct_items();
+        } catch(err) {
+            //Unforeseen technical error!
+            window.alert("A technical error occured. Try again later");
+        }
+    }
+}
 
 var itemNodeList;
 function _searchdb(str) {
+    //This only returns one Image per Item
     var xhttp = new XMLHttpRequest();
     xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
     xhttp.onreadystatechange = function() { //If we get a reply from the server
@@ -580,6 +596,8 @@ function uploadCanvasImages() {
         //There are no images. Upload just the form data
         sendformdata(fd, "add");
     }
+    //Theres a bunch of asynchronous functions ^
+    //Call the displaymodal() function when upload is done. And that's after sending the form data
 }
 function editUploadCanvasImages(index) {
     //This function gets all the data and selected images and uploads them at once
@@ -618,15 +636,38 @@ function editUploadCanvasImages(index) {
             //Read the units into an array. JS object, then parse the object into a JSON string.
             arr.push(allUnitsList[selectedUnits[i]].getElementsByTagName('unitid')[0].childNodes[0].nodeValue);
         }
-
+    } else {
+        arr = [""];
     }
     //Append the array into an object and stringify it into JSON to append to the form
-    obj["unitsarr"] = arr;
-    var jsn = JSON.stringify(obj);
-    console.log(typeof (jsn)+jsn);
-    fd.append("units", jsn);
+    if(arr.length>0) {
+        obj["unitsarr"] = arr;
+        var jsn = JSON.stringify(obj);
+        fd.append("units", jsn);
+    } else {
+        fd.append("units", ""); //Append a null string instead if the array was empty in the first place
+    }
+    //Do the same as above, but with the images set for deletion
+    //Reusing the obj and arr parameters
+    //But first, reinitialize
+    arr=[];
+    obj = {};
+    if(imgs_for_deletion.length>0) {
+        //Some images are set for deletion
+        for(i=0;i<imgs_for_deletion.length;i++) {
+            //Read the imageids into an array to be appended as JSON to be appended to fd
+            arr.push(imgs_for_deletion[i]);
+        }
+    }
+    if(arr.length>0) {
+        obj["imgids"] = arr;
+        jsn = JSON.stringify(obj);
+        fd.append("delImgs", jsn); //DONE. Off to the sever side.
+    } else {
+        fd.append("delImgs", ""); //Append a null string
+    }
 
-    //Get the images and append them recursively one after another
+    //Get the uploaded images and append them recursively one after another
     var canvasArray = document.getElementById("db_img_up_dsp").getElementsByTagName("canvas");
     var index = 0;
     //Check if there are any images
@@ -676,7 +717,22 @@ function sendformdata(fd, context) {
             if(returnStatus===0) {
                 //Everything went fine! Reload the page
                 console.log("Everything went fine!");
-                location.reload();
+                //Here, call the displaymodal function instead of reloading the page.
+                var returning_function = xmlDoc.getElementsByTagName("function")[0].childNodes[0].nodeValue;
+                if(returning_function=="add") {
+                    //Get elmt.
+                    //Write a separate function that searches the db but does something different upon return
+                    //And calls the display_modal function in its readystate event listening callback function
+                    var query = xmlDoc.getElementsByTagName("itemname")[0].childNodes[0].nodeValue;
+                    edit_added_item(query); //This searches the db for the item by the itemname again and
+                    //displays the item edit modal
+                } else if(returning_function=="edit") {
+                    //Reload the page
+                    location.reload();
+                } else {
+                    //Fatal programming error
+                    window.alert("Fatal programming error!");
+                }
             } else if(returnStatus===1) {
                 //A connection to the database couldn't be established
                 window.alert("A connection to the database could not be established. Please try again later");
@@ -700,6 +756,45 @@ function sendformdata(fd, context) {
     xhr.open("POST", "upload.php?context="+context, true);
     xhr.send(fd);
 }
+function edit_added_item(query) {
+    //Non-distinct here means the function returns multiple images, if available for the items searched
+    //In contrast the _searchdb() function only returns one image per Item
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "document";
+    xhr.onreadystatechange = function () {
+        if(this.readyState==4 && this.status==200) {
+            //Everything set
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+            if(return_status==0) { //Success.
+                //Extract the data from the document.
+                nodeList = xmlDoc.getElementsByTagName('Items')[0].getElementsByTagName('Item');
+                //Put check to trigger an error if nodeList.length>1. Only one distinct item has to be returned LATER
+                //Create a minimalistic element with only the index. it's all we need from it to trigge the
+                //display_modal() function
+                var elmt = document.createElement('div');
+                elmt.index = 0;
+                //Trigger the display_modal() funcion here passing the element. The function takes the element and
+                //Reads its index which is then used to read data from the returned node into a modal
+                display_modal(elmt);
+            } else if(return_status==1) {
+                console.log("No results were found");
+            }
+            else {
+                console.log("A problem occured. Details comin' up.");
+                console.log(return_status);
+            }
+        } else {
+            //Houston, we have a problem
+            console.log("readystate: "+this.readyState);
+            console.log("status :"+this.status);
+        }
+    }
+    xhr.open("POST", "Profiles/xhttp.php?table=editItems&q="+query, true);
+    xhr.send();
+}
+
 function switch_panes (elmt) {
     var dbeditor_form = document.getElementById("dbeditor_form");
     var db_display = document.getElementById("db_display");
@@ -718,8 +813,9 @@ function switch_panes (elmt) {
 var nodeList; //This way, other functions can access items using only the index appended to the html elements to look up
 //The item's data in the nodeList array
 function srch_dbfor_nondistinct_items() {
+    //Non-distinct here means the function returns multiple images, if available for the items searched
+    //In contrast the _searchdb() function only returns one image per Item
     var query = document.getElementById("srch_div_input").value;
-    console.log("Query= "+query);
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
@@ -872,6 +968,7 @@ function display_modal(elmt) {
     //First: get the images node array
     imgNodeList = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata');
     var db_images = document.getElementById('db_images');
+    db_images.innerHTML = ""; //Initialize
     for(i=0;i<imgNodeList.length;i++) {
         img = document.createElement('img');
         img.src = imgNodeList[i].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
@@ -889,6 +986,8 @@ function display_modal(elmt) {
     listunits(index); //Search and display all the available Units
 }
 function initialize_available_units_list(index) {
+    //First, initialize/empty selected_units
+    selectedUnits = [];
     //After listing all the available Units, search for the units for the clicked item element in an array
     var itemID = nodeList[index].getElementsByTagName('itemdata')[0].getElementsByTagName('itemid')[0].childNodes[0].nodeValue;
     var xhr = new XMLHttpRequest();
