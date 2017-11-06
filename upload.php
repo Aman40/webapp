@@ -29,6 +29,7 @@ if($context=="add") {
     edit_item_details($itemID, $itemName, $otherNames, $category, $description); //Then call upload_units() here
     //or in after success of edit_item_details?
 } else if($context=="getUnits") {
+    //This is handled by the xhttp.php script
 
 } else {
     die("<returnstatus>9</returnstatus>");
@@ -44,12 +45,15 @@ function upload_units($ItemID) {
     //JavaScript your way out of that.
     if(isset($_POST["units"])) {
         //It's hard coded, so it almost certainly should be set, except in an attempt to break the system
+
         if($_POST["units"]!="") {
             //Some units are appended
             $json = json_decode($_POST["units"], true);
             //Now we have an assoc array with one key, "unitsarr" whose value is an indexed array
             //Get the indexed array into $arr
             $arr = $json["unitsarr"];
+            var_dump($arr);
+            var_dump($_POST["units"]);
             //Open connection. Remember to close it later
             $servername = "localhost";
             $username = "aman";
@@ -64,18 +68,22 @@ function upload_units($ItemID) {
                 if(!$result) {
                     die("<returnstatus>12</returnstatus>"); //End the script here
                 }
-                //Then insert the new images
-                for($i=0;$i<count($arr);$i++) {
-                    $sql = "INSERT INTO UnitsJunct (ItemID, UnitID) VALUES ('".$ItemID."', '".$arr[$i]."')";
-                    $result = $conn->query($sql);
-                    echo "<err>".$conn->error."</err>";
-                    echo "<err>".$result."</err>";
-                    if(!$result) {
-                        //If any of the queries fails.
-                        //Unlikely but what to do if only one of the queries fails? Roll back everything? LATER
-                        //Report how many of the queries completed and die
-                        echo "<msg>Only ".$i." of the ".count($arr)." queries completed successfully.</msg>";
-                        die("<returnstatus>8</returnstatus>"); //End the script here
+                //Check if any units are appended, then append them
+                if(count($arr)>0) {//Not an efficient check. There's always
+                    //Then insert the new Units.
+                    for($i=0;$i<count($arr);$i++) {
+                        $sql = "INSERT INTO UnitsJunct (ItemID, UnitID) VALUES ('".$ItemID."', '".$arr[$i]."')";
+                        echo "<itmid>".$ItemID."</itmid>";
+                        echo "<untid>".$arr[$i]."</untid>";
+                        $result = $conn->query($sql);
+                        if(!$result) {
+                            //If any of the queries fails.
+                            //Unlikely but what to do if only one of the queries fails? Roll back everything? LATER
+                            //Report how many of the queries completed and die
+                            echo "<msg>Only ".$i." of the ".count($arr)." queries completed successfully.</msg>";
+                            echo "<err>".$conn->error."</err>";
+                            die("<returnstatus>8</returnstatus>"); //End the script here
+                        }
                     }
                 }
                 //At this point, all the queries have completed successfully. Return the appropriate status
@@ -115,7 +123,7 @@ function add_item_details($itemName, $otherNames, $category, $description) {
                 //Check that any files are appended. If yes, upload them
                 upload_pics($itemID);
                 echo "<itemname>".$itemName."</itemname>";
-                echo "<function>add</function>"; //This empasizes that it's the add_item_details() function that just
+                echo "<functn>add</functn>"; //This empasizes that it's the add_item_details() function that just
                 //returned to sendformdata() in the javascript script. In this case, call display_modal();
                 //In the case it's the edit_item_details function(), reurn "edit" and don't call the display_modal()
                 //function again unless there was a failure and corrections are necessary.
@@ -125,7 +133,7 @@ function add_item_details($itemName, $otherNames, $category, $description) {
             } else {
                 //Else, end it here returning a 0 return status.
                 echo "<msg>Successfully completed. No files appended.</msg>";
-                echo "<function>add</function>";
+                echo "<functn>add</functn>";
                 echo "<itemname>".$itemName."</itemname>";
                 echo "<returnstatus>0</returnstatus>";
             }
@@ -168,7 +176,7 @@ function edit_item_details($itemID, $itemName, $otherNames, $category, $descript
                 //Check that any files are appended. If yes, upload them
                 upload_pics($itemID);
                 upload_units($itemID); //This is the last function to run always.
-                echo "<function>edit</function>";
+                echo "<functn>edit</functn>";
                 //Return a separate status for when adding and when editing to determine whether to call the
                 //display_modal() function or not
                 //Forexample when there are errors, display the function to allow corrections
@@ -177,6 +185,7 @@ function edit_item_details($itemID, $itemName, $otherNames, $category, $descript
                 echo "<msg>Successfully completed. No files appended.</msg>";
                 delete_pictures ();
                 upload_units($itemID);
+                echo "<functn>edit</functn>";
             }
         }
         else {

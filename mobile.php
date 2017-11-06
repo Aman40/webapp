@@ -756,11 +756,8 @@ include "include.php";
                         return document.createElement(elmt);
                     }
                 </script>
-
             </div>
-
         </div><!--r2c2-->
-
     </div><!--row-2-->
     <div id="row-orders" style="display: none">
         <div class="col-12" id="orders-update" style="display: block;">

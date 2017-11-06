@@ -636,16 +636,12 @@ function editUploadCanvasImages(index) {
             //Read the units into an array. JS object, then parse the object into a JSON string.
             arr.push(allUnitsList[selectedUnits[i]].getElementsByTagName('unitid')[0].childNodes[0].nodeValue);
         }
-    } else {
-        arr = [""];
-    }
-    //Append the array into an object and stringify it into JSON to append to the form
-    if(arr.length>0) {
+        //Append the array into an object and stringify it into JSON to append to the form
         obj["unitsarr"] = arr;
         var jsn = JSON.stringify(obj);
         fd.append("units", jsn);
     } else {
-        fd.append("units", ""); //Append a null string instead if the array was empty in the first place
+        fd.append("units", "");
     }
     //Do the same as above, but with the images set for deletion
     //Reusing the obj and arr parameters
@@ -718,7 +714,7 @@ function sendformdata(fd, context) {
                 //Everything went fine! Reload the page
                 console.log("Everything went fine!");
                 //Here, call the displaymodal function instead of reloading the page.
-                var returning_function = xmlDoc.getElementsByTagName("function")[0].childNodes[0].nodeValue;
+                var returning_function = xmlDoc.getElementsByTagName("functn")[0].childNodes[0].nodeValue;
                 if(returning_function=="add") {
                     //Get elmt.
                     //Write a separate function that searches the db but does something different upon return
@@ -940,6 +936,7 @@ function display_modal(elmt) {
     //Put the info into the modal first
     var elmt = document.getElementById('modal-content');
     var db_image = document.getElementById('db_image');
+    db_image.innerHTML = ""; //Initialize and flush all children
     var db_info = document.getElementById('db_info');
     var db_units_all = document.getElementById('db_units_all');
     var img = document.createElement('img');
@@ -948,7 +945,7 @@ function display_modal(elmt) {
     var db_category = document.getElementById('db_category');
     var db_description = document.getElementById('db_description');
     //Get the span element and add to it an onclick event with the elmt as a parameter
-    var up_btn = document.getElementById("db_up_btn");
+    var up_btn = document.getElementById("db_up_btn"); //All the modal elements have the same id. Find a way to destry them, not just hiding them. URGENTF
     up_btn.addEventListener("click", function () {
         editUploadCanvasImages(index);
     })

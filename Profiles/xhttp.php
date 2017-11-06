@@ -267,7 +267,6 @@ function _searchCatalog($table, $UserID) {
                 echo "<status>2</status>"; //No results found
                 echo "<errormsg>.$conn->error.</errormsg>";
             }
-            $conn->close(); //Close the connection
         }
         else if($table=="Repository") { //For listing a particular users items
             $sql = "SELECT DISTINCT 
