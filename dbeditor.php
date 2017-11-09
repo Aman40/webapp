@@ -136,7 +136,6 @@ include "include.php";
     var modal_clone = modal.cloneNode(true); //This is not gonna change. It holds the initial state of the modal, to which the modal will be
     //reset after closing, i.e destroying and recreating it.
     // When the user clicks anywhere outside of the modal content yet inside the modal, close it.
-    //URGENT. Find a way to destroy the modals, other than just hiding them.
     //Found a solution. Get the element as a global at the start, and always reset to that after closing the modal.
     window.onclick = function(event) {
         if(event.target == modal) {

@@ -76,7 +76,8 @@ function _search_all_db($str)
     $reply="<Items>";
     $conn = new mysqli($servername, $username, $password, $database);
     if(!$conn->connect_error) { //connection succeeded
-        $sql = "SELECT
+        //Repository, Items, ItemImages
+        $sql = "SELECT 
                 Transient.UserID AS UserID,
                 Transient.ItemID AS ItemID,
                 Transient.ItemName AS ItemName,
@@ -113,55 +114,16 @@ function _search_all_db($str)
                  WHERE ItemName LIKE '%".$str."%' OR Aliases LIKE '%".$str."%')
                  AS TempTable JOIN Repository ON TempTable.ItemID = Repository.ItemID)
                  AS Transient LEFT JOIN ItemImages ON Transient.ItemID = ItemImages.ItemID
-                 "
+                ORDER BY ItemID"
 					  ;
         $result = $conn->query($sql);
         if($result!=false) { //Query executed successfully
             if($result->num_rows>0) { //At least one record was found
                 echo "<status>0</status>";
-                while($row=$result->fetch_assoc()) { //Fetch row by row
-                    global $UserID;
-                    $UserID = $row['UserID'];
-                    $ItemID = $row['ItemID'];
-                    $ItemName = $row['ItemName'];
-                    $Aliases = setdefault($row['Aliases'], "None");
-                    $Category = $row['Category'];
-                    $DefaultDescription = setdefault($row['DefaultDescription'], "None");
-                    $ImageURI =	setdefault($row['ImageURI'], "None");
-                    $RepID = $row['RepID'];
-                    $Quantity = $row['Quantity'];
-                    $Units = $row['Units'];
-                    $UnitPrice = $row['UnitPrice'];
-                    $State = setdefault($row['State'], "None");
-                    $DateAdded = $row['DateAdded'];
-                    $Description = setdefault($row['Description'], "None");
-                    $Deliverable = $row['Deliverable'];
-                    $DeliverableAreas = $row['DeliverableAreas'];
-                    $reply.="<Item>";
-                    $reply.="<UserID>".$UserID."</UserID>";
-                    $reply.="<ItemID>".$ItemID."</ItemID>";
-                    $reply.="<ItemName>".$ItemName."</ItemName>";
-                    $reply.="<Aliases>".$Aliases."</Aliases>";
-                    $reply.="<Category>".$Category."</Category>";
-                    $reply.="<DefaultDescription>".$DefaultDescription."</DefaultDescription>";
-                    $reply.="<ImageURI>".$ImageURI."</ImageURI>";
-                    $reply.="<RepID>".$RepID."</RepID>";
-                    $reply.="<Quantity>".$Quantity."</Quantity>";
-                    $reply.="<Units>".$Units."</Units>";
-                    $reply.="<UnitPrice>".$UnitPrice."</UnitPrice>";
-                    $reply.="<State>".$State."</State>";
-                    $reply.="<DateAdded>".$DateAdded."</DateAdded>";
-                    $reply.="<Description>".$Description."</Description>";
-                    $reply.="<Deliverable>".$Deliverable."</Deliverable>";
-                    $reply.="<DeliverableAreas>".$DeliverableAreas."</DeliverableAreas>";
-                    $reply.="</Item>";
-                }
-                //Close the xml
-                $reply.="</Items>";
-                //Return the xml
+                $row1 = $result->fetch_assoc();
+                $reply="<Items><Item><Images>";
+                $reply=cmp_itemid($reply, $result, $row1);
                 echo $reply;
-
-
             } else { //No results were found
                 echo "<status>1</status>";
             }
@@ -227,8 +189,8 @@ function _searchCatalog($table, $UserID) {
         if($table=="Items") { //Browsing Items catalogue before adding items to the repository
             //Get the query
             $var = filter($_REQUEST['q']);
-
-            $sql = "SELECT DISTINCT
+            //Items, ItemImages
+            $sql = "SELECT
                     Transient.ItemID AS ItemID,
                     Transient.ItemName AS ItemName,
                     Transient.Aliases AS Aliases,
@@ -240,23 +202,16 @@ function _searchCatalog($table, $UserID) {
                     from Items 
                     where ItemName like '%".$var."%' 
                     or Aliases like '%".$var."%')
-                    AS Transient LEFT JOIN ItemImages ON Transient.ItemID = ItemImages.ItemID";
+                    AS Transient LEFT JOIN ItemImages ON Transient.ItemID = ItemImages.ItemID
+                    ORDER BY ItemID";
             $result = $conn->query($sql);
             if($result!=false) { //Check success
                 if($result->num_rows > 0) { //Check the number of rows to return appropriate response when there are no results and when the query fails
                     echo "<status>0</status>"; //Results found
-                    while($row = $result->fetch_assoc()) {
-                        $ItemID = $row['ItemID'];
-                        $ItemName = $row['ItemName'];
-                        $Aliases = setdefault($row['Aliases'], "empty");
-                        $Category = $row['Category'];
-                        $Description = setdefault($row['Description'], "No description");
-                        $ImageURI = setdefault($row['ImageURI'],"../icons/placeholder.png");
-                        //Convert to XML
-                        $reply=$reply."<Item><ItemID>".$ItemID."</ItemID><ItemName>".$ItemName."</ItemName><Aliases>".$Aliases."</Aliases><Category>".$Category."</Category><Description>".$Description."</Description><ImageURI>".$ImageURI."</ImageURI></Item>";//Build the XML
-                    }
-                    //Close the xml doc
-                    $reply=$reply."</Items>";
+                    //It gets complicated from here. A recursive function inside recursive function
+                    $row1 = $result->fetch_assoc();
+                    $reply="<Items><Item><Images>";
+                    $reply=cmp_itemid($reply, $result, $row1);
                     //return the XML document to the requesting page
                     echo $reply;
                 } else { //O results found
@@ -269,12 +224,13 @@ function _searchCatalog($table, $UserID) {
             }
         }
         else if($table=="Repository") { //For listing a particular users items
+            //Repository, Items, ItemImages
             $sql = "SELECT DISTINCT 
                     Transient.ItemID AS ItemID,
                     Transient.ItemName AS ItemName,
                     Transient.Aliases AS Aliases,
                     Transient.Category AS Category,
-                    Transient.DefaultDescription AS DefaultDesctiption,
+                    Transient.DefaultDescription AS DefaultDescription,
                     Transient.RepID AS RepID,
                     Transient.Quantity AS Quantity,
                     Transient.Units AS Units,
@@ -302,47 +258,15 @@ function _searchCatalog($table, $UserID) {
 					TempTable.DeliverableAreas AS DeliverableAreas
 					 FROM (SELECT * FROM Repository WHERE UserID='".$UserID."')
 					 AS TempTable JOIN Items ON TempTable.ItemID = Items.ItemID)
-					 AS Transient LEFT JOIN ItemImages ON ItemImages.ItemID = Transient.ItemID";
+					 AS Transient LEFT JOIN ItemImages ON ItemImages.ItemID = Transient.ItemID
+					 ORDER BY ItemID";
             $result = $conn->query($sql);
             if($result!=false) { //If everything went well
                 if($result->num_rows>0) { //non-zero results found
                     echo "<status>0</status>";
-
-                    while($row=$result->fetch_assoc()) {//Fetch row by row
-                        $ItemID = $row['ItemID'];
-                        $ItemName = $row['ItemName'];
-                        $Aliases = setdefault($row['Aliases'], "None");
-                        $Category = $row['Category'];
-                        $DefaultDescription = setdefault($row['DefaultDescription'], "None");
-                        $ImageURI =	setdefault($row['ImageURI'], "None");
-                        $RepID = $row['RepID'];
-                        $Quantity = $row['Quantity'];
-                        $Units = $row['Units'];
-                        $UnitPrice = $row['UnitPrice'];
-                        $State = setdefault($row['State'], "None");
-                        $DateAdded = $row['DateAdded'];
-                        $Description = setdefault($row['Description'], "None");
-                        $Deliverable = $row['Deliverable'];
-                        $DeliverableAreas = $row['DeliverableAreas'];
-                        $reply.="<Item>";
-                        $reply.="<ItemID>".$ItemID."</ItemID>";
-                        $reply.="<ItemName>".$ItemName."</ItemName>";
-                        $reply.="<Aliases>".$Aliases."</Aliases>";
-                        $reply.="<Category>".$Category."</Category>";
-                        $reply.="<DefaultDescription>".$DefaultDescription."</DefaultDescription>";
-                        $reply.="<ImageURI>".$ImageURI."</ImageURI>";
-                        $reply.="<RepID>".$RepID."</RepID>";
-                        $reply.="<Quantity>".$Quantity."</Quantity>";
-                        $reply.="<Units>".$Units."</Units>";
-                        $reply.="<UnitPrice>".$UnitPrice."</UnitPrice>";
-                        $reply.="<State>".$State."</State>";
-                        $reply.="<DateAdded>".$DateAdded."</DateAdded>";
-                        $reply.="<Description>".$Description."</Description>";
-                        $reply.="<Deliverable>".$Deliverable."</Deliverable>";
-                        $reply.="<DeliverableAreas>".$DeliverableAreas."</DeliverableAreas>";
-                        $reply.="</Item>";
-                    }
-                    $reply.="</Items>";
+                    $row1 = $result->fetch_assoc();
+                    $reply="<Items><Item><Images>";
+                    $reply=cmp_itemid($reply, $result, $row1);
                     echo $reply;
                 } else { //No results were found
                     echo "<status>1</status>";
@@ -402,7 +326,7 @@ function _searchCatalog($table, $UserID) {
                     where ItemName like '%".$var."%' 
                     or Aliases like '%".$var."%')
                     AS Transient LEFT JOIN ItemImages ON Transient.ItemID = ItemImages.ItemID
-                    ";
+                    ORDER BY ItemID";
             $result = $conn->query($sql);
             if($result!=false) { //Check success
                 if($result->num_rows > 0) { //Check the number of rows to return appropriate response when there are no results and when the query fails
@@ -549,11 +473,24 @@ function cmp_itemid($reply, $result, $row1) {
             $reply.="</ImageData>";
             $reply.="</Images>";
             $reply.="<Itemdata>";
+
             $reply.="<ItemID>".$row1['ItemID']."</ItemID>";
             $reply.="<ItemName>".$row1['ItemName']."</ItemName>";
             $reply.="<Aliases>".$row1['Aliases']."</Aliases>";
             $reply.="<Category>".$row1['Category']."</Category>";
             $reply.="<Description>".$row1['Description']."</Description>";
+
+            $reply.="<UserID>".setdefault($row1['UserID'], 'N/A')."</UserID>";
+            $reply.="<RepID>".setdefault($row1['RepID'], 'N/A')."</RepID>";
+            $reply.="<Quantity>".setdefault($row1['Quantity'], 'N/A')."</Quantity>";
+            $reply.="<Units>".setdefault($row1['Units'], 'N/A')."</Units>";
+            $reply.="<UnitPrice>".setdefault($row1['UnitPrice'], 'N/A')."</UnitPrice>";
+            $reply.="<State>".setdefault($row1['State'], 'N/A')."</State>";
+            $reply.="<DateAdded>".setdefault($row1['DateAdded'], 'N/A')."</DateAdded>";
+            $reply.="<Deliverable>".setdefault($row1['Deliverable'], 'N/A')."</Deliverable>";
+            $reply.="<DeliverableAreas>".setdefault($row1['DeliverableAreas'], 'N/A')."</DeliverableAreas>";
+            $reply.="<ImageURI>".setdefault($row1['ImageURI'], 'N/A')."</ImageURI>"; //The default image
+
             $reply.="</Itemdata>";
             $reply.="</Item>";
             $reply.="<Item>";
@@ -577,6 +514,19 @@ function cmp_itemid($reply, $result, $row1) {
         $reply.="<Aliases>".$row1['Aliases']."</Aliases>";
         $reply.="<Category>".$row1['Category']."</Category>";
         $reply.="<Description>".$row1['Description']."</Description>";
+
+        $reply.="<UserID>".setdefault($row1['UserID'], 'N/A')."</UserID>";
+        $reply.="<DefaultDescription>".setdefault($row1['DefaultDescription'], 'N/A')."</DefaultDescription>";
+        $reply.="<RepID>".setdefault($row1['RepID'], 'N/A')."</RepID>";
+        $reply.="<Quantity>".setdefault($row1['Quantity'], 'N/A')."</Quantity>";
+        $reply.="<Units>".setdefault($row1['Units'], 'N/A')."</Units>";
+        $reply.="<UnitPrice>".setdefault($row1['UnitPrice'], 'N/A')."</UnitPrice>";
+        $reply.="<State>".setdefault($row1['State'], 'N/A')."</State>";
+        $reply.="<DateAdded>".setdefault($row1['DateAdded'], 'N/A')."</DateAdded>";
+        $reply.="<Deliverable>".setdefault($row1['Deliverable'], 'N/A')."</Deliverable>";
+        $reply.="<DeliverableAreas>".setdefault($row1['DeliverableAreas'], 'N/A')."</DeliverableAreas>";
+        $reply.="<ImageURI>".setdefault($row1['ImageURI'], 'N/A')."</ImageURI>"; //The default image
+
         $reply.="</Itemdata>";
         $reply.="</Item>";
         $reply.="</Items>";

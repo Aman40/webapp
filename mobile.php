@@ -451,7 +451,8 @@ include "include.php";
                                                 elmt.classList.add("item-slide");
                                                 elmt.indexno = i;
                                                 elmt.addEventListener("click", function () {
-                                                    _getUserInfo(this)
+                                                    _getUserInfo(this) //Gets the index from the element and uses it to
+                                                    //get the seller's id to search for their info.
                                                 }, true)
 
                                                 var img = "";
@@ -684,6 +685,7 @@ include "include.php";
                             }
                             else { //request not fulfilled. Print readyState & status to console
                                 //later
+                                console.log("The XMLHttp request was a flop! My bad!");
                             }
                         }
                         xmlhttp.open("GET", "Profiles/xhttp.php?table=sellerdata&UserID="+userid, true);

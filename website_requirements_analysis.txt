@@ -234,16 +234,13 @@ CATALOGUE MANAGER FUNCTIONS//BASICALLY THE ITEMS TABLE ONLY
 -Write JavaScript to check the image before uploading. Saves the user data and time.
 -Allow user to define size of item boxes to as far as tables. Dynamic display type
 
-PICKUP FROM
---finish up the inventoryItemDetails() function. Add the whole picture to the displayed info.
-
 FIXES
 
 
 IMMEDIATE ADDITION
 --Order/request for unavailable items //SAME AS BELOW
 --Allow users (with accounts?) to place orders in the open and allow capable sellers to bid/provide. //IN PROGRESS
---Finish dbeditor
+--Finish dbeditor DONE! Apart from the CSS
 
 
 

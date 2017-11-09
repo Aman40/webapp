@@ -945,7 +945,7 @@ function display_modal(elmt) {
     var db_category = document.getElementById('db_category');
     var db_description = document.getElementById('db_description');
     //Get the span element and add to it an onclick event with the elmt as a parameter
-    var up_btn = document.getElementById("db_up_btn"); //All the modal elements have the same id. Find a way to destry them, not just hiding them. URGENTF
+    var up_btn = document.getElementById("db_up_btn"); //All the modal elements have the same id.
     up_btn.addEventListener("click", function () {
         editUploadCanvasImages(index);
     })
