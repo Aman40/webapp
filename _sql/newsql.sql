@@ -68,11 +68,11 @@ FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 CREATE TABLE IF NOT EXISTS Clients
 (
   ClientID CHAR(14) UNIQUE,
-  FirstName VARCHAR(20),
-  MiddleName VARCHAR(20),
-  LastName VARCHAR(20),
+  Honorific ENUM('Mr.', 'Mrs.', 'Miss'), /*Eliminates need to ask for gender*/
+  Name VARCHAR(20),
   PhoneNo CHAR(11) NOT NULL,
   Email VARCHAR(50) NOT NULL,
+  PwordHash VARCHAR(255), /*Password. Permit only up to 8 characters for simplicity. We're not protecting nuclear launch codes here*/
   JoinDate DATETIME NOT NULL,
   PRIMARY KEY (ClientID)
 );
@@ -98,15 +98,13 @@ CREATE TABLE IF NOT EXISTS UnitsJunct
 );
 CREATE TABLE IF NOT EXISTS Messages
 (
-  ClientID CHAR(14),
-  UserID CHAR(14),
+  ChannelID CHAR(28),
+  SenderID CHAR(14),
   TimeStamp TIMESTAMP,
   MsgText CHAR(255),
   PictureID CHAR(14),
   ImageURI VARCHAR(255),
-  PRIMARY KEY (ClientID, UserID, TimeStamp),
-  FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
-  FOREIGN KEY (UserID) REFERENCES Users(UserID)
+  PRIMARY KEY (ChannelID, TimeStamp)
 );
 CREATE TABLE IF NOT EXISTS ItemImages
 (

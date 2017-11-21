@@ -69,6 +69,12 @@ include "include.php";
                         }
                         ?>
                         <a href="#">About Us</a>
+                        <?php
+                            if(isset($_SESSION['ClientID'])) {
+                                //Display the logout button
+                                echo "<a href='logoff.php'>Log Out ".$_SESSION['DisplayName']."</a>";
+                            }
+                        ?>
                         <a href="#" id="orderitemtab" onclick="showOrdersDiv(this)">Order Item</a>
                         <script>
                             //upon clicking Order Item, hide the main panel and display the other.
@@ -91,12 +97,12 @@ include "include.php";
                         </script>
                         <a href="#">More stuff</a>
                         <?php //If the user logs in (session_exists=true) hide the following
-                        if(!$session_exists) {
+                        if(!$session_exists && !isset($_SESSION['ClientID'])) {
                             echo "
 							<a href=\"javascript:void(0)\" onclick=
-							\"document.getElementById('id01').style.display='block'\">Sign In</a>
+							\"document.getElementById('sgn_in_selector').style.display='block'\">Sign In</a>
 							<a href=\"javascript:void(0)\" onclick=
-							\"document.getElementById('id02').style.display='block'\">Sign up</a>
+							\"document.getElementById('sgn_up_selector').style.display='block'\">Sign up</a>
 								";
                         }
                         ?>
@@ -591,7 +597,25 @@ include "include.php";
                         html+="</td>";
                         html+="</tr>";
                         html+="</table>";
-                        html+="<button type='submit' ><i class='fa fa-plus-square-o'></i> Contact Seller</button>";
+                        html+="<button type='submit' ><i class='fa fa-plus-square-o' onclick=''></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
+                        //1. check if user is logged in
+                        <?php
+                            //This should be moved later. Perhaps all the
+                            if(isset($_SESSION['ClientID'])) {
+                                //User is logged in with a temporary account
+                            } else if($session_exists) {
+                                //User is logged in with permanent account.
+
+                            } else {
+                                //User isn't logged in. Give option to log in or sign up.
+                                //Temporary only for simplicity and given context in which this was launched
+
+                            }
+                        ?>
+                        //case yes: open message channel btn user and seller if none exists
+                        //case no: open registration page for temporary registration or prompt "login" with temporary login ID.
+                        //2. Open messages modal-like div covering entire screen
+
                         //Insert into oi-13
                         document.getElementById('oi-13').innerHTML = html;
                         //Display the whole modal
@@ -1010,7 +1034,7 @@ include "include.php";
         class="close" title="Close Modal">&times;</span>
 
     <!-- Modal Content -->
-    <form class="modal-content animate" action="fmh.php" method="post">
+    <form class="modal-content animate" action="mobile.php" method="post">
         <div class="imgcontainer">
             <img src="icons/img_avatar2.png" alt="Avatar" class="avatar">
         </div>
@@ -1039,61 +1063,61 @@ include "include.php";
 <!--****************************THE SIGNUP FORM******************************-->
 <div id="id02" class="modal">
     <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">×</span>
-    <form class="modal-content animate" action="fmh.php" method="post">
+    <form class="modal-content animate" action="mobile.php" method="post">
         <div class="container">
             <input type="hidden" name="formname" value="signup"/>
 
             <lable><b>First Name</b></lable><span class="error"> *<?php echo " ".$fname_error ?></span>
             <input type="text" class="required" placeholder="First Name" name="fname" value="<?php if(isset($_POST['fname']) && $_POST['fname'] != null) echo $_POST['fname']; ?>" required>
 
-            <lable><b>Middle Name</b></lable><span>
-		<input type="text" placeholder="Middle Name" name="mname" value="<?php if(isset($_POST['mname']) && $_POST['mname'] != null) echo $_POST['mname']; ?>">
+            <lable><b>Middle Name</b></lable>
+            <input type="text" placeholder="Middle Name" name="mname" value="<?php if(isset($_POST['mname']) && $_POST['mname'] != null) echo $_POST['mname']; ?>">
 
-		<lable><b>Last Name</b></lable><span class="error"> *<?php echo " ".$lname_error ?></span>
-		<input type="text" class="required" placeholder="Last Name" name="lname" value="<?php if(isset($_POST['lname']) && $_POST['lname'] != null) echo $_POST['lname']; ?>" required>
+            <lable><b>Last Name</b></lable><span class="error"> *<?php echo " ".$lname_error ?></span>
+            <input type="text" class="required" placeholder="Last Name" name="lname" value="<?php if(isset($_POST['lname']) && $_POST['lname'] != null) echo $_POST['lname']; ?>" required>
 
-		<lable><b>Company Name</b></lable><span class="error"> <?php echo " ".$coname_error ?></span>
-		<input type="text" placeholder="First Name" name="coname" value="<?php if(isset($_POST['coname']) && $_POST['coname'] != null) echo $_POST['coname']; ?>">
+            <lable><b>Company Name</b></lable><span class="error"> <?php echo " ".$coname_error ?></span>
+            <input type="text" placeholder="First Name" name="coname" value="<?php if(isset($_POST['coname']) && $_POST['coname'] != null) echo $_POST['coname']; ?>">
 
-		<lable><b>Sex</b></lable><span class="error"> *<?php echo $sex_error ?></span><br>
-		<input type="radio" class="required" name="sex" value="M" required >M<br>
-		<input type="radio" class="required" name="sex" value="F" required >F<br>
-		<input type="radio" class="required" name="sex" value="C" required >Company<br><br>
+            <lable><b>Sex</b></lable><span class="error"> *<?php echo $sex_error ?></span><br>
+            <input type="radio" class="required" name="sex" value="M" required >M<br>
+            <input type="radio" class="required" name="sex" value="F" required >F<br>
+            <input type="radio" class="required" name="sex" value="C" required >Company<br><br>
 
-		<lable><b>Date of Birth</b></lable><span class="error"> *<?php echo $dob_error ?></span><br>
-		<input type="date" class="required" class="wide" name="dob" required value="<?php if(isset($_POST['dob']) && $_POST['dob'] != null) echo $_POST['dob']; ?>"><br><br>
+            <lable><b>Date of Birth</b></lable><span class="error"> *<?php echo $dob_error ?></span><br>
+            <input type="date" class="required wide" name="dob" required value="<?php if(isset($_POST['dob']) && $_POST['dob'] != null) echo $_POST['dob']; ?>"><br><br>
 
-		<label><b>District of Operation</b></label><span class="error"> *<?php echo " ".$district_error ?></span>
-		<input type="text" class="required" placeholder="District" name="district" value="<?php if(isset($_POST['district']) && $_POST['district'] != null) echo $_POST['district']; ?>" required>
+            <label><b>District of Operation</b></label><span class="error"> *<?php echo " ".$district_error ?></span>
+            <input type="text" class="required" placeholder="District" name="district" value="<?php if(isset($_POST['district']) && $_POST['district'] != null) echo $_POST['district']; ?>" required>
 
-		<label><b>Email</b></label><span class="warning"><?php echo " ".$email_error ?></span>
-		<input type="text" placeholder="Enter Email" name="email" value="<?php if(isset($_POST['email']) && $_POST['email'] != null) echo $_POST['email']; ?>">
+            <label><b>Email</b></label><span class="warning"><?php echo " ".$email_error ?></span>
+            <input type="text" placeholder="Enter Email" name="email" value="<?php if(isset($_POST['email']) && $_POST['email'] != null) echo $_POST['email']; ?>">
 
-		<label><b>Address</b></label>
-		<input type="text" placeholder="E.g Plot 35 Speke street, Kampala" name="address" value="<?php if(isset($_POST['address']) && $_POST['address'] != null) echo $_POST['address']; ?>">
+            <label><b>Address</b></label>
+            <input type="text" placeholder="E.g Plot 35 Speke street, Kampala" name="address" value="<?php if(isset($_POST['address']) && $_POST['address'] != null) echo $_POST['address']; ?>">
 
-		<label><b>Phone Number</b></label><span class="error"> *<?php echo " ".$phoneno_error ?></span>
-		<input type="text" class="required" placeholder="E.g 0784596469" name="phoneno" value="<?php if(isset($_POST['phoneno']) && $_POST['phoneno'] != null) echo $_POST['phoneno']; ?>" required>
+            <label><b>Phone Number</b></label><span class="error"> *<?php echo " ".$phoneno_error ?></span>
+            <input type="text" class="required" placeholder="E.g 0784596469" name="phoneno" value="<?php if(isset($_POST['phoneno']) && $_POST['phoneno'] != null) echo $_POST['phoneno']; ?>" required>
 
-		<label><b>Website</b></label>
-		<input type="text" placeholder="e.g www.domain.com" name="website" value="<?php if(isset($_POST['website']) && $_POST['website'] != null) echo $_POST['website']; ?>">
+            <label><b>Website</b></label>
+            <input type="text" placeholder="e.g www.domain.com" name="website" value="<?php if(isset($_POST['website']) && $_POST['website'] != null) echo $_POST['website']; ?>">
 
-		<label><b>About Yourself</b></label><br>
-		<textarea style="width: 100%" placeholder="About yourself..." name="about" value="<?php if(isset($_POST['about']) && $_POST['about'] != null) echo $_POST['about']; ?>"></textarea><br>
+            <label><b>About Yourself</b></label><br>
+            <textarea style="width: 100%" placeholder="About yourself..." name="about" value="<?php if(isset($_POST['about']) && $_POST['about'] != null) echo $_POST['about']; ?>"></textarea><br>
 
-		<label><b>Password</b></label><span class="error"> * <?php echo " ".$upassword_error ?></span>
-		<input type="password" class="required" placeholder="Enter Password" name="upassword" required>
+            <label><b>Password</b></label><span class="error"> * <?php echo " ".$upassword_error ?></span>
+            <input type="password" class="required" placeholder="Enter Password" name="upassword" required>
 
-		<label><b>Repeat Password</b></label><span class="error"> * </span><br>
-		<input type="password" class="required" placeholder="Repeat Password" name="upassword2" required>
-		<span class="warning">* = required</span><br>
-		<input type="checkbox" checked="checked"> Remember me
-		<p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
+            <label><b>Repeat Password</b></label><span class="error"> * </span><br>
+            <input type="password" class="required" placeholder="Repeat Password" name="upassword2" required>
+            <span class="warning">* = required</span><br>
+            <input type="checkbox" checked="checked"> Remember me
+            <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
 
-      <div class="clearfix">
-        <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
-        <button type="submit" class="signupbtn">Sign Up</button>
-      </div>
+            <div class="clearfix">
+                <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
+                <button type="submit" class="signupbtn">Sign Up</button>
+            </div>
         </div>
     </form>
 </div>
@@ -1111,26 +1135,133 @@ include "include.php";
         </div>
     </div>
 </div><!--Edit-->
-<!--*************************************************************************-->
+<!--*******************************The Messages Modal******************************************-->
+<div class="modal" id="messagebox">
+
+</div>
+<!--*******************************The Signup Modal for Guest Accounts******************************************-->
+<div class="modal" id="gst_sgn_up">
+    <span onclick="document.getElementById('gst_sgn_up').style.display='none'"
+          class="close" title="Close Modal">&times;</span>
+    <form class="modal-content animate" action="mobile.php" method="post">
+        <div class="container">
+            <input type="hidden" name="formname" value="gst_sgn_up"> <!--This contains information to identify the form by the script-->
+            <label><b>Honorific: </b></label><br>
+            <select name="honorific" style="Height: 30px; -webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;">
+                <option value="Mr." selected>Mr.</option>
+                <option value="Mrs.">Mrs.</option>
+                <option value="Miss">Miss</option>
+            </select><br>
+
+            <label><b>Display Name:</b></label><span class="error"> * <?php echo $display_name_error; ?> </span><br>
+            <input type="text" class="required" name="display_name" placeholder="Name you prefer being called" required value="<?php echo  $display_name;?>"><br>
+
+            <label><b>Email:</b></label><span class="error"> * <?php echo $email_error; ?> </span><br>
+            <input type="text" name="email" placeholder="Email address" value="<?php echo $email; ?>"><br>
+
+            <label><b>Phone number:</b></b></label><span class="error"> * <?php echo $phoneno_error; ?></span><br>
+            <input type="text" name="phoneno" class="required" placeholder="Phone Number" required value="<?php echo $phoneno; ?>" ><br>
+
+            <label><b>Password</b></label><span class="error"> * <?php echo $upassword_error; ?></span><br>
+            <input type="password" class="required" placeholder="Enter password" name="upassword" required value="<?php echo $upassword; ?>"><br>
+
+            <label><b>Repeat Password</b></label><span class="error"> * <?php echo $upassword2_error; ?></span><br>
+            <input type="password" class="required" placeholder="Repeat Password" name="upassword2" required value="<?php echo $upassword2; ?>">
+
+            <span class="warning">* = required</span><br>
+            <input type="checkbox" checked="checked"> Remember me
+            <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
+            <div class="clearfix">
+                <button type="button" onclick="" class="cancelbtn">Cancel</button>
+                <button type="submit" class="signupbtn">Sign Up</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--*******************************The Signin Modal******************************************-->
+<div class="modal" id="gst_sgn_in">
+    <span onclick="document.getElementById('gst_sgn_in').style.display='none'"
+    class="close" title="Close Modal">&times;</span>
+
+    <!-- Modal Content -->
+    <form class="modal-content animate" action="mobile.php" method="post">
+        <div class="imgcontainer">
+            <img src="icons/img_avatar2.png" alt="Avatar" class="avatar">
+        </div>
+        <div class="container">
+            <input type="hidden" name="formname" value="gst_sgn_in"/>
+
+            <label><b>Phone number</b></label><span class="error"><?php echo $phoneno_error; ?></span><br>
+            <input type="text" placeholder="Enter Username" name="phoneno" required value="<?php echo $phoneno ?>" >
+
+            <label><b>Password</b></label><span class="error"><?php echo $upassword_error; ?></span><br>
+            <input type="password" placeholder="Enter Password" name="upassword" required>
+
+            <button type="submit">Login</button>
+            <input type="checkbox" checked="checked"> Remember me
+        </div>
+        <div class="container" style="background-color:#f1f1f1">
+            <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+            <span class="psw">Forgot <a href="#">password?</a></span>
+        </div>
+    </form>
+</div>
+<div class="modal" id="sgn_up_selector">
+    <div class="modal-content animate">
+        <div style="font-size: 1.2em">Which account would you like to create</div>
+        <button onclick="selectorHandler('guest_up')"><span>Simple Guest Account</span><br>(Only capable of buying)</button>
+        <button onclick="selectorHandler('member_up')"><span>Member Account</span><br>(Capable of buying and selling)</button>
+    </div>
+</div>
+<div class="modal" id="sgn_in_selector">
+    <div class="modal-content animate">
+        <button onclick="selectorHandler('guest_in')"><span>I have a guest account</span></button>
+        <button onclick="selectorHandler('member_in')"><span>I have a member account</span></button>
+    </div>
+</div>
 <script>
     // Get the modal
     var modalin = document.getElementById('id01'); //The signin modal
     var modalup = document.getElementById('id02'); //The signup modal
     var modalOrder = document.getElementById('orderItem');
+    var modal_gst_up = document.getElementById('gst_sgn_up');
+    var modal_gst_in = document.getElementById('gst_sgn_in');
+    var sgn_up_selector = document.getElementById('sgn_up_selector');
+    var sgn_in_selector = document.getElementById('sgn_in_selector');
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target === modalup) {
-            console.log("It's the modalup");
             modalup.style.display = "none";
         } else if (event.target === modalin) {
-            console.log("It's the modalin");
             modalin.style.display = "none";
         } else if (event.target === modalOrder){
             modalOrder.style.display = "none";
+        } else if(event.target === modal_gst_in) {
+            modal_gst_in.style.display = "none";
+        } else if (event.target === modal_gst_up) {
+            modal_gst_up.style.display = "none";
+        } else if (event.target === sgn_up_selector) {
+            sgn_up_selector.style.display = "none";
+        } else if(event.target === sgn_in_selector) {
+            sgn_in_selector.style.display = "none";
+        }
+    };
+    function selectorHandler(ctx) {
+        if(ctx==='guest_up') {
+            document.getElementById('sgn_up_selector').style.display = "none";
+            document.getElementById('gst_sgn_up').style.display = "block";
+        } else if(ctx==='member_up') {
+            document.getElementById('sgn_up_selector').style.display = "none";
+            document.getElementById('id02').style.display = "block";
+        } else if(ctx==='guest_in') {
+            document.getElementById('sgn_in_selector').style.display = "none";
+            document.getElementById('gst_sgn_in').style.display = "block";
+        } else if(ctx==='member_in') {
+            document.getElementById('sgn_in_selector').style.display = "none";
+            document.getElementById('id01').style.display = "block";
         }
     }
-
     function change_view() {
         var slide_container = document.getElementById("r2c2");
         if(slide_container.classList.contains("slide-container-view-list")) {
@@ -1140,7 +1271,43 @@ include "include.php";
             slide_container.classList.add("slide-container-view-list");
         }
     }
+    <?php
+    //echo some javascript here to reload the modal based on $reload_gst_up which is true when there's a problem
+            //And uploading is not possible
+            if($reload_gst_up == true) {
+                echo "document.getElementById('gst_sgn_up').style.display = 'block';"; //Javascript code to reload the modal
+            }
+            if($reload_gst_in) {
+                echo "document.getElementById('gst_sgn_in').style.display = 'block';"; //Javascript code to reload the modal
+            }
+    ?>
 </script>
+<!-------------------------------The Messaging interface begins below------------------------------------------>
+<div class="modal" id="msg_iface" style="display: block">
+    <div class="modal-content" id="msg_content">
+        <div id="msg_outer"><!--The messages outer frame-->
+            <div id="msg_row_top"><!--The top row-->
+                <div id="msg_row_top_container"><!--Contains the correspondent's name, back button, close button -->
+                    <div id="msg_back"> Back</div>
+                    <div id="msg_name">Correspondent's name</div>
+                    <div id="msg_close">Close</div>
+                </div>
+            </div>
+            <div id="msg_row_middle"><!--The middle row. Outer wrap for the actual texts-->
+                <div id="msg_capsule_container"><!--Actual container for the text "capsules"-->
+                    <!--The text capsules will be put in here using ajax, 10 at a time. Contains msg text and time-->
+                </div>
+            </div>
+            <div id="msg_row_btm"><!--The bottom row. Contans image selector, text area and send button-->
+                <div id="msg_row_btm_wrap"><!--Outer wrap-->
+                    <div id="msg_img_slctor">Img</div>
+                    <div id="msg_txt_area"><input type="text"></div>
+                    <div id="msg_send">Send</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
 

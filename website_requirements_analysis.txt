@@ -242,10 +242,34 @@ IMMEDIATE ADDITION
 --Allow users (with accounts?) to place orders in the open and allow capable sellers to bid/provide. //IN PROGRESS
 --Finish dbeditor DONE! Apart from the CSS
 
+MESSAGES
+1. Buyers looking to order or contact/message a seller will need an account.
+    Prompt whether user needs to create temporary or permanent account.
+2. A registration modal will pop up upon clicking to buy an item or "message seller"
+3. Upon completion of registration, the user is redirected to whatever task they were attempting in the first place
+4. Perhaps add a new field to show whether a message has been seen or not
+5. Have a separate table to show new messages. Different from "unread". Message notifications will base here.
+
+-Pair the two IDs of the clients involved in the messaging by concatenation to create a huge string - the Unique Connection Identifier.
+-The pairing should be such that the lesser one in the alphabetical order comes first
+-That way regardless of who messages who, any to arbitrary ID's will point to a unique conversation, regardless of order
+-
+TODO
+1. Create sign up & sign in interfaces CHECK!
+2. Create selector between guest & member sign up/sign in CHECK!
+3. Write PHP Scripts for signup/signin CHECK!
+4. Create messenger interface
+5. Write messenger php script
+
+PROBLEMS
+1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
 
 
-
-
+ORDERS
+1. User searches entire catalog for "orderable" items;
+2. Upon clicking, a model opens prompting details about the order
+3. Upon "finishing", the info is stored in the Orders table
+4. How do others(the sellers) access this info and how is it presented for them?
 
 
 

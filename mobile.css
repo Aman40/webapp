@@ -901,3 +901,70 @@ span.psw {
     clear: both;
     display: table;
 }
+#sgn_up_selector button {
+    height:60px;
+    margin:2px auto;
+}
+#sgn_up_selector button span {
+    font-size: 1.5em;
+}
+#sgn_up_selector .modal-content {
+    width: 80%;
+    margin: 35% auto;
+}
+[id*=msg] {
+    display: block;
+}
+#msg_iface {
+
+}
+#msg_content {
+
+}
+#msg_outer {
+    padding: 2px;
+}
+#msg_row_top {
+
+}
+#msg_row_top_container {
+
+}
+#msg_back {
+
+}
+#msg_name {
+
+}
+#msg_close {
+
+}
+#msg_row_middle {
+
+}
+#msg_capsule_container {
+    min-height: 400px;
+    background-color: azure;
+}
+#msg_row_btm {
+
+}
+#msg_row_btm_wrap {
+
+}
+#msg_img_slctor, #msg_back {
+    width: 10%;
+}
+#msg_txt_area, #msg_name {
+    width: 75%;
+}
+#mgs_send, #msg_close {
+    width: 10%;
+}
+#msg_row_top_container > div, #msg_row_btm_wrap > div {
+    display: inline-block;
+}
+#msg_txt_area input {
+    width: 100%;
+    background-color: white;
+}
