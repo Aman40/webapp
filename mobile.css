@@ -913,7 +913,6 @@ span.psw {
     margin: 35% auto;
 }
 [id*=msg] {
-    display: block;
 }
 #msg_iface {
 
@@ -931,13 +930,11 @@ span.psw {
 
 }
 #msg_back {
-
 }
 #msg_name {
-
+    cursor: pointer;
 }
 #msg_close {
-
 }
 #msg_row_middle {
 
@@ -954,17 +951,20 @@ span.psw {
 }
 #msg_img_slctor, #msg_back {
     width: 10%;
+    cursor: pointer;
 }
 #msg_txt_area, #msg_name {
     width: 75%;
 }
 #mgs_send, #msg_close {
     width: 10%;
+    cursor: pointer;
 }
 #msg_row_top_container > div, #msg_row_btm_wrap > div {
     display: inline-block;
+    margin: 7px 0px;
 }
-#msg_txt_area input {
+#msg_txt_area textarea {
     width: 100%;
     background-color: white;
 }

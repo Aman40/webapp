@@ -10,6 +10,38 @@ include "include.php";
     <link type="text/css" rel="stylesheet" href="mobile.css">
 </head>
 <body>
+<script>
+    //1. check if user is logged in
+    var isLogged = false; //Default
+    <?php
+    if(isset($_SESSION['ClientID']) || isset($_SESSION['UserID'])) {
+        //User is logged in. Type of account is irrelevant;
+        //Set javascript isLogged variable to true.
+        echo "isLogged = true;";
+    }
+    ?>
+    function messageClient(indexNo) {
+        //uses isLogged variable
+        if(isLogged) {
+            //User is logged in
+            console.log("Is logged in");
+            //Get seller ID
+            var sellerID = itemNodeList[indexNo].getElementsByClassName("UserID")[0].childNodes[0].nodeValue;
+            //Open messenger interface with UserID embedded somewhere for retrieval
+            var msgInterface = document.getElementById("msg_iface");
+            msgInterface.sellerID = sellerID; //This violates HTML5 integrity but meh!!
+            msgInterface.style.display = "block";
+        } else {
+            //User is not logged in
+            console.log("Not logged in!");
+            //Prompt user to sign up or sign in
+            document.getElementById('sgn_in_selector').style.display = "none";
+        }
+    }
+    //case yes: open message channel btn user and seller if none exists
+    //case no: open registration page for temporary registration or prompt "login" with temporary login ID.
+    //2. Open messages modal-like div covering entire screen
+</script>
 <div id="main-wrapper">
     <div id="row-1">
 
@@ -142,7 +174,7 @@ include "include.php";
                 }
             </script>
         </div>
-        <div class="col-3" id="categories" class="cat-slide-in"> <!--search by category-->
+        <div id="categories" class=" col-3 cat-slide-in"> <!--search by category-->
             <div class="col-12" id="inventory-crops">
                 <div class="col-12 lvl-1" onclick="hide_show('inventory-crops')">
                     <i class="fa fa-caret-right"></i>
@@ -438,7 +470,7 @@ include "include.php";
                         xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
                         xhttp.onreadystatechange = function() { //If we get a reply from the server
                             if(this.readyState===4 && this.status===200) { //Check the status and readystate
-                                if(this.responseXML!=null) { //Do we have any meaningful response other than null?
+                                if(this.responseXML!==null) { //Do we have any meaningful response other than null?
                                     var xmlDoc = this.responseXML;
                                     console.log(xmlDoc);
                                     var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
@@ -504,7 +536,7 @@ include "include.php";
                                     console.log("The is no response XML");
                                 }
                             }
-                        }
+                        };
                         xhttp.open("GET", "Profiles/xhttp.php?table=nonlogged&q="+str, true);
                         xhttp.send();
                     }
@@ -572,8 +604,8 @@ include "include.php";
                         html+="<td>";
                         html+=userInfoNode.getElementsByTagName('district')[0].childNodes[0].nodeValue;
                         html+="</td>";
-                        html+="</tr>"
-                        html+="<tr>"
+                        html+="</tr>";
+                        html+="<tr>";
                         html+="<th>";
                         html+="Contact Email:";
                         html+="</th>";
@@ -597,24 +629,8 @@ include "include.php";
                         html+="</td>";
                         html+="</tr>";
                         html+="</table>";
-                        html+="<button type='submit' ><i class='fa fa-plus-square-o' onclick=''></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
-                        //1. check if user is logged in
-                        <?php
-                            //This should be moved later. Perhaps all the
-                            if(isset($_SESSION['ClientID'])) {
-                                //User is logged in with a temporary account
-                            } else if($session_exists) {
-                                //User is logged in with permanent account.
+                        html+="<button onclick='messageClient("+i+")'><i class='fa fa-plus-square-o' ></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
 
-                            } else {
-                                //User isn't logged in. Give option to log in or sign up.
-                                //Temporary only for simplicity and given context in which this was launched
-
-                            }
-                        ?>
-                        //case yes: open message channel btn user and seller if none exists
-                        //case no: open registration page for temporary registration or prompt "login" with temporary login ID.
-                        //2. Open messages modal-like div covering entire screen
 
                         //Insert into oi-13
                         document.getElementById('oi-13').innerHTML = html;
@@ -688,7 +704,7 @@ include "include.php";
                         xmlhttp.responseType = "document";
                         xmlhttp.onreadystatechange = function() {
                             if(this.readyState===4 && this.status===200) {
-                                if(this.responseXML!=null) { //OK
+                                if(this.responseXML!==null) { //OK
                                     var doc = this.responseXML;
                                     var returnStatus = doc.getElementsByTagName('status')[0].childNodes[0].nodeValue; //This is a string. Cast it into an integer
                                         returnStatus = parseInt(returnStatus);
@@ -711,7 +727,7 @@ include "include.php";
                                 //later
                                 console.log("The XMLHttp request was a flop! My bad!");
                             }
-                        }
+                        };
                         xmlhttp.open("GET", "Profiles/xhttp.php?table=sellerdata&UserID="+userid, true);
                         xmlhttp.send();
                     }
@@ -719,12 +735,12 @@ include "include.php";
                         //This function searches the db table Items for item templates for users to define the items
                         //they want to order. It's used by the orders div. It's almost exactly the same as the _searchdb()
                         //function in Profiles/index.
-                        console.log("Is the function even called?!")
+                        console.log("Is the function even called?!");
                         var xhttp = new XMLHttpRequest();
                         xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
                         xhttp.onreadystatechange = function() { //If we get a reply from the server
-                            if(this.readyState==4 && this.status==200) { //Check the status and readystate
-                                if(this.responseXML!=null) { //Do we have any meaningful response other than null?
+                            if(this.readyState===4 && this.status===200) { //Check the status and readystate
+                                if(this.responseXML!==null) { //Do we have any meaningful response other than null?
                                     var xmlDoc = this.responseXML;
                                     console.log(xmlDoc);
                                     var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
@@ -1217,6 +1233,7 @@ include "include.php";
     <div class="modal-content animate">
         <button onclick="selectorHandler('guest_in')"><span>I have a guest account</span></button>
         <button onclick="selectorHandler('member_in')"><span>I have a member account</span></button>
+        <button onclick="selectorHandler('create')"><span>New here. Create an account</span></button>
     </div>
 </div>
 <script>
@@ -1260,6 +1277,9 @@ include "include.php";
         } else if(ctx==='member_in') {
             document.getElementById('sgn_in_selector').style.display = "none";
             document.getElementById('id01').style.display = "block";
+        } else if(ctx==='create') {
+            document.getElementById('sgn_in_selector').style.display = "none";
+            document.getElementById("sgn_up_selector").style.display = "block";
         }
     }
     function change_view() {
@@ -1283,7 +1303,7 @@ include "include.php";
     ?>
 </script>
 <!-------------------------------The Messaging interface begins below------------------------------------------>
-<div class="modal" id="msg_iface" style="display: block">
+<div class="modal" id="msg_iface">
     <div class="modal-content" id="msg_content">
         <div id="msg_outer"><!--The messages outer frame-->
             <div id="msg_row_top"><!--The top row-->
@@ -1301,13 +1321,86 @@ include "include.php";
             <div id="msg_row_btm"><!--The bottom row. Contans image selector, text area and send button-->
                 <div id="msg_row_btm_wrap"><!--Outer wrap-->
                     <div id="msg_img_slctor">Img</div>
-                    <div id="msg_txt_area"><input type="text"></div>
+                    <div id="msg_txt_area"><textarea id="msgtxt"></textarea></div>
                     <div id="msg_send">Send</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    //This is to handle messages;
+    function sendMessage() {
+        //This function sends the message and refreshes
+        var msgText = document.getElementById('msgtxt').value;
+        //Send this text via AJAX to the db. The UserID/ClientID is already described in the $_SESSION['xxxID']
+        //So sending it is unnecessary.
+        //Send the text via AJAX to messages.php
+        var xht = new XMLHttpRequest();
+        xht.responseType = "document";
+        xht.onreadystatechange = function () {
+          //Send and call refreshMessages();
+          if(this.status===200 && this.readyState===4) {
+              //Everything went according to plan
+              //Get the return xml
+              var xmlDoc = this.responseXML;
+              //Get the return status
+              var returnStatus = xmlDoc.getElementsByTagNameNS("returnstatus")[0].childNodes[0].nodeValue;
+              //Convert return status to integer
+              returnStatus = parseInt(returnStatus);
+              //Analyze the return status for errors
+              if(returnStatus===0) {
+                  //Everything went according to plan
+                  //Clear text area
+                  document.getElementById('msgtxt').value = "";
+                  //Call loadMessages and finish.
+                  loadMessages();
+              } else {
+                  console.log("A problem with returnStatus "+returnStatus+" occured.");
+              }
+          } else {
+              //Analyze the status and ready states
+              console.log(this.status);
+              console.log(this.readyState);
+          }
+        };
+        xht.open("POST", "messages.php?context=send&msgText="+msgText,true);
+        xht.send();
+    }
+    var msgCapsuleContainer = document.getElementById("msg_capsule_container");
+    function loadMessages() {
+        //This fetches messages into the msg_capsule_container div
+        //Fetch the messages using AJAX
+        var xht = new XMLHttpRequest();
+        xht.responseXML = "document";
+        xht.onreadystatechange = function () {
+            //Send and call refreshMessages();
+            if(this.status===200 && this.readyState===4) {
+                //Everything went according to plan
+                //Get the return xml
+                var xmlDoc = this.responseXML;
+                //Get the return status
+                var returnStatus = xmlDoc.getElementsByTagNameNS("returnstatus")[0].childNodes[0].nodeValue;
+                //Convert return status to integer
+                returnStatus = parseInt(returnStatus);
+                //Analyze the return status for errors
+                if(returnStatus===0) {
+                    //Everything went according to plan
+                    //load the div with messages
+                    //That depends on the returned XML, so return XML from PHP first.
+                } else {
+                    console.log("A problem with returnStatus "+returnStatus+" occured.");
+                }
+            } else {
+                //Analyze the status and ready states
+                console.log(this.status);
+                console.log(this.readyState);
+            }
+        };
+        xht.open("POST", "messages.php?context=fetch", true);
+        xht.send();
+    }
+</script>
 </body>
 </html>
 

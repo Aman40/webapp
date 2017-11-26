@@ -253,7 +253,9 @@ MESSAGES
 -Pair the two IDs of the clients involved in the messaging by concatenation to create a huge string - the Unique Connection Identifier.
 -The pairing should be such that the lesser one in the alphabetical order comes first
 -That way regardless of who messages who, any to arbitrary ID's will point to a unique conversation, regardless of order
--
+-Number every single message. This will not only help counting messages, it'll also help in fetching older messages.
+-use php. Extract the larges, add 1 to get the next. I used mysql SERIAL.
+
 TODO
 1. Create sign up & sign in interfaces CHECK!
 2. Create selector between guest & member sign up/sign in CHECK!

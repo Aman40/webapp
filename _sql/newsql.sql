@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS Messages
   MsgText CHAR(255),
   PictureID CHAR(14),
   ImageURI VARCHAR(255),
+  MsgSerial SERIAL,
   PRIMARY KEY (ChannelID, TimeStamp)
 );
 CREATE TABLE IF NOT EXISTS ItemImages
