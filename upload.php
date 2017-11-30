@@ -26,7 +26,8 @@ if($context=="add") {
     $description = get_if_set('Description');
     $itemID = get_if_set('ItemID');
     echo "<msg>The ItemID=".$itemID."</msg>";
-    edit_item_details($itemID, $itemName, $otherNames, $category, $description); //Then call upload_units() here
+    edit_item_details
+($itemID, $itemName, $otherNames, $category, $description); //Then call upload_units() here
     //or in after success of edit_item_details?
 } else if($context=="getUnits") {
     //This is handled by the xhttp.php script

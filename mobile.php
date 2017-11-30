@@ -26,16 +26,18 @@ include "include.php";
             //User is logged in
             console.log("Is logged in");
             //Get seller ID
-            var sellerID = itemNodeList[indexNo].getElementsByClassName("UserID")[0].childNodes[0].nodeValue;
+            var sellerID = itemNodeList[indexNo].getElementsByTagName("UserID")[0].childNodes[0].nodeValue;
             //Open messenger interface with UserID embedded somewhere for retrieval
             var msgInterface = document.getElementById("msg_iface");
             msgInterface.sellerID = sellerID; //This violates HTML5 integrity but meh!!
             msgInterface.style.display = "block";
+            loadMessages();
         } else {
             //User is not logged in
             console.log("Not logged in!");
             //Prompt user to sign up or sign in
-            document.getElementById('sgn_in_selector').style.display = "none";
+           // document.getElementById('orderItem').style.display = "none";
+            document.getElementById('sgn_in_selector').style.display = "block";
         }
     }
     //case yes: open message channel btn user and seller if none exists
@@ -1322,7 +1324,7 @@ include "include.php";
                 <div id="msg_row_btm_wrap"><!--Outer wrap-->
                     <div id="msg_img_slctor">Img</div>
                     <div id="msg_txt_area"><textarea id="msgtxt"></textarea></div>
-                    <div id="msg_send">Send</div>
+                    <div id="msg_send" onclick="sendMessage()">Send</div>
                 </div>
             </div>
         </div>
@@ -1331,10 +1333,20 @@ include "include.php";
 <script>
     //This is to handle messages;
     function sendMessage() {
+        //From the perspective of a buyer messaging a seller. (Because of where the recepientID comes from)
+        //This is all predicated from someone clicking "contact seller". A version for "reply to message", for the
+        //seller's part will be handled too.
         //This function sends the message and refreshes
         var msgText = document.getElementById('msgtxt').value;
         //Send this text via AJAX to the db. The UserID/ClientID is already described in the $_SESSION['xxxID']
         //So sending it is unnecessary.
+        //Get the seller's ID
+        var recepID = document.getElementById("msg_iface").sellerID; //Recepient ID
+        //Create the Form Data object;
+        var fd = new FormData;
+        fd.append("context", "send");
+        fd.append("recepID", recepID);
+        fd.append("msgText", msgText);
         //Send the text via AJAX to messages.php
         var xht = new XMLHttpRequest();
         xht.responseType = "document";
@@ -1344,8 +1356,9 @@ include "include.php";
               //Everything went according to plan
               //Get the return xml
               var xmlDoc = this.responseXML;
+              console.log(xmlDoc);
               //Get the return status
-              var returnStatus = xmlDoc.getElementsByTagNameNS("returnstatus")[0].childNodes[0].nodeValue;
+              var returnStatus = xmlDoc.getElementsByTagName("returnstatus")[0].childNodes[0].nodeValue;
               //Convert return status to integer
               returnStatus = parseInt(returnStatus);
               //Analyze the return status for errors
@@ -1354,9 +1367,11 @@ include "include.php";
                   //Clear text area
                   document.getElementById('msgtxt').value = "";
                   //Call loadMessages and finish.
+                  console.log("The message was sent successfully");
                   loadMessages();
               } else {
-                  console.log("A problem with returnStatus "+returnStatus+" occured.");
+                  console.log(xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue);
+                  console.log("Problem "+returnStatus+" occured.");
               }
           } else {
               //Analyze the status and ready states
@@ -1364,23 +1379,33 @@ include "include.php";
               console.log(this.readyState);
           }
         };
-        xht.open("POST", "messages.php?context=send&msgText="+msgText,true);
-        xht.send();
+        xht.open("POST", "messages.php",true);
+        xht.send(fd);
     }
     var msgCapsuleContainer = document.getElementById("msg_capsule_container");
+    var offset = 0.5; //The lower limit for rows to be fetched, based on the Serial number 'cause the date would make
+                    //things a little complicated
     function loadMessages() {
+        //This is from the perspective of the buyer messaging a seller. The other way round will be hadled semi-independently
         //This fetches messages into the msg_capsule_container div
         //Fetch the messages using AJAX
         var xht = new XMLHttpRequest();
-        xht.responseXML = "document";
+        var recepID = document.getElementById("msg_iface").sellerID; //Recepient ID
+        //Create the Form Data object;
+        var fd = new FormData;
+        fd.append("context", "fetch");
+        fd.append("recepID", recepID);
+        fd.append("offset", offset);
+        xht.responseType = "document";
         xht.onreadystatechange = function () {
             //Send and call refreshMessages();
             if(this.status===200 && this.readyState===4) {
                 //Everything went according to plan
                 //Get the return xml
                 var xmlDoc = this.responseXML;
+                console.log(xmlDoc);
                 //Get the return status
-                var returnStatus = xmlDoc.getElementsByTagNameNS("returnstatus")[0].childNodes[0].nodeValue;
+                var returnStatus = xmlDoc.getElementsByTagName("returnstatus")[0].childNodes[0].nodeValue;
                 //Convert return status to integer
                 returnStatus = parseInt(returnStatus);
                 //Analyze the return status for errors
@@ -1388,6 +1413,52 @@ include "include.php";
                     //Everything went according to plan
                     //load the div with messages
                     //That depends on the returned XML, so return XML from PHP first.
+                    var msg_node_list = xmlDoc.getElementsByTagName("message"); //Contains 10 messages at a time
+                    //Get the message capsule container
+                    var msg_capsule_container = document.getElementById("msg_capsule_container");
+                    msg_capsule_container.innerHTML = "";
+                    //Create the message container capsules
+                    for(var i = 0; i<msg_node_list.length;i++) {
+                        //Get all the <message> variables first
+                        var timesent = msg_node_list[i].getElementsByTagName("timesent")[0].childNodes[0].nodeValue;
+                        var msgtext = msg_node_list[i].getElementsByTagName("msgtext")[0].childNodes[0].nodeValue;
+                      //  var pictureid = msg_node_list[i].getElementsByTagName("pictureid")[0].childNodes[0].nodeValue;
+                      //  var imageuri = msg_node_list[i].getElementsByTagName("imageuri")[0].childNodes[0].nodeValue;
+                        var bool_in_out = msg_node_list[i].getElementsByTagName("sender")[0].childNodes[0].nodeValue;
+
+                        var elmt = document.createElement("div");
+                        elmt.id = "cap_wrap"; //Capsule outer wrap
+                            var elmt2 = document.createElement("div");
+                            elmt2.id = "cap_col_left";
+                            elmt.appendChild(elmt2);
+                            elmt2 = document.createElement("div");
+                            elmt2.id = "cap_col_center";
+                                var elmt3 = document.createElement("div"); //Date and time of sending
+                                elmt3.id="cap_col_center_top";
+                                elmt3.innerHTML = timesent;
+                                elmt2.appendChild(elmt3);
+                                var elmt3 = document.createElement("div"); //Actual message
+                                elmt3.id="cap_col_center_middle";
+                                    var elmt4 = document.createElement("div");
+                                    elmt4.classList.add("cap_msg_text_wrapper");
+                                    //Change background color depending on whether message is in or outbound
+                                    if(bool_in_out==="inbound") {
+                                        elmt4.classList.add("cap_msg_text_inbound");
+                                    } else {
+                                        elmt4.classList.add("cap_msg_text_outbound");
+                                    }
+                                    elmt4.innerHTML = msgtext;
+                                    elmt3.appendChild(elmt4);
+                                elmt2.appendChild(elmt3);
+                                var elmt3 = document.createElement("div"); //"seen". Will be implemented later
+                                elmt3.id="cap_col_center_bottom";
+                                elmt2.appendChild(elmt3);
+                            elmt.appendChild(elmt2);
+                            elmt2 = document.createElement("div");
+                            elmt2.id = "cap_col_right";
+                            elmt.appendChild(elmt2);
+                        msg_capsule_container.appendChild(elmt);
+                    }
                 } else {
                     console.log("A problem with returnStatus "+returnStatus+" occured.");
                 }
@@ -1397,8 +1468,8 @@ include "include.php";
                 console.log(this.readyState);
             }
         };
-        xht.open("POST", "messages.php?context=fetch", true);
-        xht.send();
+        xht.open("POST", "messages.php", true);
+        xht.send(fd);
     }
 </script>
 </body>

@@ -260,8 +260,9 @@ TODO
 1. Create sign up & sign in interfaces CHECK!
 2. Create selector between guest & member sign up/sign in CHECK!
 3. Write PHP Scripts for signup/signin CHECK!
-4. Create messenger interface
+4. Create messenger interface CHECK
 5. Write messenger php script
+6. PAGINATION with mysql
 
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.

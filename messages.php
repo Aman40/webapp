@@ -1,7 +1,7 @@
 <?php
 //This script is for handling all messages between clients and sellers.
 include "customErrorHandler.php";
-set_error_handler(customErrorHandler.php); //Setting error handler
+set_error_handler(customErrorHandler); //Setting error handler
 //Start session
 session_start();
 //Check for already existing sessionID
@@ -15,13 +15,140 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         $myID = $_SESSION["ClientID"];
     }
     //There's need to send the recepient userID.
+    //Get the context and perform the action
+    $context = filter($_POST['context']) or die("<msg>Context is not set!</msg><returnstatus>2</returnstatus>");
+    //Start with the receiving the sent message
+    if($context=="send") {
+        //Receiving a sent message
+        //Get the recepient ID
+        $recepID = filter($_POST['recepID']) or die("<msg>recepID is not set!</msg><returnstatus>2</returnstatus>");
+        //Get the message text
+        $msgText = addslashes(filter($_POST['msgText'])) or die("<msg>msgText is not set</msg><returnstatus>3</returnstatus>"); //URGENT: Find a way to deal with null messages
+        //Generate the "ChannelID" by concatenating myID and recepID in alphabetical order, smaller one first
+        if(strcmp($myID, $recepID)) {
+            //myID is lexicographically smaller, i.e comes first alphabetically
+            $channelID = $myID.$recepID;
+        } else {
+            $channelID = $recepID.$myID;
+        }
+        //Open a connection to the database
+        $servername = "localhost";
+        $username = "aman";
+        $password = "password";
+        $database = "test";
+
+        $pictureID = "";
+        $imageURI = "";
+        $conn = new mysqli($servername, $username, $password, $database);
+        if(!$conn->connect_error) {
+            //Connected successfully
+            //Create sql statement
+            $sql = "INSERT INTO Messages(ChannelID, MsgText, PictureID, ImageURI, Sender) 
+                    VALUES ('".$channelID."', '".$msgText."', '".$pictureID."', '".$imageURI."',
+                    '".$myID."')";
+
+            if($conn->query($sql)) {
+                 //Successfully executed
+                echo "<returnstatus>0</returnstatus>";
+            } else {
+                echo "<msg>".$conn->error."</msg>";
+                echo "<returnstatus>2</returnstatus>";
+            }
+        } else {
+            echo "<msg>Connection to the database was not successful</msg>";
+            echo "<returnstatus>2</returnstatus>";
+        }
+    } else if($context=="fetch") {
+        //fetching messages to the view port
+        //fetch 10 messages at a time. HOW?
+        //get the recepID and offset
+        $recepID = filter($_POST['recepID']) or die("<msg>recepID is not set!</msg><returnstatus>2</returnstatus>");
+        $offset = filter($_POST['offset']) or die("<msg>offset is not set!</msg><returnstatus>2</returnstatus>");
+        //Fetch messages whose serial is greater than the offset
+        //Limit the number to the top 10 and sort by the serial in ascending order
+        //But first, let's get the channelID
+            $channelID1 = $myID.$recepID;
+            $channelID2 = $recepID.$myID;
+        //open a connection
+        $servername = "localhost";
+        $username = "aman";
+        $password = "password";
+        $database = "test";
+
+        $conn = new mysqli($servername, $username, $password, $database);
+        //Check for any errors
+        if(!$conn->connect_error) {
+            //No connection errors
+            $sql = "SELECT
+                    Transient.ChannelID AS ChannelID,
+                    Transient.TimeStamp AS TimeSent,
+                    Transient.MsgText AS MsgText,
+                    Transient.PictureID AS PictureID,
+                    Transient.ImageURI AS ImageURI,
+                    Transient.Sender AS Sender,
+                    Transient.Serial AS SerialNo
+                    FROM ( SELECT * FROM Messages WHERE ChannelID='".$channelID1."' OR ChannelID='".$channelID2."') 
+                    AS Transient WHERE Transient.Serial>".$offset." ORDER BY SerialNo ASC LIMIT 10";
+            $result = $conn->query($sql);
+            if($result) {
+                //$result contains an associative array of results.
+                //Now check the array is not empty
+                if($result->num_rows>0) {
+                    //Got some results
+                    $reply = "";
+                    //Encode all the messages into $reply here
+                    while($row=$result->fetch_assoc()) {
+                        if($row['Sender']==$myID) {
+                            $sender = "outbound";
+                        } else {
+                            $sender = "inbound";
+                        }
+                        $reply.="<message>";
+                            $reply.="<timesent>".$row['TimeSent']."</timesent>";
+                            $reply.="<msgtext>".$row['MsgText']."</msgtext>";
+                            $reply.="<pictureid>".$row['PictureID']."</pictureid>";
+                            $reply.="<imageuri>".$row['ImageURI']."</imageuri>";
+                            $reply.="<sender>".$sender."</sender>";
+                            $reply.="<serial>".$row['SerialNo']."</serial>";
+                        $reply.="</message>";
+                    }
+                    //Return reply
+                    echo "<returnstatus>0</returnstatus>"; //Perfection!!
+                    echo $reply;
+                } else {
+                    echo "<returnstatus>4</returnstatus>"; //No results
+                }
+            } else {
+                //The query failed. Complain. LOUDLY
+                echo "<msg>The mysql query failed: ".$conn->error."</msg>";
+                echo "<returnstatus>2</returnstatus>";
+            }
+        } else {
+            echo "<msg>Connection to the database was not successful</msg>";
+            echo "<returnstatus>2</returnstatus>";
+        }
+    } else {
+        echo "<msg>Context is not set 2</msg>";
+        echo "<returnstatus>2</returnstatus>";
+    }
+
 } else {
     //Prompt the user to log in or sign up
     //So we can get an session ID for their identification
     //End the script here
-    return "<returnstatus>1</returnstatus>";
+    echo "<returnstatus>1</returnstatus>";
+}
+function filter($entry) {
+    //Filter user input to safeguard against XXS and SQL injections.
+    $entry = htmlspecialchars($entry); //Against any XSS and SQL injections
+    $entry = trim($entry); //Against SQL injections
+    $entry = stripslashes($entry);
+    return $entry; //Sanitized input
 }
 //RETURN STATUSES EXPLAINED
 //1. The user is not logged in
+//2. A programming error or attempted system compromise
+//3. Empty message
+//4. No results
 ?>
 
