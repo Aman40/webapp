@@ -58,7 +58,8 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
             echo "<msg>Connection to the database was not successful</msg>";
             echo "<returnstatus>2</returnstatus>";
         }
-    } else if($context=="fetch") {
+    }
+    else if($context=="fetch") {
         //fetching messages to the view port
         //fetch 10 messages at a time. HOW?
         //get the recepID and offset
@@ -112,7 +113,7 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                             $reply.="<serial>".$row['SerialNo']."</serial>";
                         $reply.="</message>";
                     }
-                    //Return reply
+                    //Return reply.
                     echo "<returnstatus>0</returnstatus>"; //Perfection!!
                     echo $reply;
                 } else {
@@ -127,9 +128,60 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
             echo "<msg>Connection to the database was not successful</msg>";
             echo "<returnstatus>2</returnstatus>";
         }
-    } else {
-        echo "<msg>Context is not set 2</msg>";
-        echo "<returnstatus>2</returnstatus>";
+    }
+    else if($context=="get_recep_name") {
+        //get the recepID and offset
+        $recepID = filter($_POST['recepID']) or die("<msg>recepID is not set!</msg><returnstatus>2</returnstatus>");
+        //open a connection
+        $servername = "localhost";
+        $username = "aman";
+        $password = "password";
+        $database = "test";
+
+        $conn = new mysqli($servername, $username, $password, $database);
+        //Check for any errors
+        if(!$conn->connect_error) {
+            //Here on the server side, the only way to tell the type of account the sender/receiver possesses
+            //is by looking at their IDs. If the id begins with a U, it's a members' account. If it's with a 'c',
+            //it's a client's account. This tells us which table to check when looking for the details of the
+            if(preg_match("/C[[:alnum:]]/", $recepID)) {
+                //The recepient has a clients' account.
+                $sql = "SELECT DisplayName 
+                                FROM Clients WHERE ClientID='".$recepID."'";
+                $result = $conn->query($sql);
+                if($result) {
+                    //query was successful
+                    $row = $result->fetch_assoc();
+                    $reply.="<recepname>".$row['DisplayName']."</recepname>";
+                }
+                else {
+                    echo "<msg>Recepient name query unsuccessful for Client</msg>";
+                    echo "<returnstatus>2</returnstatus>";
+                }
+            } else if(preg_match("/U[[:alnum:]]/", $recepID)) {
+                //The recepient has a members' account
+                $sql = "SELECT FirstName 
+                                FROM Users WHERE UserID='".$recepID."'"; //Later: FirstName can be Null if the Javascript constraints are bypassed
+                $result = $conn->query($sql);
+                if($result) {
+                    //query was successful
+                    $row = $result->fetch_assoc();
+                    $reply.="<recepname>".$row['FirstName']."</recepname>";
+                    echo "<returnstatus>0</returnstatus>"; //Perfection!!
+                    echo $reply;
+                }
+                else {
+                    echo "<msg>Recepient name query unsuccessful for Client</msg>";
+                    echo "<returnstatus>2</returnstatus>";
+                }
+            }
+        } else {
+            echo "<msg>Connection Error</msg>";
+            echo "<returnstatus>2</returnstatus>";
+        }
+    }
+    else {
+
     }
 
 } else {
@@ -147,8 +199,7 @@ function filter($entry) {
 }
 //RETURN STATUSES EXPLAINED
 //1. The user is not logged in
-//2. A programming error or attempted system compromise
+//2. A programming error or attempted system compromise or Connection error
 //3. Empty message
-//4. No results
 ?>
 

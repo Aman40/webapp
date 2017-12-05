@@ -940,8 +940,9 @@ span.psw {
 
 }
 #msg_capsule_container {
-    min-height: 400px;
+    height: 500px;
     background-color: ghostwhite;
+    overflow-y: scroll;
 }
 #msg_row_btm {
 
@@ -1013,4 +1014,12 @@ span.psw {
 }
 .cap_msg_text_outbound {
     background-color: #bbecbb;
+}
+element.style {
+    margin: 3px 5px;
+    height: 35px;
+    position: absolute;
+    left: 90px;
+    padding: 2px 45px;
+    width: 250px;
 }

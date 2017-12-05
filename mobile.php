@@ -30,8 +30,40 @@ include "include.php";
             //Open messenger interface with UserID embedded somewhere for retrieval
             var msgInterface = document.getElementById("msg_iface");
             msgInterface.sellerID = sellerID; //This violates HTML5 integrity but meh!!
-            msgInterface.style.display = "block";
-            loadMessages();
+            //Get and set the recepient name and get the image with AJAX
+            //Access the db
+            var fd = new FormData();
+            //Get the recepID here
+            var recepID = document.getElementById("msg_iface").sellerID; //Recepient ID
+            fd.append("recepID", recepID);
+            fd.append("context", "get_recep_name");
+            var xht = new XMLHttpRequest();
+            xht.responseType = "document";
+            xht.onreadystatechange = function () {
+                if(this.status===200 && this.readyState===4) {
+                    var xmlDoc = this.responseXML;
+                    var returnStatus = xmlDoc.getElementsByTagName("returnStatus")[0].childNodes[0].nodeValue;
+                    returnStatus = parseInt(returnStatus);
+                    if(returnStatus===0) {
+                        //Things went fine. I expect two things in the returned xmlDoc
+                        //1. the name of the recepient
+                        //2. the imageURI of the recepient
+                        //var recep_img = xmlDoc.getElementsByTagName("recepimg")[0].childNodes[0].nodeValue;
+                        document.getElementById("msg_name").innerHTML = xmlDoc.getElementsByTagName("recepname")[0].childNodes[0].nodeValue;
+                        //Also set bind the imageURI to the element for subsequent reference.
+                        msgInterface.style.display = "block";
+                        loadMessages();
+                    } else {
+                        console.log("Recep name, img retrieval failed.");
+                        //Show error to user. LATER
+                    }
+                } else {
+                    console.log("Recep name, img retrieval failed.");
+                    //Show error to user. LATER
+                }
+            };
+            xht.open("POST", "messages.php", true);
+            xht.send(fd);
         } else {
             //User is not logged in
             console.log("Not logged in!");
@@ -1247,6 +1279,7 @@ include "include.php";
     var modal_gst_in = document.getElementById('gst_sgn_in');
     var sgn_up_selector = document.getElementById('sgn_up_selector');
     var sgn_in_selector = document.getElementById('sgn_in_selector');
+    var msg_iface = document.getElementById('msg_iface');
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
@@ -1264,6 +1297,8 @@ include "include.php";
             sgn_up_selector.style.display = "none";
         } else if(event.target === sgn_in_selector) {
             sgn_in_selector.style.display = "none";
+        } else if(event.target === msg_iface) {
+            msg_iface.style.display = "none";
         }
     };
     function selectorHandler(ctx) {
@@ -1311,8 +1346,8 @@ include "include.php";
             <div id="msg_row_top"><!--The top row-->
                 <div id="msg_row_top_container"><!--Contains the correspondent's name, back button, close button -->
                     <div id="msg_back"> Back</div>
-                    <div id="msg_name">Correspondent's name</div>
-                    <div id="msg_close">Close</div>
+                    <div id="msg_name"></div>
+                    <div id="msg_close" onclick="document.getElementById('msg_iface').style.display='none';">Close</div>
                 </div>
             </div>
             <div id="msg_row_middle"><!--The middle row. Outer wrap for the actual texts-->
