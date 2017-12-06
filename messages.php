@@ -49,6 +49,37 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
 
             if($conn->query($sql)) {
                  //Successfully executed
+                 //But wait...
+                if(preg_match("/C[[:alnum:]]/", $recepID)) {
+                    //Client account. Go there and update the Unread Messages count
+                    $sql = "SELECT UnreadMessages FROM Clients WHERE ClientID='".$recepID."'";
+                    $result = $conn->query($sql);
+                    if($result) {
+                      $row=$result->fetch_assoc();
+                      $msg_count = $row['UnreadMessages'];
+                      $msg_count++;
+                      $sql = "UPDATE Clients SET UnreadMessages='".$msg_count."' WHERE ClientID='".$recepID."'";
+                      //No need for success checks. Not significant.
+                        $conn->query($sql);
+                    } else {
+                        echo "<msgerror>The query failed??</msgerror>";
+                    }
+                } else if (preg_match("/U[[:alnum:]]/", $recepID)) {
+                    //Member account
+                    $sql = "SELECT UnreadMessages FROM Users WHERE UserID='".$recepID."'";
+                    $result = $conn->query($sql);
+                    if($result) {
+                        $row = $result->fetch_assoc();
+                        $msg_count = $row['UnreadMessages'];
+                        $msg_count++;
+                        $sql = "UPDATE Users SET UnreadMessages='".$msg_count."' WHERE UserID='".$recepID."'";
+                        //No need for success checks. Not significant.
+                        $conn->query($sql);
+                    } else {
+                        echo "<msgerror>The query failed??</msgerror>";
+                    }
+                }
+                echo "<msgerror>".$conn->error."</msgerror>";
                 echo "<returnstatus>0</returnstatus>";
             } else {
                 echo "<msg>".$conn->error."</msg>";

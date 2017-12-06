@@ -86,7 +86,6 @@ include "include.php";
                         F<span>MH</span>
                     </h1>
                     <div id="min-prof">
-
                         <div id="prof-pic">
                             <div id="prof-pic-img">
                                 <?php
@@ -105,25 +104,58 @@ include "include.php";
                                 }
                                 ?>
                             </div><!--prof-picimg-->
+                            <div id="prof-pic-name">
+                                <div id="prof-menu-launcher" onclick="prof_menu_launcher()">
+                                    <script>
+                                        function prof_menu_launcher() {
+                                            var prof_menu = document.getElementById("prof-menu");
+                                            if(prof_menu.style.display==="block") {
+                                                prof_menu.style.display="none";
+                                            } else {
+                                                prof_menu.style.display="block";
+                                            }
+                                        }
+                                    </script>
+                                    <?php
+                                    if($session_exists) {
+                                        echo $_SESSION["FirstName"];
+                                    } else {
+                                        echo "Log in";
+                                    }
+                                    ?> <i class="fa fa-angle-down"></i> <!--I'll worry about this later-->
+                                </div><!--Name-->
+                                <div id="prof-menu"><!--Whatever is supposed to be initially hidden goes here-->
+                                    <div class="p-opt-float"><!--Logoff link-->
+                                        <?php
+                                        if($session_exists) {
+                                            echo '<a 
+                                        href="logoff.php">Log Out</a>';
+                                        }
+                                        ?>
+                                    </div>
+                                    <div class="p-opt-float">
+                                        Orders
+                                        <a href="#" id="orders" >
+                                            <div id="order-count">
+                                                5
+                                            </div><!--order-count-->
+
+                                        </a><!--orders-->
+                                    </div>
+                                    <div class="p-opt-float">
+                                          Messages
+                                        <a href="#" id="messages" >
+                                            <div id="message-count">
+                                                7
+                                            </div><!--comment-count-->
+                                        </a><!--comments-->
+                                    </div>
+                                    <!--More could be added here-->
+                                </div>
+                            </div>
                         </div><!--prof-pic-->
                     </div><!--min-prof-->
-
                 </div><!--r1c1-->
-                <div class="full-width" id="searchdiv">
-                    <form class="search">
-                        <input type="text" id="inventory-search" onkeydown="_checkenterkey(event, 'feed')" name="search" placeholder="Search..">
-                        <input id="uglyButton" style="display: none;" type="button" onclick="javascript:_searchdb(document.getElementById('inventory-search').value)" value="Search">
-                        <span id="beaut">Go</span>
-                        <script>
-                            var ugly = document.getElementById("uglyButton");
-                            var beaut = document.getElementById("beaut");
-                            beaut.onclick = function () {
-                                ugly.click();
-                            }
-                        </script>
-
-                    </form>
-                </div>
             </div><!--r1c2r1-->
             <div class="full-width" id="r1c2r2"><!--Insert an unordered list here for the menu-->
                 <div id="hor-menu">
@@ -188,6 +220,20 @@ include "include.php";
                 <div style="background-color: gray; width: 40%; height: 40%; margin: 5%"></div>
             </div>
             <div class="fa fa-angle-double-down" onclick="change_class(this)" style="height: 100%; color: grey; float: left; font-size: 3em; padding: 0px 10px;"></div>
+            <div class="full-width" id="rep_srch">
+                <form class="search">
+                    <input type="text" id="inventory-search" onkeydown="_checkenterkey(event, 'feed')" name="search" placeholder="Search..">
+                    <input id="uglyButton" style="display: none;" type="button" onclick="javascript:_searchdb(document.getElementById('inventory-search').value)" value="Search">
+                    <span id="beaut">Go</span>
+                    <script>
+                        var ugly = document.getElementById("uglyButton");
+                        var beaut = document.getElementById("beaut");
+                        beaut.onclick = function () {
+                            ugly.click();
+                        }
+                    </script>
+                </form>
+            </div>
             <script>
                 function change_class(element) {
                     var categories = document.getElementById("categories");

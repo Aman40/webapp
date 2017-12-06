@@ -28,7 +28,6 @@ include "include.php";
 						</div><!--r1c1-->
 						
 						<div id="min-prof">
-						
 							<div id="prof-pic">
 								<div id="prof-pic-img">
 									<?php

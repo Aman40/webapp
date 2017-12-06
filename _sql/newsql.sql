@@ -15,10 +15,11 @@ District VARCHAR(20) NOT NULL,/*District (Head offices) CHAR(50)*/
 Website VARCHAR(30),/*Website VARCHAR(30)*/
 PhoneNo CHAR(11) NOT NULL, /*Phone number INT(11) NOT NULL*/
 About TEXT,
-NewOrders INT(3),
 ProfilePic VARCHAR(255), /*uri to profile pic*/
 ResponseTime TIME,
 PrivacyBitmap VARCHAR(12),
+UnreadMessages SMALLINT UNSIGNED DEFAULT 0,
+NewOrders SMALLINT UNSIGNED,
 UNIQUE (PhoneNo),
 PRIMARY KEY (UserID)
 );
@@ -74,6 +75,7 @@ CREATE TABLE IF NOT EXISTS Clients
   Email VARCHAR(50) NOT NULL,
   PwordHash VARCHAR(255), /*Password. Permit only up to 8 characters for simplicity. We're not protecting nuclear launch codes here*/
   JoinDate DATETIME NOT NULL,
+  UnreadMessages SMALLINT UNSIGNED DEFAULT 0,
   PRIMARY KEY (ClientID)
 );
 CREATE TABLE IF NOT EXISTS Units

@@ -84,7 +84,7 @@ body {
 }
 
 #r1c1 {
-    min-height: 150px;
+    min-height: 88px;
     padding: 25px;
 }
 #r1c1 h1 {
@@ -109,8 +109,8 @@ body {
         line-height: 1em;
     }
     #r1c1 {
-        min-height: 50px;
         padding: 5px;
+        float: none;
     }
     #r1c1 h1 span {
         letter-spacing: -12px;
@@ -119,7 +119,6 @@ body {
 #r1c2 {
     background-color: rgba(238, 238, 238, 0.71);
     padding: 0px;
-    min-height: 135px;
 }
 #r2c1 {
     background-color: #ffffff;;
@@ -163,50 +162,41 @@ body {
     background-color: rgba(208, 208, 208, 0);
 }
 #r1c2r1 {
-    min-height: 85px;
     position: relative;
 }
 #min-prof {
-    display: block;
-    min-height: 50px;
-    width: 50px;
+    width: 150px;
     margin: 0px;
     padding: 0px;
     position: absolute;
-    right: 15px;
+    right: 5px;
     /*background-color: rgba(34, 139, 34, 0.21);*/
 }
 #prof-pic {
-    height: 50px;
     width: 100%;
 }
 #prof-pic-img {
     margin: auto;
-    height: 50px;
-    width: 50px;
+    width: 75px;
 }
 #prof-pic-img img {
-    border-radius: 10px;
+    border-radius: 50px;
     height: auto;
     width: 100%;
     margin: auto;
 }
 #prof-pic-name {
-    height: 45px;
     width: 100%;
 }
-#notifications {
-    height: 30px;
-    width: 100%;
-}
-#comments {
+#messages {
     height: inherit;
     width: 30px;
     float: left;
     background-image: url(icons/comments.png);
     background-size: contain;
+    background-repeat: no-repeat;
 }
-#comment-count, #order-count {
+#message-count, #order-count {
     padding-left: 5px;
     height: 20px;
     width: 20px;
@@ -224,8 +214,10 @@ body {
     width: 30px;
     float: left;
     background-image: url(icons/cart.png);
+    background-repeat: no-repeat;
     background-size: contain;
 }
+
 .item-slide {
     width: 240px;
     float: left;
@@ -687,12 +679,13 @@ span.psw {
     }
 }
 #beaut {
-    width: 30%;
     border: groove 2px;
     background-color: white;
-    padding: 10px 23px;
     border-radius: 5px;
+    padding: 4px 4px 4px 10px;
     cursor: pointer;
+    display: inline-block;
+    width: 15%;
 }
 
 @keyframes scroll_hand{
@@ -709,6 +702,7 @@ span.psw {
     width: 100%;
     height: 42px;
     background-color: black;
+    display: flex;
 }
 .slide-container-view-list .item-slide {
     width: 100%;
@@ -1015,11 +1009,39 @@ span.psw {
 .cap_msg_text_outbound {
     background-color: #bbecbb;
 }
-element.style {
+#inventory-search {
     margin: 3px 5px;
     height: 35px;
-    position: absolute;
-    left: 90px;
     padding: 2px 45px;
-    width: 250px;
+    width: 75%;
+}
+#rep_srch {
+    height: 100%;
+    width: 78%;
+}
+.p-opt-float {
+    margin: 1px 0px;
+    width: inherit;
+    padding: 10px;
+    display: block;
+    height: 40px;
+    background-color: silver;
+}
+.p-opt-float:hover {
+    background-color: white;
+}
+.p-opt-float a:link, .p-opt-float a:visited {
+    text-decoration: none;
+    color: inherit;
+}
+#prof-menu-launcher {
+    width: inherit;
+    padding: 5px 10px;
+    display: block;
+    height: 30px;
+}
+#prof-menu {
+    z-index: 5;
+    display: none;
+    box-shadow: -1px 1px 10px 0px black;
 }
