@@ -43,9 +43,9 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         if(!$conn->connect_error) {
             //Connected successfully
             //Create sql statement
-            $sql = "INSERT INTO Messages(ChannelID, MsgText, PictureID, ImageURI, Sender) 
+            $sql = "INSERT INTO Messages(ChannelID, MsgText, PictureID, ImageURI, SenderID, ReceiverID) 
                     VALUES ('".$channelID."', '".$msgText."', '".$pictureID."', '".$imageURI."',
-                    '".$myID."')";
+                    '".$myID."', '".$recepID."')";
 
             if($conn->query($sql)) {
                  //Successfully executed
@@ -96,8 +96,8 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         //get the recepID and offset
         $recepID = filter($_POST['recepID']) or die("<msg>recepID is not set!</msg><returnstatus>2</returnstatus>");
         $offset = filter($_POST['offset']) or die("<msg>offset is not set!</msg><returnstatus>2</returnstatus>");
-        //Fetch messages whose serial is greater than the offset
-        //Limit the number to the top 10 and sort by the serial in ascending order
+        //Fetch messages whose MsgSerial is greater than the offset
+        //Limit the number to the top 10 and sort by the MsgSerial in ascending order
         //But first, let's get the channelID
             $channelID1 = $myID.$recepID;
             $channelID2 = $recepID.$myID;
@@ -117,10 +117,10 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                     Transient.MsgText AS MsgText,
                     Transient.PictureID AS PictureID,
                     Transient.ImageURI AS ImageURI,
-                    Transient.Sender AS Sender,
-                    Transient.Serial AS SerialNo
+                    Transient.SenderID AS SenderID,
+                    Transient.MsgSerial AS SerialNo
                     FROM ( SELECT * FROM Messages WHERE ChannelID='".$channelID1."' OR ChannelID='".$channelID2."') 
-                    AS Transient WHERE Transient.Serial>".$offset." ORDER BY SerialNo ASC LIMIT 10";
+                    AS Transient WHERE Transient.MsgSerial>".$offset." ORDER BY SerialNo DESC LIMIT 10";
             $result = $conn->query($sql);
             if($result) {
                 //$result contains an associative array of results.
@@ -130,17 +130,17 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                     $reply = "";
                     //Encode all the messages into $reply here
                     while($row=$result->fetch_assoc()) {
-                        if($row['Sender']==$myID) {
-                            $sender = "outbound";
+                        if($row['SenderID']==$myID) {
+                            $senderID = "outbound";
                         } else {
-                            $sender = "inbound";
+                            $senderID = "inbound";
                         }
                         $reply.="<message>";
                             $reply.="<timesent>".$row['TimeSent']."</timesent>";
                             $reply.="<msgtext>".$row['MsgText']."</msgtext>";
                             $reply.="<pictureid>".$row['PictureID']."</pictureid>";
                             $reply.="<imageuri>".$row['ImageURI']."</imageuri>";
-                            $reply.="<sender>".$sender."</sender>";
+                            $reply.="<sender>".$senderID."</sender>";
                             $reply.="<serial>".$row['SerialNo']."</serial>";
                         $reply.="</message>";
                     }
@@ -211,8 +211,50 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
             echo "<returnstatus>2</returnstatus>";
         }
     }
-    else {
+    else if($context==="inbox") {
+        //Name of recepient, last message sent + time + read status, recepient profile picture,
+        $inbxMax = filter($_POST['inboxMax']) or die("<msg>offset is not set!</msg><returnstatus>2</returnstatus>");
+        //Fetch messages whose MsgSerial is greater than the inbox-offset
 
+        //open a connection
+        $servername = "localhost";
+        $username = "aman";
+        $password = "password";
+        $database = "test";
+
+        $conn = new mysqli($servername, $username, $password, $database);
+        if(!$conn->connect_error) {
+            //Successfully connected
+            if($inbxMax===0) {
+                //First time accessing the db. $inbxMax is for pagination.
+                $sql = "SELECT MAX(MsgSerial) AS MsgSerial, `TimeStamp`, MsgText, ImageURI, SenderID,
+                    ReceiverID, SeenStatus FROM
+                    (SELECT * FROM Messages WHERE 
+                    SenderID='".$myID."' OR ReceiverID='".$myID."' ORDER BY ChannelID, MsgSerial DESC) 
+                    GROUP BY ChannelID ORDER BY MsgSerial DESC LIMIT 10";
+            } else {
+                $sql = "SELECT MAX(MsgSerial) AS MsgSerial, `TimeStamp`, MsgText, ImageURI, SenderID,
+                    ReceiverID, SeenStatus FROM
+                    (SELECT * FROM Messages WHERE 
+                    SenderID='".$myID."' OR ReceiverID='".$myID."' ORDER BY ChannelID, MsgSerial DESC) 
+                    WHERE MsgSerial<'".$inbxMax."' GROUP BY ChannelID ORDER BY MsgSerial DESC LIMIT 10";
+            }
+
+            //Query
+            $result = $conn->query($sql);
+            if($result) {
+                //Successfully executed
+                //Now retrieve the profile picture and name of each Sender/Receiver that's not me
+                
+            } else {
+                echo "<msg>The inbox query failed</msg>";
+                echo "<returnstatus>2</returnstatus>";
+            }
+
+        } else {
+            echo "<msg>Connection Error</msg>";
+            echo "<returnstatus>2</returnstatus>";
+        }
     }
 
 } else {

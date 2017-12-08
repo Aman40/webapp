@@ -55,10 +55,12 @@ include "include.php";
                         loadMessages();
                     } else {
                         console.log("Recep name, img retrieval failed.");
+                        console.log("Return Status="+returnStatus);
                         //Show error to user. LATER
                     }
                 } else {
-                    console.log("Recep name, img retrieval failed.");
+                    console.log("Recep name, img retrieval failed. Server problem?");
+                    console.log("Status="+this.status+" Ready State="+this.readyState);
                     //Show error to user. LATER
                 }
             };

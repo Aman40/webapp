@@ -102,11 +102,13 @@ CREATE TABLE IF NOT EXISTS Messages
 (
   ChannelID CHAR(28),
   SenderID CHAR(14),
+  ReceiverID CHAR(14) NOT NULL,
   TimeStamp TIMESTAMP,
   MsgText CHAR(255),
   PictureID CHAR(14),
   ImageURI VARCHAR(255),
   MsgSerial SERIAL,
+  SeenStatus BOOL NOT NULL DEFAULT FALSE,
   PRIMARY KEY (ChannelID, TimeStamp)
 );
 CREATE TABLE IF NOT EXISTS ItemImages

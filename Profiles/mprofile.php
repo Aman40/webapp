@@ -58,7 +58,8 @@ include "../include.php";
                     <div class="col-12" id="tab-row">
                         <a href="javascript:reveal1hide23('prof-container', 'inventory-container', 'prof-orders')" id="tab-1">Profile</a>
                         <a href="javascript:reveal1hide23('inventory-container', 'prof-container', 'prof-orders')" id="tab-2">Inventory</a>
-                        <a href="javascript:reveal1hide23('prof-orders', 'inventory-container', 'prof-container')" id="tab-3">Something</a>
+                        <a href="javascript:reveal1hide23('prof-orders', 'inventory-container', 'prof-container')" id="tab-3">Messages</a>
+                        <a href="javascript:void(0)" id="tab-4">Orders</a>
                         <a href="javascript:void(0)" id="tab-4">Pictures</a>
                     </div><!--tab-row-->
                     <div class="col-12 prof-content-row" id="prof-container">
@@ -152,8 +153,8 @@ include "../include.php";
                                             <input id="uglyButton" style="display: none;" type="button" onclick="_searchdb(document.getElementById('search-input').value)" value="Search">
                                             <span id="beaut">Go</span>
                                             <script>
-                                                var ugly = document.getElementById("uglyButton");
-                                                var beaut = document.getElementById("beaut");
+                                                var ugly = document.getElementById("msg-uglyButton");
+                                                var beaut = document.getElementById("msg-beaut");
                                                 beaut.onclick = function () {
                                                     ugly.click();
                                                 }
@@ -376,18 +377,43 @@ include "../include.php";
                         </div><!--Inventory update-->
 
                     </div><!--Inventory container-->
+                    <div class="col-12 prof-content-row" id="prof-msg">
+                        <div id="msg-title-bar"><!--This holds the search bar for the messages-->
+                            <div id="msg-srch-div">
+                                <form class="search">
+                                    <input type="text" id="msg-search" onkeydown="" name="search" placeholder="Search messages...">
+                                    <input id="msg-uglyButton" style="display: none;" type="button" onclick="javascript:_searchdb(document.getElementById('inventory-search').value)" value="Search">
+                                    <span id="msg-beaut">Go</span>
+                                    <script>
+                                        var ugly = document.getElementById("uglyButton");
+                                        var beaut = document.getElementById("beaut");
+                                        beaut.onclick = function () {
+                                            ugly.click();
+                                        }
+                                    </script>
+                                </form>
+                            </div>
+                        </div>
+                        <div><!--This holds the different message templates.-->
+                            <script>
+                                //Access the db to fetch the user's messages
+                                //
+                            </script>
+                        </div>
+
+                    </div><!--Messages div-->
                     <div class="col-12 prof-content-row" id="prof-orders">
                         <p>
                             This is the orders container. Still under development.
                         </p>
-                    </div>
+                    </div><!--Orders div-->
                     <!--script3-->
                     <script> //Script3
                         function reveal1hide23(div1, div2, div3) {
                             document.getElementById(div1).style.display="block";
                             document.getElementById(div2).style.display="none";
                             document.getElementById(div3).style.display="none";
-                            if(div1=="inventory-container") { //
+                            if(div1==="inventory-container") { //
                                 var idisplay=document.getElementById('inventory-display');
                                 var iupdate=document.getElementById('inventory-update');
                                 add_to_inventory();//Switches the visibilities of inventory-update and inventory-

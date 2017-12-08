@@ -859,7 +859,39 @@ h3.dash_item_name {
     width: 100%;
     margin: 0 auto;
 }
+#msg-title-bar {
+}
+#msg-srch-div {
+    width: 100%;
+}
+#msg-search {
+    margin: 3px 5px;
+    height: 35px;
+    padding: 2px 12px;
+    width: 75%;
+    display: inline-block;
+    position: relative;
+    border: solid 1px gray;
+    background-image: none;
+}
+#msg-uglyButton {
 
+}
+#msg-beaut {
+    background-color: white;
+    border-radius: 5px;
+    padding: 5px 4px 5px 13px;
+    cursor: pointer;
+    display: inline-block;
+    border: solid 1px gray;
+    width: 15%;
+}
+#msg-srch-div .search {
+    position: relative;
+    display: block;
+    margin: auto;
+    width: 80%;
+}
 
 
 
