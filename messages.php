@@ -242,21 +242,99 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
 
             //Query
             $result = $conn->query($sql);
-            if($result) {
+            if($result!==false) {
                 //Successfully executed
                 //Now retrieve the profile picture and name of each Sender/Receiver that's not me
-                
+                $reply = "<messages>"; //To hold the XML;
+                while($row=$result->fetch_assoc()) {
+                    //Fetch row by row
+                    //Get the ID of the other person that's not me. Could be the SenderID if they sent the message
+                    //Or the ReceiverID if I sent the message. Store that shit in $receiver
+                    if($row['SenderID']===$myID) {
+                        //Use the recepient
+                        $receiver = $row['ReceiverID'];
+                    } else {
+                        $receiver = $row['SenderID'];
+                    }
+                    //Now check if person is client or Member. Use PCRE
+                    if(preg_match("/C[[:alnum:]]/", $receiver)) {
+                        //receiver possesses client account
+                        //Access Clients table in db for user info
+                        $sql = "SELECT Honorific, DisplayName FROM Clients WHERE ClientID='".$receiver."'";
+                        $result_tmp = $conn->query($sql);
+                        if($result_tmp!==false) {
+                            if($result_tmp->num_rows===1) {
+                                $row_tmp = $result_tmp->fetch_assoc();
+                                $reply.="<message>";
+                                    $reply.="<msgserial>".$row['MsgSerial']."</msgserial>";
+                                    $reply.="<timestamp>".$row['TimeStamp']."</timestamp>";
+                                    $reply.="<msgtext>".$row['MsgText']."</msgtext>";
+                                    $reply.="<imageuri>".$row['ImageURI']."</imageuri>";
+                                    if($row['SenderID']==$myID) {
+                                        $senderID = "outbound";
+                                    } else {
+                                        $senderID = "inbound";
+                                    }
+                                    $reply.="<senderid>".$senderID."</senderid>";
+                                    $reply.="<theirid>".$receiver."</theirid>";
+                                    $reply.="<honorific>".$row_tmp['Honorific']."</honorific>";
+                                    $reply.="<name>".$row_tmp['DisplayName']."</name>";
+                                $reply.="</message>";
+                            } else {
+                                echo "<msg>".$result_tmp->num_rows." results were found when exactly 1 expected!</msg>";
+                                die("<returnstatus>2</returnstatus>");
+                            }
+                        } else {
+                            echo "<msg>A secondary query failed</msg>";
+                            die("<returnstatus>2</returnstatus>");
+                        }
+                    } else if(preg_match("/U[[:alnum:]]/", $receiver)) {
+                        //receiver posseses Member account
+                        //Access Users table in
+                        //receiver possesses client account
+                        //Access Clients table in db for user info
+                        $sql = "SELECT FirstName, LastName FROM Users WHERE UserID='".$receiver."'";
+                        $result_tmp = $conn->query($sql);
+                        if($result_tmp!==false) {
+                            if($result_tmp->num_rows===1) {
+                                $row_tmp = $result_tmp->fetch_assoc();
+                                $reply.="<message>";
+                                $reply.="<msgserial>".$row['MsgSerial']."</msgserial>";
+                                $reply.="<timestamp>".$row['TimeStamp']."</timestamp>";
+                                $reply.="<msgtext>".$row['MsgText']."</msgtext>";
+                                $reply.="<imageuri>".$row['ImageURI']."</imageuri>";
+                                if($row['SenderID']==$myID) {
+                                    $senderID = "outbound";
+                                } else {
+                                    $senderID = "inbound";
+                                }
+                                $reply.="<senderid>".$senderID."</senderid>";
+                                $reply.="<theirid>".$receiver."</theirid>";
+                                $reply.="<honorific>na</honorific>";
+                                $reply.="<name>".$row_tmp['FirstName']." ".$row_tmp['LastName']."</name>";
+                                $reply.="</message>";
+                            } else {
+                                echo "<msg>".$result_tmp->num_rows." results were found when exactly 1 expected!!</msg>";
+                                die("<returnstatus>2</returnstatus>");
+                            }
+                        } else {
+                            echo "<msg>A secondary query failed</msg>";
+                            die("<returnstatus>2</returnstatus>");
+                        }
+                    }
+                }
+                $reply = "</messages>";
+                echo "<returnstatus>0</returnstatus>";
+                echo $reply;
             } else {
                 echo "<msg>The inbox query failed</msg>";
                 echo "<returnstatus>2</returnstatus>";
             }
-
         } else {
             echo "<msg>Connection Error</msg>";
             echo "<returnstatus>2</returnstatus>";
         }
     }
-
 } else {
     //Prompt the user to log in or sign up
     //So we can get an session ID for their identification
