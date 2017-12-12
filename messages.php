@@ -25,11 +25,13 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         //Get the message text
         $msgText = addslashes(filter($_POST['msgText'])) or die("<msg>msgText is not set</msg><returnstatus>3</returnstatus>"); //URGENT: Find a way to deal with null messages
         //Generate the "ChannelID" by concatenating myID and recepID in alphabetical order, smaller one first
-        if(strcmp($myID, $recepID)) {
+        if(strcmp($myID, $recepID)>0) {
             //myID is lexicographically smaller, i.e comes first alphabetically
             $channelID = $myID.$recepID;
+            echo "<msg>".$myID.">".$recepID."</msg>";
         } else {
             $channelID = $recepID.$myID;
+            echo "<msg>".$recepID.">".$myID."</msg>";
         }
         //Open a connection to the database
         $servername = "localhost";
@@ -99,8 +101,14 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         //Fetch messages whose MsgSerial is greater than the offset
         //Limit the number to the top 10 and sort by the MsgSerial in ascending order
         //But first, let's get the channelID
-            $channelID1 = $myID.$recepID;
-            $channelID2 = $recepID.$myID;
+        if(strcmp($myID, $recepID)>0) {
+            //myID is lexicographically smaller, i.e comes first alphabetically
+            $channelID = $myID.$recepID;
+            echo "<msg>".$myID.">".$recepID."</msg>";
+        } else {
+            $channelID = $recepID.$myID;
+            echo "<msg>".$recepID.">".$myID."</msg>";
+        }
         //open a connection
         $servername = "localhost";
         $username = "aman";
@@ -119,8 +127,8 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                     Transient.ImageURI AS ImageURI,
                     Transient.SenderID AS SenderID,
                     Transient.MsgSerial AS SerialNo
-                    FROM ( SELECT * FROM Messages WHERE ChannelID='".$channelID1."' OR ChannelID='".$channelID2."') 
-                    AS Transient WHERE Transient.MsgSerial>".$offset." ORDER BY SerialNo DESC LIMIT 10";
+                    FROM ( SELECT * FROM Messages WHERE ChannelID='".$channelID."') 
+                    AS Transient WHERE Transient.MsgSerial>".$offset." ORDER BY SerialNo ASC LIMIT 10";
             $result = $conn->query($sql);
             if($result) {
                 //$result contains an associative array of results.
@@ -225,19 +233,16 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         $conn = new mysqli($servername, $username, $password, $database);
         if(!$conn->connect_error) {
             //Successfully connected
-            if($inbxMax===0) {
-                //First time accessing the db. $inbxMax is for pagination.
-                $sql = "SELECT MAX(MsgSerial) AS MsgSerial, `TimeStamp`, MsgText, ImageURI, SenderID,
-                    ReceiverID, SeenStatus FROM
-                    (SELECT * FROM Messages WHERE 
-                    SenderID='".$myID."' OR ReceiverID='".$myID."' ORDER BY ChannelID, MsgSerial DESC) 
-                    GROUP BY ChannelID ORDER BY MsgSerial DESC LIMIT 10";
+            if($inbxMax<10) {
+                //First time accessing the db. $inbxMax is for pagination. ChannelID has to be Unique for each connection.
+                $sql = "SELECT * FROM (SELECT MAX(MsgSerial) AS LastMsg FROM (SELECT * FROM Messages WHERE 
+                    SenderID='".$myID."' OR ReceiverID='".$myID."') AS Table1 GROUP BY ChannelID)
+                    AS Table2 LEFT JOIN Messages ON Table2.LastMsg=Messages.MsgSerial ORDER BY Messages.MsgSerial DESC";
             } else {
-                $sql = "SELECT MAX(MsgSerial) AS MsgSerial, `TimeStamp`, MsgText, ImageURI, SenderID,
-                    ReceiverID, SeenStatus FROM
-                    (SELECT * FROM Messages WHERE 
-                    SenderID='".$myID."' OR ReceiverID='".$myID."' ORDER BY ChannelID, MsgSerial DESC) 
-                    WHERE MsgSerial<'".$inbxMax."' GROUP BY ChannelID ORDER BY MsgSerial DESC LIMIT 10";
+                $sql = "SELECT * FROM (SELECT MAX(MsgSerial) AS LastMsg FROM (SELECT * FROM Messages WHERE 
+                    SenderID='".$myID."' OR ReceiverID='".$myID."') AS Table1 GROUP BY ChannelID)
+                    AS Table2 LEFT JOIN Messages ON Table2.LastMsg=Messages.MsgSerial WHERE 
+                    Table2.LastMsg<'".$inbxMax."' ORDER BY Messages.MsgSerial DESC";
             }
 
             //Query
@@ -286,6 +291,7 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                             }
                         } else {
                             echo "<msg>A secondary query failed</msg>";
+                            echo "<err>".$conn->error."</err>";
                             die("<returnstatus>2</returnstatus>");
                         }
                     } else if(preg_match("/U[[:alnum:]]/", $receiver)) {
@@ -319,19 +325,22 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                             }
                         } else {
                             echo "<msg>A secondary query failed</msg>";
+                            echo "<err>".$conn->error."</err>";
                             die("<returnstatus>2</returnstatus>");
                         }
                     }
                 }
-                $reply = "</messages>";
+                $reply .= "</messages>";
                 echo "<returnstatus>0</returnstatus>";
                 echo $reply;
             } else {
                 echo "<msg>The inbox query failed</msg>";
+                echo "<err>".$conn->error."</err>";
                 echo "<returnstatus>2</returnstatus>";
             }
         } else {
             echo "<msg>Connection Error</msg>";
+            echo "<err>".$conn->error."</err>";
             echo "<returnstatus>2</returnstatus>";
         }
     }

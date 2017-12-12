@@ -1069,7 +1069,7 @@ function listunits(index) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState===4 && this.status===200) {
             //Everything set
             var xmlDoc = this.responseXML;
             console.log("Units:");
@@ -1243,6 +1243,77 @@ function markOrUnmarkImgForDeletion(img) {
         //Unmark the image with css
         img.style.opacity = 1.0;
     }
+}
+var inboxMax = 0.5; //Initial is 1. A 0 was considered as an unset variable. Script knows how to handle it.
+function inboxMessages() {
+    //This shows all the ongoing message exchanges in the inbox
+    //Set the inboxMax somewhere. It's got to be a global and static
+    var context = "inbox";
+    var fd = new FormData();
+    fd.append("context", context);
+    fd.append("inboxMax", inboxMax);
+
+    var xht = new XMLHttpRequest();
+    xht.responseType = "document";
+    xht.onreadystatechange = function () {
+        if(this.status===200 && this.readyState===4) {
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            //Get the return status
+            var returnStatus = xmlDoc.getElementsByTagName("returnstatus")[0].childNodes[0].nodeValue;
+            //Convert return status to integer
+            returnStatus = parseInt(returnStatus);
+            //Analyze the return status for errors
+            if(returnStatus===0) {
+                //Success
+                console.log("Success! Proceed!");
+                var msgDisplay = document.getElementById("msg-display");
+                //Fetch the node list
+                var msg_node_list = xmlDoc.getElementsByTagName("message"); //Array
+                //Fetch one by one from the array into the container
+                console.log(msg_node_list.length+" nodes");
+                for(var i=0;i<msg_node_list.length; i++) {
+                    var elmt = document.createElement("div");
+                    elmt.id = "inbox-slide";
+                    var elmt2 = document.createElement("div");
+                    elmt2.id="ib-prof";
+                    var elmt3 = document.createElement("img");
+                    elmt3.src = "Pictures/"+msg_node_list[i].getElementsByTagName("theirid")[0].childNodes[0].nodeValue;
+                    elmt2.appendChild(elmt3);
+                    elmt.appendChild(elmt2);
+                    elmt2 = document.createElement("div");
+                    elmt2.id = "ib-msg";
+                    elmt3 = document.createElement("div");
+                    elmt3.id = "ib-title-time";
+                    var elmt4 = document.createElement("div");
+                    elmt4.id = "ib-title";
+                    elmt4.innerHTML = msg_node_list[i].getElementsByTagName("name")[0].childNodes[0].nodeValue;
+                    elmt3.appendChild(elmt4);
+                    elmt4 = document.createElement("div");
+                    elmt4.id = "ib-time";
+                    elmt4.innerHTML = msg_node_list[i].getElementsByTagName("timestamp")[0].childNodes[0].nodeValue;
+                    elmt3.appendChild(elmt4);
+                    elmt2.appendChild(elmt3);
+                    elmt3 = document.createElement("div");
+                    elmt3.id = "ib-msg-txt";
+                    elmt3.innerHTML = msg_node_list[i].getElementsByTagName("msgtext")[0].childNodes[0].nodeValue;
+                    elmt2.appendChild(elmt3);
+                    elmt.appendChild(elmt2);
+                    msgDisplay.appendChild(elmt); //Append to the msg div. Make sure it's unique!! This script is shared.
+                    console.log("Appended!");
+                }
+            } else {
+                console.log(xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue);
+                console.log("Problem "+returnStatus+" occured.");
+            }
+        } else {
+            //Analyze the status and ready states
+            console.log(this.status);
+            console.log(this.readyState);
+        }
+    };
+    xht.open("POST", "../messages.php", true);
+    xht.send(fd);
 }
 //Caution:
 //I've used a about 3 different node list arrays, all with global scope. Hope they don't get mixed up.

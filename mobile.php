@@ -1554,6 +1554,7 @@ include "include.php";
         xht.open("POST", "messages.php", true);
         xht.send(fd);
     }
+
 </script>
 </body>
 </html>

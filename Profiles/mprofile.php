@@ -153,8 +153,8 @@ include "../include.php";
                                             <input id="uglyButton" style="display: none;" type="button" onclick="_searchdb(document.getElementById('search-input').value)" value="Search">
                                             <span id="beaut">Go</span>
                                             <script>
-                                                var ugly = document.getElementById("msg-uglyButton");
-                                                var beaut = document.getElementById("msg-beaut");
+                                                var ugly = document.getElementById("uglyButton");
+                                                var beaut = document.getElementById("beaut");
                                                 beaut.onclick = function () {
                                                     ugly.click();
                                                 }
@@ -386,7 +386,7 @@ include "../include.php";
                                     <span id="msg-beaut">Go</span>
                                     <script>
                                         var ugly = document.getElementById("uglyButton");
-                                        var beaut = document.getElementById("beaut");
+                                        var beaut = document.getElementById("msg-beaut");
                                         beaut.onclick = function () {
                                             ugly.click();
                                         }
@@ -394,7 +394,7 @@ include "../include.php";
                                 </form>
                             </div>
                         </div>
-                        <div><!--This holds the different message templates.-->
+                        <div id="msg-display"><!--This holds the different message templates.-->
                             <script>
                                 //Access the db to fetch the user's messages
                                 //
@@ -570,6 +570,9 @@ function _selected($var) {
     </div>
 
 </div>
+<script>
+    inboxMessages();
+</script>
 <!--Below is the orders div-->
 
 <!--Script5-->
