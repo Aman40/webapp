@@ -21,20 +21,21 @@ include "include.php";
     }
     ?>
     function messageClient(indexNo) {
+        //DEPENDENTS: isLogged, loadMessages()
+        //This opens the messaging API then calls the loadMessages function
         //uses isLogged variable
         if(isLogged) {
             //User is logged in
             console.log("Is logged in");
-            //Get seller ID
-            var sellerID = itemNodeList[indexNo].getElementsByTagName("UserID")[0].childNodes[0].nodeValue;
-            //Open messenger interface with UserID embedded somewhere for retrieval
+            //Get seller ID from the itemNodeList
+            var recepID = itemNodeList[indexNo].getElementsByTagName("UserID")[0].childNodes[0].nodeValue; //recepID
+            //Open messenger interface with UserID embedded somewhere for retrieval by other function
             var msgInterface = document.getElementById("msg_iface");
-            msgInterface.sellerID = sellerID; //This violates HTML5 integrity but meh!!
+            msgInterface.recepID = recepID; //Attach recepID to interface. This violates HTML5 integrity but meh!!
             //Get and set the recepient name and get the image with AJAX
             //Access the db
             var fd = new FormData();
             //Get the recepID here
-            var recepID = document.getElementById("msg_iface").sellerID; //Recepient ID
             fd.append("recepID", recepID);
             fd.append("context", "get_recep_name");
             var xht = new XMLHttpRequest();
@@ -1424,7 +1425,7 @@ include "include.php";
         //Send this text via AJAX to the db. The UserID/ClientID is already described in the $_SESSION['xxxID']
         //So sending it is unnecessary.
         //Get the seller's ID
-        var recepID = document.getElementById("msg_iface").sellerID; //Recepient ID
+        var recepID = document.getElementById("msg_iface").recepID; //Recepient ID
         //Create the Form Data object;
         var fd = new FormData;
         fd.append("context", "send");
@@ -1473,7 +1474,7 @@ include "include.php";
         //This fetches messages into the msg_capsule_container div
         //Fetch the messages using AJAX
         var xht = new XMLHttpRequest();
-        var recepID = document.getElementById("msg_iface").sellerID; //Recepient ID
+        var recepID = document.getElementById("msg_iface").recepID; //Recepient ID
         //Create the Form Data object;
         var fd = new FormData;
         fd.append("context", "fetch");

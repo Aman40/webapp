@@ -2,7 +2,7 @@
 function _checkenterkey(event) {
     //This is solely for the "srchdemo" input and
     //"search-input" input elements. There's a separate one for the  srch_div_input
-    if(event.key=='Enter') { //If it's the enter key, call the _searchdb function
+    if(event.key ==='Enter') { //If it's the enter key, call the _searchdb function
         event.preventDefault();
         try {
             _searchdb(document.getElementById('srchdemo').value);
@@ -13,7 +13,7 @@ function _checkenterkey(event) {
 }
 function _checkenterkey2(event) {
     //This is solely for the "srch_div_input" input element
-    if(event.key=='Enter') { //If it's the enter key, call the _searchdb function
+    if(event.key==='Enter') { //If it's the enter key, call the _searchdb function
         event.preventDefault();
         try {
             //Do here what the clicking search should've done.
@@ -31,12 +31,12 @@ function _searchdb(str) {
     var xhttp = new XMLHttpRequest();
     xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
     xhttp.onreadystatechange = function() { //If we get a reply from the server
-        if(this.readyState==4 && this.status==200) { //Check the status and readystate
+        if(this.readyState===4 && this.status===200) { //Check the status and readystate
             if(this.responseXML!=null) { //Do we have any meaningful response other than null?
                 var xmlDoc = this.responseXML;
                 console.log(xmlDoc);
                 var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-                if(returnStatus==0) {
+                if(returnStatus===0) {
                     //get an itemNodeList object
                     itemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
                     //Purge the 'html' variable of previous search data
@@ -49,8 +49,8 @@ function _searchdb(str) {
                             html="<div class='item-slide'>";
                             html+="<div class='item-slide-image'>";
                             html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";
-                            html+="</div><!--item-slide-header-->"
-                            html+="<div class='item-slide-content' id='itemNo"+i+"'>"
+                            html+="</div>";<!--item-slide-header-->
+                            html+="<div class='item-slide-content' id='itemNo"+i+"'>";
                             /**html+="<table>";
                             html+="<tr>";
                             html+="<th>Name</th>";
@@ -68,18 +68,18 @@ function _searchdb(str) {
                             html+="<div id='addToRep'>";//ID means 'Add to repository'
                             html+="<button onclick='displaymodal("+i+")'><i class='fa fa-plus-square-o'></i> Add an Item</button>";
                             html+="</div>";
-                            html+="</div><!--item-slide-header-->"
+                            html+="</div><!--item-slide-header-->";
                             html+="</div>";
                             document.getElementById("display-search-results").innerHTML+=html;
                         }
                     } else {
                         console.log("0 results were found");
                     }
-                } else if(returnStatus==1) { //returnStatus (defined in the php). 1=No results found.
+                } else if(returnStatus===1) { //returnStatus (defined in the php). 1=No results found.
                     console.log("No matching results were found");
-                } else if(returnStatus==2) { //2=couldn't connect to the database
+                } else if(returnStatus ===2) { //2=couldn't connect to the database
                     console.log("There was a problem connecting to the database");
-                } else if(returnStatus==11) {
+                } else if(returnStatus ===11) {
                     window.alert("Please log in");
                 }
             } else { //For some weird reason, no XML, null returned.
@@ -99,11 +99,11 @@ function _getInventory() {
     var xmlhttpr = new XMLHttpRequest();
     xmlhttpr.responseType = "document";
     xmlhttpr.onreadystatechange = function() {
-        if(this.readyState==4 && this.status==200) {//The request was fulfilled
+        if(this.readyState ===4 && this.status ===200) {//The request was fulfilled
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(returnStatus==0) {
+            if(returnStatus ===0) {
                 //Results were found
                 //get an itemNodeList object
                 itemNodeListr = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
@@ -131,7 +131,7 @@ function _getInventory() {
                         var elmt2 = "";
                         elmt2 = document.createElement("div");
                         elmt2.classList.add("item-slide-image");
-                        if(getValue(itemNodeListr, i, 'ImageURI') == 'None') {
+                        if(getValue(itemNodeListr, i, 'ImageURI')  === 'None') {
                             img.src = '../icons/placeholder.png'
                         }
                         else {
@@ -154,11 +154,11 @@ function _getInventory() {
                     console.log("Done 1");
                 }
 
-            } else if(returnStatus==1) {//No Results found
+            } else if(returnStatus ===1) {//No Results found
                 console.log("No results were found");
-            } else if(returnStatus==3) {//Problem connecting to the database
+            } else if(returnStatus ===3) {//Problem connecting to the database
                 console.log("There was a problem connecting to the database");
-            } else if(returnStatus==11) {//User is not logged in. Not even sure how that's possible
+            } else if(returnStatus ===11) {//User is not logged in. Not even sure how that's possible
                 console.log("WTF? Is that even possible");
             }
         } else {//The request wasn't fulfilled for some reason
@@ -210,10 +210,10 @@ function inventoryItemDetails(elmt, nodelist) {
     //Add an event listener to the span
     closeButton.onclick = function (event) {
         modal.style.display = "none";
-    }
+    };
     modal.onclick = function (event) {//Event listener to close the modal if user clicks anywhere outside the modal content
         modal.style.display = "none";
-    }
+    };
     modal.appendChild(closeButton);
     modal_content.classList.add("modal-content");
     var imgDiv = document.createElement('div'); //width: inherit
@@ -292,7 +292,7 @@ function hide_show(elmtId) {
     var arrow = element.getElementsByTagName("i")[0];
     element = element.getElementsByClassName('inventory-hidden')[0];
     //if it's hidden show it. If it's visible, hide it.
-    if(element.style.display=="none" || element.style.display=="") {
+    if(element.style.display ==="none" || element.style.display ==="") {
         element.style.display="block";
         arrow.className="fa fa-caret-down";
     } else {
@@ -305,16 +305,16 @@ function add_to_inventory() { //Hide inventory data onclick
     var iupdate=document.getElementById('inventory-update');
     console.log(idisplay.style.display);
     console.log(iupdate.style.display);
-    if(idisplay.style.display=='block' && iupdate.style.display=='none') {
+    if(idisplay.style.display ==='block' && iupdate.style.display ==='none') {
         console.log("Check Point 1");
         console.log("Conditions fulfilled");
         idisplay.style.display='none';
         iupdate.style.display='block';
-    } else if(idisplay.style.display=='' && iupdate.style.display=='none') { //Same statements as above instead of ||
+    } else if(idisplay.style.display ==='' && iupdate.style.display ==='none') { //Same statements as above instead of ||
         idisplay.style.display='none';
         iupdate.style.display='block';
         console.log("Check Point 2");
-    } else if(idisplay.style.display=='' && iupdate.style.display=='') { //For before javascript sets anything
+    } else if(idisplay.style.display ==='' && iupdate.style.display ==='') { //For before javascript sets anything
         idisplay.style.display='block';
         iupdate.style.display='none';
         console.log("Check Point 3");
@@ -333,17 +333,17 @@ function rem_rep_item(i) {
     xmlhttp.responseType = "document";
     xmlhttp.onreadystatechange = function() {
         //Check the return status for success/failure
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState ===4 && this.status ===200) {
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(return_status==0) { //Success. Rerun the _srchdb() function
+            if(return_status ===0) { //Success. Rerun the _srchdb() function
                 alert("Item Deleted");
-            } else if(return_status==1) {
+            } else if(return_status ===1) {
                 alert("A problem occurred");
             } else {
                 console.log(return_status);
-                reveal1hide23('inventory-container', 'prof-container', 'prof-orders');
+                reveal1hide23('inventory-container', 'prof-container', 'prof-orders', 'prof-msg', 'prof-pictures');
             }
         } else { //There was a problem at the server end
             console.log("There was a problem!");
@@ -359,7 +359,7 @@ function rem_rep_item(i) {
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     modalup = document.getElementById('id02');
-        if (event.target == modalup) {
+        if (event.target  === modalup) {
             modalup.style.display = "none";
         }
     }
@@ -367,9 +367,9 @@ window.onclick = function(event) {
 var deliverable="";
 function getradio(option) {
     console.log("getting radio");
-    if(option=="yes") {
+    if(option ==="yes") {
         deliverable="Y";
-    } else if(option=="no") {
+    } else if(option==="no") {
         deliverable="N";
     }
 }
@@ -385,9 +385,9 @@ function submit_add_form(i) {
     xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () { //When we get a reply from the webserver
         //Display success/failure status
-        if(this.readyState==4 && this.status==200){
+        if(this.readyState ===4 && this.status ===200){
             console.log(this.responseText);
-            if(this.responseText==true){ //Success. Close the modal
+            if(this.responseText ===true){ //Success. Close the modal
                 document.getElementById("editAddItem").style.display="none";
                 window.alert("Item successfully added");
             } else { //Failure. alert an error
@@ -481,7 +481,7 @@ function upload_prof_pic() {
         fd.append("myfile", blob, "profpic.jpg");
         xhr.open("POST", "up.php", true);
         xhr.onreadystatechange = function () {
-            if(this.readyState==4 && this.status==200) {
+            if(this.readyState ===4 && this.status ===200) {
                 console.log("Upload was successful");
                 console.log("The server says "+this.responseText);
             } else {
@@ -703,7 +703,7 @@ function sendformdata(fd, context) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState ===4 && this.status ===200) {
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             //Values of returnStatus range from 1 ~ 7. Each is defined in upload.php
@@ -715,14 +715,14 @@ function sendformdata(fd, context) {
                 console.log("Everything went fine!");
                 //Here, call the displaymodal function instead of reloading the page.
                 var returning_function = xmlDoc.getElementsByTagName("functn")[0].childNodes[0].nodeValue;
-                if(returning_function=="add") {
+                if(returning_function ==="add") {
                     //Get elmt.
                     //Write a separate function that searches the db but does something different upon return
                     //And calls the display_modal function in its readystate event listening callback function
                     var query = xmlDoc.getElementsByTagName("itemname")[0].childNodes[0].nodeValue;
                     edit_added_item(query); //This searches the db for the item by the itemname again and
                     //displays the item edit modal
-                } else if(returning_function=="edit") {
+                } else if(returning_function ==="edit") {
                     //Reload the page
                     location.reload();
                 } else {
@@ -758,12 +758,12 @@ function edit_added_item(query) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState ===4 && this.status ===200) {
             //Everything set
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(return_status==0) { //Success.
+            if(return_status ===0) { //Success.
                 //Extract the data from the document.
                 nodeList = xmlDoc.getElementsByTagName('Items')[0].getElementsByTagName('Item');
                 //Put check to trigger an error if nodeList.length>1. Only one distinct item has to be returned LATER
@@ -774,7 +774,7 @@ function edit_added_item(query) {
                 //Trigger the display_modal() funcion here passing the element. The function takes the element and
                 //Reads its index which is then used to read data from the returned node into a modal
                 display_modal(elmt);
-            } else if(return_status==1) {
+            } else if(return_status ===1) {
                 console.log("No results were found");
             }
             else {
@@ -796,7 +796,7 @@ function switch_panes (elmt) {
     var db_display = document.getElementById("db_display");
 
     //if the add div is hidden, show it and hide the edit div
-    if(db_display.style.display=="none" || db_display.style.display=="") {
+    if(db_display.style.display ==="none" || db_display.style.display ==="") {
         db_display.style.display="block";
         dbeditor_form.style.display="none";
         elmt.innerHTML="Add";
@@ -815,12 +815,13 @@ function srch_dbfor_nondistinct_items() {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState ===4 && this.status ===200) {
             //Everything set
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(return_status==0) { //Success.
+            return_status = parseInt(return_status);
+            if(return_status ===0) { //Success.
                 //Extract the data from the document.
                 nodeList = xmlDoc.getElementsByTagName('Items')[0].getElementsByTagName('Item');
                 var display_div = document.getElementById('dsp_div'); //Container where the items will be put
@@ -875,7 +876,7 @@ function srch_dbfor_nondistinct_items() {
                     elmt.appendChild(elmt2);
                     display_div.appendChild(elmt);
                 }
-            } else if(return_status==1) {
+            } else if(return_status ===1) {
                 console.log("No results were found");
             }
             else {
@@ -899,15 +900,16 @@ function getunits(itemID) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState ===4 && this.status ===200) {
             //Everything set
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(return_status==0) { //Success.
+            return_status = parseInt(return_status);
+            if(return_status ===0) { //Success.
                 //Extract the data from the document.
                 return xmlDoc.getElementsByTagName("Unit"); //Return a node list of the Units
-            } else if(return_status==1) {
+            } else if(return_status ===1) {
                 console.log("No results were found");
                 return false;
             }
@@ -948,7 +950,7 @@ function display_modal(elmt) {
     var up_btn = document.getElementById("db_up_btn"); //All the modal elements have the same id.
     up_btn.addEventListener("click", function () {
         editUploadCanvasImages(index);
-    })
+    });
     //Insert the image into the modal
     img.src = nodeList[index].getElementsByTagName('images')[0].getElementsByTagName('imagedata')[0].getElementsByTagName('imageuri')[0].childNodes[0].nodeValue;
     db_image.appendChild(img);
@@ -990,12 +992,13 @@ function initialize_available_units_list(index) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
-        if(this.readyState==4 && this.status==200) {
+        if(this.readyState ===4 && this.status ===200) {
             //Everything set
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(return_status==0) { //Success.
+            return_status = parseInt(return_status);
+            if(return_status ===0) { //Success.
                 //Extract the data from the document.
                 //Initialize the selectedUnits array with the indices of the units in the allUnitsList array. Yeah. it's a bit complicated
                 var tmp1;
@@ -1007,7 +1010,7 @@ function initialize_available_units_list(index) {
                     tmp1 = selected_units_list[i].getElementsByTagName("UnitID")[0].childNodes[0].nodeValue;
                     for(j=0;j<allUnitsList.length;j++) {
                         tmp2 = allUnitsList[j].getElementsByTagName("UnitID")[0].childNodes[0].nodeValue;
-                        if(tmp1==tmp2) {
+                        if(tmp1 ===tmp2) {
                             //Then add j to the selected units' list
                             selectedUnits.push(j);
                             //Easy peasy. I only have to do this once, luckily to initialize the selectedUnits array.
@@ -1043,7 +1046,7 @@ function initialize_available_units_list(index) {
                 }
                 html+="</table>";
                 db_units_selected.innerHTML = html;
-            } else if(return_status==1) {
+            } else if(return_status ===1) {
                 console.log("No results were found");
                 return false;
             }
@@ -1075,7 +1078,8 @@ function listunits(index) {
             console.log("Units:");
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(return_status==0) { //Success.
+            return_status = parseInt(return_status);
+            if(return_status ===0) { //Success.
                 //Extract the data from the document and build the table
                 var db_units_all = document.getElementById('db_units_all');
                 allUnitsList = xmlDoc.getElementsByTagName('Unit');
@@ -1105,7 +1109,7 @@ function listunits(index) {
                 db_units_all.innerHTML = html;
                 //Display the units the item alredy has in the appropriate assigned div
                 initialize_available_units_list(index);
-            } else if(return_status==1) {
+            } else if(return_status ===1) {
                 console.log("No results were found");
             }
             else {
@@ -1197,32 +1201,32 @@ function unselectunit(index) {
 //Adding a method to the Array object to check if a certain value is in the array
 Array.prototype.contains = function (value) { //Checks whether the array contains the given value
     for(i=0;i<this.length;i++) {
-        if(this[i]==value) {
+        if(this[i] ===value) {
             return true;
         }
     }
     return false;
-}
+};
 Array.prototype.remove = function (index) { //removes the value corresponding to the given index and returns a new array
     var arr = []; //New temporary array
     for(i=0;i<this.length;i++) {
-        if(i!=index) {
+        if(i!==index) {
             //Move to the new array
             arr.push(this[i]);
         }
     }
     return arr;
-}
+};
 Array.prototype.delete = function (value) { //Deletes all the values corresponding to 'value' and returns a new array
     var arr = []; //New temporary array
     for(i=0;i<this.length;i++) {
-        if(this[i]!=value) {
+        if(this[i]!==value) {
             //Move to the new array
             arr.push(this[i]);
         }
     }
     return arr;
-}
+};
 var imgs_for_deletion = []; //An array with images marked for deletion
 function markOrUnmarkImgForDeletion(img) {
     //This maintains the imgs_for_deletion array, which will be sent with the form data
@@ -1273,29 +1277,33 @@ function inboxMessages() {
                 //Fetch one by one from the array into the container
                 console.log(msg_node_list.length+" nodes");
                 for(var i=0;i<msg_node_list.length; i++) {
-                    var elmt = document.createElement("div");
-                    elmt.id = "inbox-slide";
+                    var elmt = document.createElement("div"); //Add an onclick event and an index number
+                    elmt.recepID = msg_node_list[i].getElementsByTagName("theirid")[0].childNodes[0].nodeValue;
+                    elmt.addEventListener("click", function () {
+                        messageClient(this); //Attach the element on to the function
+                    }, true);
+                    elmt.className = "inbox-slide";
                     var elmt2 = document.createElement("div");
-                    elmt2.id="ib-prof";
+                    elmt2.className="ib-prof";
                     var elmt3 = document.createElement("img");
                     elmt3.src = "Pictures/"+msg_node_list[i].getElementsByTagName("theirid")[0].childNodes[0].nodeValue;
                     elmt2.appendChild(elmt3);
                     elmt.appendChild(elmt2);
                     elmt2 = document.createElement("div");
-                    elmt2.id = "ib-msg";
+                    elmt2.className = "ib-msg";
                     elmt3 = document.createElement("div");
-                    elmt3.id = "ib-title-time";
+                    elmt3.className = "ib-title-time";
                     var elmt4 = document.createElement("div");
-                    elmt4.id = "ib-title";
+                    elmt4.className = "ib-title";
                     elmt4.innerHTML = msg_node_list[i].getElementsByTagName("name")[0].childNodes[0].nodeValue;
                     elmt3.appendChild(elmt4);
                     elmt4 = document.createElement("div");
-                    elmt4.id = "ib-time";
+                    elmt4.className = "ib-time";
                     elmt4.innerHTML = msg_node_list[i].getElementsByTagName("timestamp")[0].childNodes[0].nodeValue;
                     elmt3.appendChild(elmt4);
                     elmt2.appendChild(elmt3);
                     elmt3 = document.createElement("div");
-                    elmt3.id = "ib-msg-txt";
+                    elmt3.className = "ib-msg-txt";
                     elmt3.innerHTML = msg_node_list[i].getElementsByTagName("msgtext")[0].childNodes[0].nodeValue;
                     elmt2.appendChild(elmt3);
                     elmt.appendChild(elmt2);
@@ -1305,6 +1313,201 @@ function inboxMessages() {
             } else {
                 console.log(xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue);
                 console.log("Problem "+returnStatus+" occured.");
+            }
+        } else {
+            //Analyze the status and ready states
+            console.log(this.status);
+            console.log(this.readyState);
+        }
+    };
+    xht.open("POST", "../messages.php", true);
+    xht.send(fd);
+}
+function messageClient(elmt) {
+    //DEPENDENTS: isLogged, loadMessages(), itemNodeList[],
+    //This opens the messaging API, accesses the database to get the recepient's name and then calls the loadMessages function
+    //uses isLogged variable. This is defined in mprofile.php
+    if(isLogged) {
+        //User is logged in
+        console.log("Is logged in");
+        //Get seller ID as is appended on the element in the inbox.
+        var recepID = elmt.recepID;
+        //Open messenger interface with UserID embedded somewhere for retrieval by the sendMessage() and loadMessages()
+        var msgInterface = document.getElementById("msg_iface");
+        msgInterface.recepID = recepID; //Append the receipient ID to the element. This violates HTML5 integrity but meh!!
+        //Get and set the recepient name and get the image with AJAX
+        //Access the db
+        var fd = new FormData();
+        //Get the recepID here
+        fd.append("recepID", recepID);
+        fd.append("context", "get_recep_name");
+        var xht = new XMLHttpRequest();
+        xht.responseType = "document";
+        xht.onreadystatechange = function () {
+            if(this.status===200 && this.readyState===4) {
+                var xmlDoc = this.responseXML;
+                var returnStatus = xmlDoc.getElementsByTagName("returnStatus")[0].childNodes[0].nodeValue;
+                returnStatus = parseInt(returnStatus);
+                if(returnStatus===0) {
+                    //Things went fine. I expect two things in the returned xmlDoc
+                    //1. the name of the recepient
+                    //2. the imageURI of the recepient
+                    //var recep_img = xmlDoc.getElementsByTagName("recepimg")[0].childNodes[0].nodeValue;
+                    document.getElementById("msg_name").innerHTML = xmlDoc.getElementsByTagName("recepname")[0].childNodes[0].nodeValue;
+                    //Also set bind the imageURI to the element for subsequent reference.
+                    msgInterface.style.display = "block";
+                    loadMessages();
+                } else {
+                    console.log("Recep name, img retrieval failed.");
+                    console.log("Return Status="+returnStatus);
+                    //Show error to user. LATER
+                }
+            } else {
+                console.log("Recep name, img retrieval failed. Server problem?");
+                console.log("Status="+this.status+" Ready State="+this.readyState);
+                //Show error to user. LATER
+            }
+        };
+        xht.open("POST", "../messages.php", true);
+        xht.send(fd);
+    } else {
+        //User is not logged in
+        console.log("Not logged in!");
+        //Prompt user to sign up or sign in
+        // document.getElementById('orderItem').style.display = "none";
+        document.getElementById('sgn_in_selector').style.display = "block";
+    }
+}
+//This is to handle messages;
+function sendMessage() {
+    //From the perspective of a buyer messaging a seller. (Because of where the recepientID comes from)
+    //This is all predicated from someone clicking "contact seller". A version for "reply to message", for the
+    //seller's part will be handled too.
+    //This function sends the message and refreshes
+    var msgText = document.getElementById('msgtxt').value;
+    //Send this text via AJAX to the db. The UserID/ClientID is already described in the $_SESSION['xxxID']
+    //So sending it is unnecessary.
+    //Get the seller's ID
+    var recepID = document.getElementById("msg_iface").recepID; //Recepient ID
+    //Create the Form Data object;
+    var fd = new FormData;
+    fd.append("context", "send");
+    fd.append("recepID", recepID);
+    fd.append("msgText", msgText);
+    //Send the text via AJAX to messages.php
+    var xht = new XMLHttpRequest();
+    xht.responseType = "document";
+    xht.onreadystatechange = function () {
+        //Send and call refreshMessages();
+        if(this.status===200 && this.readyState===4) {
+            //Everything went according to plan
+            //Get the return xml
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            //Get the return status
+            var returnStatus = xmlDoc.getElementsByTagName("returnstatus")[0].childNodes[0].nodeValue;
+            //Convert return status to integer
+            returnStatus = parseInt(returnStatus);
+            //Analyze the return status for errors
+            if(returnStatus===0) {
+                //Everything went according to plan
+                //Clear text area
+                document.getElementById('msgtxt').value = "";
+                //Call loadMessages and finish.
+                console.log("The message was sent successfully");
+                loadMessages();
+            } else {
+                console.log(xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue);
+                console.log("Problem "+returnStatus+" occured.");
+            }
+        } else {
+            //Analyze the status and ready states
+            console.log(this.status);
+            console.log(this.readyState);
+        }
+    };
+    xht.open("POST", "../messages.php",true);
+    xht.send(fd);
+}
+var msgCapsuleContainer = document.getElementById("msg_capsule_container");
+var offset = 0.5; //The lower limit for rows to be fetched, based on the Serial number 'cause the date would make
+//things a little complicated
+function loadMessages() {
+    //This is from the perspective of the buyer messaging a seller. The other way round will be hadled semi-independently
+    //This fetches messages into the msg_capsule_container div
+    //Fetch the messages using AJAX
+    var xht = new XMLHttpRequest();
+    var recepID = document.getElementById("msg_iface").recepID; //Recepient ID
+    //Create the Form Data object;
+    var fd = new FormData;
+    fd.append("context", "fetch");
+    fd.append("recepID", recepID);
+    fd.append("offset", offset);
+    xht.responseType = "document";
+    xht.onreadystatechange = function () {
+        //Send and call refreshMessages();
+        if(this.status===200 && this.readyState===4) {
+            //Everything went according to plan
+            //Get the return xml
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            //Get the return status
+            var returnStatus = xmlDoc.getElementsByTagName("returnstatus")[0].childNodes[0].nodeValue;
+            //Convert return status to integer
+            returnStatus = parseInt(returnStatus);
+            //Analyze the return status for errors
+            if(returnStatus===0) {
+                //Everything went according to plan
+                //load the div with messages
+                //That depends on the returned XML, so return XML from PHP first.
+                var msg_node_list = xmlDoc.getElementsByTagName("message"); //Contains 10 messages at a time
+                //Get the message capsule container
+                var msg_capsule_container = document.getElementById("msg_capsule_container");
+                msg_capsule_container.innerHTML = "";
+                //Create the message container capsules
+                for(var i = 0; i<msg_node_list.length;i++) {
+                    //Get all the <message> variables first
+                    var timesent = msg_node_list[i].getElementsByTagName("timesent")[0].childNodes[0].nodeValue;
+                    var msgtext = msg_node_list[i].getElementsByTagName("msgtext")[0].childNodes[0].nodeValue;
+                    //  var pictureid = msg_node_list[i].getElementsByTagName("pictureid")[0].childNodes[0].nodeValue;
+                    //  var imageuri = msg_node_list[i].getElementsByTagName("imageuri")[0].childNodes[0].nodeValue;
+                    var bool_in_out = msg_node_list[i].getElementsByTagName("sender")[0].childNodes[0].nodeValue;
+
+                    var elmt = document.createElement("div");
+                    elmt.id = "cap_wrap"; //Capsule outer wrap
+                    var elmt2 = document.createElement("div");
+                    elmt2.id = "cap_col_left";
+                    elmt.appendChild(elmt2);
+                    elmt2 = document.createElement("div");
+                    elmt2.id = "cap_col_center";
+                    var elmt3 = document.createElement("div"); //Date and time of sending
+                    elmt3.id="cap_col_center_top";
+                    elmt3.innerHTML = timesent;
+                    elmt2.appendChild(elmt3);
+                    elmt3 = document.createElement("div"); //Actual message
+                    elmt3.id="cap_col_center_middle";
+                    var elmt4 = document.createElement("div");
+                    elmt4.classList.add("cap_msg_text_wrapper");
+                    //Change background color depending on whether message is in or outbound
+                    if(bool_in_out==="inbound") {
+                        elmt4.classList.add("cap_msg_text_inbound");
+                    } else {
+                        elmt4.classList.add("cap_msg_text_outbound");
+                    }
+                    elmt4.innerHTML = msgtext;
+                    elmt3.appendChild(elmt4);
+                    elmt2.appendChild(elmt3);
+                    var elmt3 = document.createElement("div"); //"seen". Will be implemented later
+                    elmt3.id="cap_col_center_bottom";
+                    elmt2.appendChild(elmt3);
+                    elmt.appendChild(elmt2);
+                    elmt2 = document.createElement("div");
+                    elmt2.id = "cap_col_right";
+                    elmt.appendChild(elmt2);
+                    msg_capsule_container.appendChild(elmt);
+                }
+            } else {
+                console.log("A problem with returnStatus "+returnStatus+" occured.");
             }
         } else {
             //Analyze the status and ready states

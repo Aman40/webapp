@@ -10,6 +10,16 @@ include "../include.php";
     <script src="index.js"></script>
 </head>
 <body>
+<script>
+    var isLogged = false; //Default
+    <?php
+    if(isset($_SESSION['ClientID']) || isset($_SESSION['UserID'])) {
+        //User is logged in. Type of account is irrelevant;
+        //Set javascript isLogged variable to true.
+        echo "isLogged = true;";
+    }
+    ?>
+</script>
 <div id="main-wrapper">
     <div id="row-1">
 
@@ -56,11 +66,11 @@ include "../include.php";
             <div class="col-12 r2c2row">
                 <div class="col-12" id="prof-page-main">
                     <div class="col-12" id="tab-row">
-                        <a href="javascript:reveal1hide23('prof-container', 'inventory-container', 'prof-orders')" id="tab-1">Profile</a>
-                        <a href="javascript:reveal1hide23('inventory-container', 'prof-container', 'prof-orders')" id="tab-2">Inventory</a>
-                        <a href="javascript:reveal1hide23('prof-orders', 'inventory-container', 'prof-container')" id="tab-3">Messages</a>
-                        <a href="javascript:void(0)" id="tab-4">Orders</a>
-                        <a href="javascript:void(0)" id="tab-4">Pictures</a>
+                        <a href="javascript:reveal1hide2345('prof-container', 'inventory-container', 'prof-orders', 'prof-msg', 'prof-pictures')" id="tab-1">Profile</a>
+                        <a href="javascript:reveal1hide2345('inventory-container', 'prof-container', 'prof-orders', 'prof-msg', 'prof-pictures')" id="tab-2">Inventory</a>
+                        <a href="javascript:reveal1hide2345('prof-msg', 'prof-orders', 'inventory-container', 'prof-container', 'prof-pictures')" id="tab-3">Messages</a>
+                        <a href="javascript:reveal1hide2345('prof-orders', 'inventory-container', 'prof-container', 'prof-msg', 'prof-pictures')" id="tab-4">Orders</a>
+                        <a href="javascript:reveal1hide2345('prof-pictures' ,'prof-orders', 'inventory-container', 'prof-container', 'prof-msg')" id="tab-5">Pictures</a>
                     </div><!--tab-row-->
                     <div class="col-12 prof-content-row" id="prof-container">
                         <?php
@@ -397,7 +407,6 @@ include "../include.php";
                         <div id="msg-display"><!--This holds the different message templates.-->
                             <script>
                                 //Access the db to fetch the user's messages
-                                //
                             </script>
                         </div>
 
@@ -407,15 +416,22 @@ include "../include.php";
                             This is the orders container. Still under development.
                         </p>
                     </div><!--Orders div-->
+                    <div class="col-12 prof-content-row" id="prof-pictures">
+                        <p>
+                            This is the Pictures container. Still under development.
+                        </p>
+                    </div><!--Pictures div-->
                     <!--script3-->
                     <script> //Script3
-                        function reveal1hide23(div1, div2, div3) {
+                        function reveal1hide2345(div1, div2, div3, div4, div5) {
                             document.getElementById(div1).style.display="block";
                             document.getElementById(div2).style.display="none";
                             document.getElementById(div3).style.display="none";
+                            document.getElementById(div4).style.display="none";
+                            document.getElementById(div5).style.display="none";
                             if(div1==="inventory-container") { //
-                                var idisplay=document.getElementById('inventory-display');
-                                var iupdate=document.getElementById('inventory-update');
+                                var idisplay = document.getElementById('inventory-display');
+                                var iupdate = document.getElementById('inventory-update');
                                 add_to_inventory();//Switches the visibilities of inventory-update and inventory-
                                 //display back and forth.
                                 <?php
@@ -570,8 +586,35 @@ function _selected($var) {
     </div>
 
 </div>
+<div class="modal" id="msg_iface">
+    <div class="modal-content" id="msg_content">
+        <div id="msg_outer"><!--The messages outer frame-->
+            <div id="msg_row_top"><!--The top row-->
+                <div id="msg_row_top_container"><!--Contains the correspondent's name, back button, close button -->
+                    <div id="msg_back"> Back</div>
+                    <div id="msg_name"></div>
+                    <div id="msg_close" onclick="document.getElementById('msg_iface').style.display='none';">Close</div>
+                </div>
+            </div>
+            <div id="msg_row_middle"><!--The middle row. Outer wrap for the actual texts-->
+                <div id="msg_capsule_container"><!--Actual container for the text "capsules"-->
+                    <!--The text capsules will be put in here using ajax, 10 at a time. Contains msg text and time-->
+                </div>
+            </div>
+            <div id="msg_row_btm"><!--The bottom row. Contans image selector, text area and send button-->
+                <div id="msg_row_btm_wrap"><!--Outer wrap-->
+                    <div id="msg_img_slctor">Img</div>
+                    <div id="msg_txt_area"><textarea id="msgtxt"></textarea></div>
+                    <div id="msg_send" onclick="sendMessage()">Send</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-    inboxMessages();
+    if(isLogged) {
+        inboxMessages();
+    }
 </script>
 <!--Below is the orders div-->
 
