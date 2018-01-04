@@ -263,6 +263,7 @@ TODO
 4. Create messenger interface CHECK
 5. Write messenger php script
 6. PAGINATION with mysql
+7. Deal with the undefined index error.
 
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.

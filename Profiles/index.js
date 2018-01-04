@@ -103,7 +103,8 @@ function _getInventory() {
             var xmlDoc = this.responseXML;
             console.log(xmlDoc);
             var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-            if(returnStatus ===0) {
+            returnStatus = parseInt(returnStatus)
+            if(returnStatus===0) {
                 //Results were found
                 //get an itemNodeList object
                 itemNodeListr = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
@@ -113,7 +114,6 @@ function _getInventory() {
                 html+="<img src='../icons/add.png'>"
                 html+="</div>"; //APPROPRIATE ID
                 invDisplay.innerHTML=html;
-
                 if(itemNodeListr.length>0) {
                     var i = 0;
                     var html="";
@@ -151,7 +151,6 @@ function _getInventory() {
                         elmt.appendChild(elmt3);
                         document.getElementById("inventory-display").appendChild(elmt);
                     }
-                    console.log("Done 1");
                 }
 
             } else if(returnStatus ===1) {//No Results found
@@ -165,7 +164,6 @@ function _getInventory() {
             console.log("ReadyState = "+this.readyState);
             console.log("Status = "+this.status)
         }
-        console.log("Done 2");
         return null;
     }
     xmlhttpr.open("GET", "xhttp.php?table=Repository", true);
@@ -306,23 +304,19 @@ function add_to_inventory() { //Hide inventory data onclick
     console.log(idisplay.style.display);
     console.log(iupdate.style.display);
     if(idisplay.style.display ==='block' && iupdate.style.display ==='none') {
-        console.log("Check Point 1");
         console.log("Conditions fulfilled");
         idisplay.style.display='none';
         iupdate.style.display='block';
     } else if(idisplay.style.display ==='' && iupdate.style.display ==='none') { //Same statements as above instead of ||
         idisplay.style.display='none';
         iupdate.style.display='block';
-        console.log("Check Point 2");
     } else if(idisplay.style.display ==='' && iupdate.style.display ==='') { //For before javascript sets anything
         idisplay.style.display='block';
         iupdate.style.display='none';
-        console.log("Check Point 3");
     } else {
         console.log("Conditions unfulfilled")
         idisplay.style.display='block';
         iupdate.style.display='none';
-        console.log("Check Point 4");
     }
 }
 function rem_rep_item(i) {
@@ -343,7 +337,7 @@ function rem_rep_item(i) {
                 alert("A problem occurred");
             } else {
                 console.log(return_status);
-                reveal1hide23('inventory-container', 'prof-container', 'prof-orders', 'prof-msg', 'prof-pictures');
+                reveal1hide2345('inventory-container', 'prof-container', 'prof-orders', 'prof-msg', 'prof-pictures');
             }
         } else { //There was a problem at the server end
             console.log("There was a problem!");

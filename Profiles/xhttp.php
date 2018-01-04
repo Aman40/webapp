@@ -57,12 +57,12 @@ function filter($entry) {
     return $entry; //Sanitized input
 }
 //When optional fields are empty, fill in default values
-function setdefault($value, $default) {
+function setdefault($value, $default, $array) {
     //If a value is null, set it with the default given in the second parameter.
-    if($value==null) {
-        return $default;
+    if(isset($array[$value])) {
+        return $array[$value];
     } else {
-        return $value;
+        return $default;
     }
 }
 //_search_all_db() searches for all items available for sale, i.e items in the Repository
@@ -153,7 +153,7 @@ function _getuserinfo($userid) { //SHOULD IT ECHO TO OUTPUT OR RETURN TO CALLING
             $About = $row['About'];
             $CoName = $row['CoName'];
             $District = $row['District'];
-            $Email = setdefault($row['Email'], "None");
+            $Email = setdefault('Email', "None", $row);
             //Echo the extracted values into a return string
             $userData="<userdata>";
             $userData.="<sex>".$Sex."</sex>";
@@ -459,8 +459,8 @@ function cmp_itemid($reply, $result, $row1) {
         if($row1['ItemID']==$row2['ItemID']) {
             //Same ItemID, different Image
             $reply.="<ImageData>";
-            $reply.="<ImageID>".$row1['ImageID']."</ImageID>";
-            $reply.="<ImageURI>".setdefault($row1['ImageURI'],"icons/placeholder.png")."</ImageURI>";
+            $reply.="<ImageID>".setdefault('ImageID', 'N/A', $row1)."</ImageID>";
+            $reply.="<ImageURI>".setdefault('ImageURI',"icons/placeholder.png", $row1)."</ImageURI>";
             $reply.="</ImageData>";
             $row1=$row2;
             $reply=cmp_itemid($reply, $result, $row1);
@@ -468,28 +468,28 @@ function cmp_itemid($reply, $result, $row1) {
         } else {
             //New ItemID
             $reply.="<ImageData>";
-            $reply.="<ImageID>".$row1['ImageID']."</ImageID>";
-            $reply.="<ImageURI>".setdefault($row1['ImageURI'],"icons/placeholder.png")."</ImageURI>";
+            $reply.="<ImageID>".setdefault('ImageID', 'N/A', $row1)."</ImageID>";
+            $reply.="<ImageURI>".setdefault('ImageURI',"icons/placeholder.png", $row1)."</ImageURI>";
             $reply.="</ImageData>";
             $reply.="</Images>";
             $reply.="<Itemdata>";
 
             $reply.="<ItemID>".$row1['ItemID']."</ItemID>";
             $reply.="<ItemName>".$row1['ItemName']."</ItemName>";
-            $reply.="<Aliases>".$row1['Aliases']."</Aliases>";
-            $reply.="<Category>".$row1['Category']."</Category>";
-            $reply.="<Description>".$row1['Description']."</Description>";
+            $reply.="<Aliases>".setdefault('Aliases', 'N/A', $row1)."</Aliases>";
+            $reply.="<Category>".setdefault('Category', 'N/A', $row1)."</Category>";
+            $reply.="<Description>".setdefault('Description', 'N/A', $row1)."</Description>";
 
-            $reply.="<UserID>".setdefault($row1['UserID'], 'N/A')."</UserID>";
-            $reply.="<RepID>".setdefault($row1['RepID'], 'N/A')."</RepID>";
-            $reply.="<Quantity>".setdefault($row1['Quantity'], 'N/A')."</Quantity>";
-            $reply.="<Units>".setdefault($row1['Units'], 'N/A')."</Units>";
-            $reply.="<UnitPrice>".setdefault($row1['UnitPrice'], 'N/A')."</UnitPrice>";
-            $reply.="<State>".setdefault($row1['State'], 'N/A')."</State>";
-            $reply.="<DateAdded>".setdefault($row1['DateAdded'], 'N/A')."</DateAdded>";
-            $reply.="<Deliverable>".setdefault($row1['Deliverable'], 'N/A')."</Deliverable>";
-            $reply.="<DeliverableAreas>".setdefault($row1['DeliverableAreas'], 'N/A')."</DeliverableAreas>";
-            $reply.="<ImageURI>".setdefault($row1['ImageURI'], 'N/A')."</ImageURI>"; //The default image
+            $reply.="<UserID>".setdefault('UserID', 'N/A', $row1)."</UserID>";
+            $reply.="<RepID>".setdefault('RepID', 'N/A', $row1)."</RepID>";
+            $reply.="<Quantity>".setdefault('Quantity', 'N/A', $row1)."</Quantity>";
+            $reply.="<Units>".setdefault('Units', 'N/A', $row1)."</Units>";
+            $reply.="<UnitPrice>".setdefault('UnitPrice', 'N/A', $row1)."</UnitPrice>";
+            $reply.="<State>".setdefault('State', 'N/A', $row1)."</State>";
+            $reply.="<DateAdded>".setdefault('DateAdded', 'N/A', $row1)."</DateAdded>";
+            $reply.="<Deliverable>".setdefault('Deliverable', 'N/A', $row1)."</Deliverable>";
+            $reply.="<DeliverableAreas>".setdefault('DeliverableAreas', 'N/A', $row1)."</DeliverableAreas>";
+            $reply.="<ImageURI>".setdefault('ImageURI', 'N/A', $row1)."</ImageURI>"; //The default image
 
             $reply.="</Itemdata>";
             $reply.="</Item>";
@@ -504,28 +504,28 @@ function cmp_itemid($reply, $result, $row1) {
         //Store the last row
         //Close the last <Images> tag
         $reply.="<ImageData>";
-        $reply.="<ImageID>".$row1['ImageID']."</ImageID>";
-        $reply.="<ImageURI>".setdefault($row1['ImageURI'],"icons/placeholder.png")."</ImageURI>";
+        $reply.="<ImageID>".setdefault('ImageID', 'N/A', $row1)."</ImageID>";
+        $reply.="<ImageURI>".setdefault('ImageURI',"icons/placeholder.png", $row1)."</ImageURI>";
         $reply.="</ImageData>";
         $reply.="</Images>";
         $reply.="<Itemdata>";
         $reply.="<ItemID>".$row1['ItemID']."</ItemID>";
         $reply.="<ItemName>".$row1['ItemName']."</ItemName>";
-        $reply.="<Aliases>".$row1['Aliases']."</Aliases>";
-        $reply.="<Category>".$row1['Category']."</Category>";
-        $reply.="<Description>".$row1['Description']."</Description>";
+        $reply.="<Aliases>".setdefault('Aliases', 'N/A', $row1)."</Aliases>";
+        $reply.="<Category>".setdefault('Category', 'N/A', $row1)."</Category>";
+        $reply.="<Description>".setdefault('Description', 'N/A', $row1)."</Description>";
 
-        $reply.="<UserID>".setdefault($row1['UserID'], 'N/A')."</UserID>";
-        $reply.="<DefaultDescription>".setdefault($row1['DefaultDescription'], 'N/A')."</DefaultDescription>";
-        $reply.="<RepID>".setdefault($row1['RepID'], 'N/A')."</RepID>";
-        $reply.="<Quantity>".setdefault($row1['Quantity'], 'N/A')."</Quantity>";
-        $reply.="<Units>".setdefault($row1['Units'], 'N/A')."</Units>";
-        $reply.="<UnitPrice>".setdefault($row1['UnitPrice'], 'N/A')."</UnitPrice>";
-        $reply.="<State>".setdefault($row1['State'], 'N/A')."</State>";
-        $reply.="<DateAdded>".setdefault($row1['DateAdded'], 'N/A')."</DateAdded>";
-        $reply.="<Deliverable>".setdefault($row1['Deliverable'], 'N/A')."</Deliverable>";
-        $reply.="<DeliverableAreas>".setdefault($row1['DeliverableAreas'], 'N/A')."</DeliverableAreas>";
-        $reply.="<ImageURI>".setdefault($row1['ImageURI'], 'N/A')."</ImageURI>"; //The default image
+        $reply.="<UserID>".setdefault('UserID', 'N/A', $row1)."</UserID>";
+        $reply.="<DefaultDescription>".setdefault('DefaultDescription', 'N/A', $row1)."</DefaultDescription>";
+        $reply.="<RepID>".setdefault('RepID', 'N/A', $row1)."</RepID>";
+        $reply.="<Quantity>".setdefault('Quantity', 'N/A', $row1)."</Quantity>";
+        $reply.="<Units>".setdefault('Units', 'N/A', $row1)."</Units>";
+        $reply.="<UnitPrice>".setdefault('UnitPrice', 'N/A', $row1)."</UnitPrice>";
+        $reply.="<State>".setdefault('State', 'N/A', $row1)."</State>";
+        $reply.="<DateAdded>".setdefault('DateAdded', 'N/A', $row1)."</DateAdded>";
+        $reply.="<Deliverable>".setdefault('Deliverable', 'N/A', $row1)."</Deliverable>";
+        $reply.="<DeliverableAreas>".setdefault('DeliverableAreas', 'N/A', $row1)."</DeliverableAreas>";
+        $reply.="<ImageURI>".setdefault('ImageURI', 'N/A', $row1)."</ImageURI>"; //The default image
 
         $reply.="</Itemdata>";
         $reply.="</Item>";
