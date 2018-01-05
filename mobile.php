@@ -753,10 +753,9 @@ include "include.php";
                             label.innerHTML="Quantity:"
                             form.appendChild(newElmt('br'));
                         var input = newElmt('input');
-                            form.appendChild(input);
                             input.type='text';
+                            form.appendChild(input);
                             //Another input
-
 
                         //Create and append button
                         var button = newElmt("button");
@@ -765,7 +764,7 @@ include "include.php";
                         button.innerHTML = "Place Open Order";
                         button.onclick = function () {
                             place_open_order(this.indexno);
-                        }
+                        };
                         var icon = newElmt("i");
                         icon.classList.add('fa'); //set class part 1
                         icon.classList.add('fa-plus-square-o'); //set class part 2

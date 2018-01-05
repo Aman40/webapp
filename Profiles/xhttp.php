@@ -399,7 +399,7 @@ function _searchCatalog($table, $UserID) {
             } else {
                 //Query failed
                 //Return corresponding return status in xml
-                echo "<err>".trigger_error($conn->error)."</err>";
+                echo "<err>".$conn->error."</err>";
                 echo "<status>2</status>";
             }
         }

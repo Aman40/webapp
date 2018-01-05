@@ -543,14 +543,7 @@ function _selected($var) {
             <form target="hidden_iframe">
                 <label>Stock Quantity</label><br>
                 <input id="quantity" name="quantity" type="number" min=0 max=9999999 step=0.01>
-                <select name="units" id="units">
-                    <option value="kgs">Kilograms</option>
-                    <option value="grams">Grams</option>
-                    <option value="pieces">Pieces</option>
-                    <option value="units">Units</option>
-                    <option value="bunches">Bunches</option>
-                    <option value="bags">Bags</option>
-                    <option value="litres">Litres</option>
+                <select name="units" id="units"> <!--Replace this with the item's units fetched using getunits() in index.js -->
 
                 </select>
                 <br>

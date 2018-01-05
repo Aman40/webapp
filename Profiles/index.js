@@ -36,13 +36,14 @@ function _searchdb(str) {
                 var xmlDoc = this.responseXML;
                 console.log(xmlDoc);
                 var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+                returnStatus = parseInt(returnStatus);
                 if(returnStatus===0) {
                     //get an itemNodeList object
                     itemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
                     //Purge the 'html' variable of previous search data
                     document.getElementById("display-search-results").innerHTML="";
 
-                    if(itemNodeList.length>0) {
+                    if(itemNodeList.length>0) { //Build the item slides HTML and append
                         var html="";
                         var i=0;
                         for(i=0;i<itemNodeList.length;i++) {
@@ -188,7 +189,27 @@ function displaymodal(i) {
     html+="</div>";
     document.getElementById("item_submit_button").innerHTML="<button type='submit' onclick='submit_add_form("+i+")'><i class='fa fa-plus-square-o'></i>  Add to repository</button>";
     document.getElementById("eAI-12").innerHTML=html;
-    document.getElementById("editAddItem").style.display="block";
+
+    //Get the <select> Element and put the unit as <option>s
+    var object = {
+        "calling_function": "display_modal",
+        "itemid":getValue(itemNodeList, i, 'ItemID'),//Should be a string
+        "function": function(unitsNodeList) {
+            var selectElmt = document.getElementById("units");
+            selectElmt.innerHTML = "";
+            //Get the list of units into a list
+            console.log(unitsNodeList);
+            for(var i=0;i<unitsNodeList.length;i++) {
+                var option = document.createElement('option');
+                var value = unitsNodeList[i].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                option.value = value.toLowerCase();
+                option.innerHTML = unitsNodeList[i].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                selectElmt.appendChild(option);
+            }
+            document.getElementById("editAddItem").style.display="block";
+        } // A function
+    }
+    getunits(object)
 }
 
 function inventoryItemDetails(elmt, nodelist) {
@@ -396,7 +417,7 @@ function submit_add_form(i) {
 }
 function readval(id) {
     return	document.getElementById(id).value;
-}
+};
 function place_order() {
     var orderItem = document.getElementById("orderItem");
 }
@@ -887,10 +908,12 @@ function srch_dbfor_nondistinct_items() {
     xhr.send();
 }
 
-function getunits(itemID) {
+function getunits(object) {
+    //The object parsed as the argument contains extra information and code to run depending on the function calling
+    //this function.
     //Function accesses database to retrieve all the Units associated with an item
-    //Returns an array with the units or null if no units at all
-    //Returns an xmlDoc array with units or false otherwise
+    //Calling_fn is a selector for use in an if statement to determine what to do with the returned data
+    //xtra_data is a structure that varies depending on the calling_fn. It's an object
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
@@ -900,17 +923,21 @@ function getunits(itemID) {
             console.log(xmlDoc);
             var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
             return_status = parseInt(return_status);
-            if(return_status ===0) { //Success.
-                //Extract the data from the document.
-                return xmlDoc.getElementsByTagName("Unit"); //Return a node list of the Units
-            } else if(return_status ===1) {
-                console.log("No results were found");
-                return false;
-            }
-            else {
-                console.log("A problem occured. Details comin' up.");
-                console.log(return_status);
-                return false;
+            if(object.calling_function==="display_modal") {
+                if(return_status===0) { //Success.
+                    //Extract the data from the document.
+                    var units = xmlDoc.getElementsByTagName("Unit");
+                    //Run the code defined in the object's "function" attribute
+                    object.function(units);
+                } else if(return_status ===1) {
+                    console.log("No results were found");
+                    //LATER
+                }
+                else {
+                    console.log("A problem occured. Details comin' up.");
+                    console.log(return_status);
+                    //LATER
+                }
             }
         } else {
             //Houston, we have a problem
@@ -918,7 +945,7 @@ function getunits(itemID) {
             console.log("status :"+this.status);
         }
     }
-    xhr.open("POST", "Profiles/xhttp.php?table=getUnits&ItemID="+itemID, true);
+    xhr.open("POST", "xhttp.php?table=getUnits&ItemID="+object.itemid, true);
     xhr.send();
 }
 var imgNodeList;
