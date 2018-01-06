@@ -573,8 +573,10 @@ include "include.php";
                                                 elmt.indexno = i;
                                                 elmt.addEventListener("click", function () {
                                                     _getUserInfo(this) //Gets the index from the element and uses it to
-                                                    //get the seller's id to search for their info.
-                                                }, true)
+                                                    //get the seller's id to search for their info. After getting the info,
+                                                    //it's stored as userInfoNodeList, a global, which is then used by
+                                                    //displaymodal(index i), which is called immediately
+                                                }, true);
 
                                                 var img = "";
                                                 img = document.createElement("img");
@@ -723,55 +725,120 @@ include "include.php";
                     function catalogItem(i){
                         //This displays a modal with the item's details when the user clicks on one of the search
                         //results from the catalog search
-                        console.log("catalogItem check")
-                        var html=""; //in the itemNodeList
-                        html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";//Get image URI from node list
-                        document.getElementById('oi-11').innerHTML = html; //Insert image
-                        html="<h3>"+getValue(itemNodeList, i, 'ItemName')+"</h3>";//Get item name
-                        document.getElementById('oi-12').innerHTML = html; //Insert item name
+                        //There's no seller info here since these items are from the catalog.
+                        //On the server side, the same function cmp_itemid() is used to parse rows selected from the
+                        //repository (which is why it was built) and those selected from the catalog (Items table)
+                        //since one is a subset of the other. The extra rows are filled with "N/A"
+                        //This should get the units for each item. Perhaps there's a function for that getUnits(object)
+                        console.log("catalogItem check");
+                        //Create object
+                        var object = { //this shit will definitely confuse me later
+                            "calling_function": "catalog_item",
+                            "nodeindex": i, //This is passed to the function later
+                            "itemid": getValue(catItemNodeList, i, 'ItemID'),
+                            "function": function(index, unitsNodeList) {
+                                var html=""; //in the itemNodeList
+                                html+="<img src='"+getValue(catItemNodeList, index, 'ImageURI')+"'>";//Get image URI from node list
+                                document.getElementById('oi-11').innerHTML = html; //Insert image
+                                html="<h3>"+getValue(catItemNodeList, index, 'ItemName')+"</h3>";//Get item name
+                                document.getElementById('oi-12').innerHTML = html; //Insert item name
 
-                        //Add the product and seller details to oi-13
-                        var oi_13 = document.getElementById('oi-13');
-                        oi_13.innerHTML = "";
-                        var table = newElmt("table");
-                        table.classList.add('oi-table');
-                        var tr = newElmt("tr");
-                        var th = newElmt("th");
-                        var td = newElmt("td");
-                        th.innerHTML = "Description";
-                        td.innerHTML = getValue(itemNodeList,i,'description');
-                        tr.appendChild(th);
-                        tr.appendChild(td);
-                        table.appendChild(tr);
-                        oi_13.appendChild(table);
+                                //Add the product and seller details to oi-13
+                                var oi_13 = document.getElementById('oi-13');
+                                oi_13.innerHTML = "";
+                                var table = newElmt("table");
+                                table.classList.add('oi-table');
+                                var tr = newElmt("tr");
+                                var th = newElmt("th");
+                                var td = newElmt("td");
+                                th.innerHTML = "Description";
+                                td.innerHTML = getValue(catItemNodeList,index,'description');
+                                tr.appendChild(th);
+                                tr.appendChild(td);
+                                table.appendChild(tr);
+                                oi_13.appendChild(table);
 
-                        //Create and append form
-                        var form = newElmt('form');
-                            oi_13.appendChild(form);
-                        var label = newElmt('label');
-                            form.appendChild(label);
-                            label.innerHTML="Quantity:"
-                            form.appendChild(newElmt('br'));
-                        var input = newElmt('input');
-                            input.type='text';
-                            form.appendChild(input);
-                            //Another input
-
-                        //Create and append button
-                        var button = newElmt("button");
-                        button.indexno = i;
-                        button.type = 'submit';
-                        button.innerHTML = "Place Open Order";
-                        button.onclick = function () {
-                            place_open_order(this.indexno);
+                                //Create and append form
+                                var form = newElmt('form');
+                                oi_13.appendChild(form);
+                                var label = newElmt('label');
+                                form.appendChild(label);
+                                label.innerHTML="Quantity:";
+                                form.appendChild(newElmt('br'));
+                                var input = newElmt('input');
+                                input.type='text';
+                                form.appendChild(input);
+                                //Another input. Selector for units
+                                var select = newElmt('select');
+                                select.name = "units";
+                                select.id = "units";
+                                for(var i=0;i<unitsNodeList.length;i++) {
+                                    var option = document.createElement('option');
+                                    var value = unitsNodeList[i].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                                    option.value = value.toLowerCase();
+                                    option.innerHTML = unitsNodeList[i].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                                    select.appendChild(option);
+                                }
+                                form.appendChild(select);
+                                //Create and append button
+                                var button = newElmt("button");
+                                button.indexno = index;
+                                button.type = 'submit';
+                                button.innerHTML = "Place Open Order";
+                                button.onclick = function () {
+                                    place_open_order(this.indexno);
+                                };
+                                var icon = newElmt("i");
+                                icon.classList.add('fa'); //set class part 1
+                                icon.classList.add('fa-plus-square-o'); //set class part 2
+                                button.appendChild(icon); //Append the i to the button
+                                oi_13.appendChild(button);
+                                //Display the whole modal
+                                document.getElementById("orderItem").style.display="block";
+                            }
                         };
-                        var icon = newElmt("i");
-                        icon.classList.add('fa'); //set class part 1
-                        icon.classList.add('fa-plus-square-o'); //set class part 2
-                        button.appendChild(icon); //Append the i to the button
-                        oi_13.appendChild(button);
-                        //Display the whole modal
-                        document.getElementById("orderItem").style.display="block";
+                        //Call async function getUnits(object)
+                        getUnits(object);
+                    }
+                    function getUnits(object) {
+                        //The object parsed as the argument contains extra information and code to run depending on the function calling
+                        //this function. object = {"calling_function": <String>, "itemid": <String>, "function": function()}
+                        //Function accesses database to retrieve all the Units associated with an item
+                        //Calling_fn is a selector for use in an if statement to determine what to do with the returned data
+                        //xtra_data is a structure that varies depending on the calling_fn. It's an object
+                        var xhr = new XMLHttpRequest();
+                        xhr.responseType = "document";
+                        xhr.onreadystatechange = function () {
+                            if(this.readyState ===4 && this.status ===200) {
+                                //Everything set
+                                var xmlDoc = this.responseXML;
+                                console.log(xmlDoc);
+                                var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
+                                return_status = parseInt(return_status);
+                                if(object.calling_function==="catalog_item") {
+                                    if(return_status===0) { //Success.
+                                        //Extract the data from the document.
+                                        var units = xmlDoc.getElementsByTagName("Unit");
+                                        //Run the code defined in the object's "function" attribute
+                                        object.function(object.nodeindex, units);
+                                    } else if(return_status ===1) {
+                                        console.log("No results were found");
+                                        //LATER
+                                    }
+                                    else {
+                                        console.log("A problem occured. Details comin' up.");
+                                        console.log(return_status);
+                                        //LATER
+                                    }
+                                }
+                            } else {
+                                //Houston, we have a problem
+                                console.log("readystate: "+this.readyState);
+                                console.log("status :"+this.status);
+                            }
+                        };
+                        xhr.open("POST", "Profiles/xhttp.php?table=getUnits&ItemID="+object.itemid, true);
+                        xhr.send();
                     }
                     //What lays below is read as the page loads, hence displaying the inventory
                     _searchdb(""); //Pre-load the "dashboard" with db items when the page loads
@@ -779,6 +846,7 @@ include "include.php";
                     function _getUserInfo(elmt) { 
                         //Uses the index no of the item to get the user (seller) info
                         //incomplete
+                        console.log("Getting User Info");
                         console.log(elmt.indexno);
                         var i = elmt.indexno; //get the index number
                         var userid = getValue(itemNodeList, i, 'userid');
@@ -788,12 +856,13 @@ include "include.php";
                             if(this.readyState===4 && this.status===200) {
                                 if(this.responseXML!==null) { //OK
                                     var doc = this.responseXML;
+                                    console.log(doc);
                                     var returnStatus = doc.getElementsByTagName('status')[0].childNodes[0].nodeValue; //This is a string. Cast it into an integer
                                         returnStatus = parseInt(returnStatus);
                                     if(returnStatus===0) { //Success
                                         //get an item node list object
                                         userInfoNode = doc.getElementsByTagName("userdata")[0];
-                                        displaymodal(i);
+                                        displaymodal(i); //This shares the userInfoNode info since userInfoNode is global
                                     }
                                     else {
                                         //later
@@ -813,10 +882,13 @@ include "include.php";
                         xmlhttp.open("GET", "Profiles/xhttp.php?table=sellerdata&UserID="+userid, true);
                         xmlhttp.send();
                     }
+                    var catItemNodeList; //Catalog item node list
                     function _searchCatalog(str) {
                         //This function searches the db table Items for item templates for users to define the items
                         //they want to order. It's used by the orders div. It's almost exactly the same as the _searchdb()
                         //function in Profiles/index.
+                        //The results are displayed in #display-search-results, as it's the only time this function is needed
+                        //MUST.NOT.USE.itemNodeList
                         console.log("Is the function even called?!");
                         var xhttp = new XMLHttpRequest();
                         xhttp.responseType = "document";//Only this way, shall we be able to return an XML/HTML document
@@ -828,35 +900,35 @@ include "include.php";
                                     var returnStatus = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
                                         returnStatus = parseInt(returnStatus); //Parse it as an int
                                     if(returnStatus===0) {
-                                        //get an itemNodeList object
-                                        itemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
+                                        //get an catItemNodeList object
+                                        catItemNodeList = xmlDoc.getElementsByTagName("Items")[0].getElementsByTagName("Item");
                                         //Purge the 'html' variable of previous search data
                                         document.getElementById("display-search-results").innerHTML="";
 
-                                        if(itemNodeList.length>0) {
+                                        if(catItemNodeList.length>0) {
                                             var html="";
                                             var i=0;
-                                            for(i=0;i<itemNodeList.length;i++) {
+                                            for(i=0;i<catItemNodeList.length;i++) {
                                                 html="<div class='item-slide' onclick='catalogItem("+i+")'>";
                                                 html+="<div class='item-slide-image'>";
-                                                html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";
-                                                html+="</div><!--item-slide-header-->"
-                                                html+="<div class='item-slide-content' id='itemNo"+i+"'>"
+                                                html+="<img src='"+getValue(catItemNodeList, i, 'ImageURI')+"'>";
+                                                html+="</div><!--item-slide-header-->";
+                                                html+="<div class='item-slide-content' id='itemNo"+i+"'>";
                                                 html+="<div id='addToRep'>";//ID means 'Add to repository'
-                                                html+="<button onclick='displaymodal("+i+")'><i class='fa fa-plus-square-o'></i> Add an Item</button>";
+                                                html+="<button><i class='fa fa-plus-square-o'></i> Add an Item</button>";
                                                 html+="</div>";
-                                                html+="</div><!--item-slide-header-->"
+                                                html+="</div><!--item-slide-header-->";
                                                 html+="</div>";
                                                 document.getElementById("display-search-results").innerHTML+=html;
                                             }
                                         } else {
                                             console.log("0 results were found");
                                         }
-                                    } else if(returnStatus==1) { //returnStatus (defined in the php). 1=No results found.
+                                    } else if(returnStatus===1) { //returnStatus (defined in the php). 1=No results found.
                                         console.log("No matching results were found");
-                                    } else if(returnStatus==2) { //2=couldn't connect to the database
+                                    } else if(returnStatus===2) { //2=couldn't connect to the database
                                         console.log("There was a problem connecting to the database");
-                                    } else if(returnStatus==11) {
+                                    } else if(returnStatus===11) {
                                         window.alert("Please log in");
                                     } else {
                                         console.log("Weird!");
@@ -865,7 +937,7 @@ include "include.php";
                                     console.log("There is no response XML");
                                 }
                             }
-                        }
+                        };
                         xhttp.open("GET", "Profiles/xhttp.php?table=Items&q="+str, true);
                         xhttp.send();
                     }

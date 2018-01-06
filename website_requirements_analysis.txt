@@ -256,7 +256,7 @@ MESSAGES
 -Number every single message. This will not only help counting messages, it'll also help in fetching older messages.
 -use php. Extract the larges, add 1 to get the next. I used mysql SERIAL.
 
-TODO
+TODO (ISSUES)
 1. Create sign up & sign in interfaces CHECK!
 2. Create selector between guest & member sign up/sign in CHECK!
 3. Write PHP Scripts for signup/signin CHECK!
@@ -266,9 +266,10 @@ TODO
 7. Deal with the undefined index error. CHECK
 8. Add option for browsing seller's other items.
 9. Complete the place_open_order() function
-10. mprofile.php line 546
+10. mprofile.php line 546 FIXED
 11. Where does the ItemID come from to get the UserInfoNodeList? It must not be from the $_SESSION Superglobal
-
+12. Fix catalogItem(): The function that shows details of the items in the Catalog(!=Inventory)
+13. In the very end, check that there aren't any "nodeList"s being shared in ways that they shouldn't
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
 
