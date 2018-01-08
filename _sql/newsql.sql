@@ -50,10 +50,10 @@ PRIMARY KEY (RepID),
 FOREIGN KEY (UserID) REFERENCES Users(UserID),
 FOREIGN KEY (ItemID) REFERENCES Items(ItemID)
 );
-CREATE TABLE IF NOT EXISTS Orders 
+CREATE TABLE IF NOT EXISTS ClosedOrders
 (
 OrderID CHAR(14), /*Generated at the time "place order" is placed*/
-ItemID CHAR(14),
+RepID CHAR(14),
 Quantity INT(9) NOT NULL,
 PriceMax DECIMAL(12,2) NOT NULL,
 Units VARCHAR(10) NOT NULL,
@@ -61,9 +61,28 @@ ClientID CHAR(11) NOT NULL, /*The client's phone number*/
 Delivery CHAR(30) NOT NULL, /*The client's location*/
 ClientRemarks VARCHAR(255), /*the client's comments*/
 OrderTime TIMESTAMP NOT NULL,
+OrderExpiration DATETIME NOT NULL,
 PRIMARY KEY (OrderID),
-FOREIGN KEY (ItemID) REFERENCES Items(ItemID),
+FOREIGN KEY (RepID) REFERENCES Repository(RepID),
 FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
+);
+CREATE TABLE IF NOT EXISTS OpenOrders
+(
+  OrderID CHAR(14), /*Generated at the time "place order" is placed*/
+  ItemID CHAR(14),
+  Quantity INT(9) NOT NULL,
+  PriceMax DECIMAL(12,2) NOT NULL,
+  Units VARCHAR(10) NOT NULL,
+  ClientID CHAR(11) NOT NULL, /*The client's phone number*/
+  OrderExpiration DATETIME NOT NULL,
+  Delivery CHAR(30) NOT NULL, /*The client's location*/
+  ClientRemarks VARCHAR(255), /*the client's comments*/
+  OrderTime TIMESTAMP NOT NULL,
+  DeliveryRequest CHAR(255),
+  PickUpCapability CHAR(255), /*Where the client is capable of picking up*/
+  PRIMARY KEY (OrderID),
+  FOREIGN KEY (ItemID) REFERENCES Items(ItemID),
+  FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 );
 /*Any other constraints will be applied on the forms*/
 CREATE TABLE IF NOT EXISTS Clients
@@ -128,7 +147,7 @@ CREATE TABLE IF NOT EXISTS OrderImages
   ImageURI VARCHAR(255),
   TimeStamp TIMESTAMP,
   PRIMARY KEY (ImgID),
-  FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+  FOREIGN KEY (OrderID) REFERENCES OpenOrders(OrderID),
   FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 );
 CREATE TABLE IF NOT EXISTS RepImages
@@ -142,5 +161,20 @@ CREATE TABLE IF NOT EXISTS RepImages
   FOREIGN KEY (UserID) REFERENCES Users(UserID),
   FOREIGN KEY (RepID) REFERENCES Repository(RepID)
 );
-
+CREATE TABLE IF NOT EXISTS ItemAssoc
+(
+  UserID CHAR(14) NOT NULL,
+  ItemID CHAR(14) NOT NULL,
+  PRIMARY KEY (UserID, ItemID),
+  FOREIGN KEY (UserID) REFERENCES Users(UserID),
+  FOREIGN KEY (ItemID) REFERENCES Items(ItemID)
+);
+CREATE TABLE IF NOT EXISTS InterestedOrders /*This keeps track of which seller is interested in which open orders*/
+(
+  UserID CHAR(14) NOT NULL,
+  OrderID CHAR(14) NOT NULL, /*The one in OpenOrders*/
+  PRIMARY KEY (UserID, OrderID),
+  FOREIGN KEY (UserID) REFERENCES Users(UserID),
+  FOREIGN KEY (OrderID) REFERENCES OpenOrders(OrderID)
+);
 

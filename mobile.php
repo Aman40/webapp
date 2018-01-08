@@ -714,13 +714,22 @@ include "include.php";
                         html+="</td>";
                         html+="</tr>";
                         html+="</table>";
-                        html+="<button onclick='messageClient("+i+")'><i class='fa fa-plus-square-o' ></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
-
+                        html+="<button onclick='placeClosedOrder("+i+")'><i class='fa fa-plus-square-o' ></i> Place Order</button>";
+                        //Clicking the above should reveal an originally hidden div prompting order details, then the button should change to "Confirm order" or something.
+                        html+="<button onclick='messageClient("+i+")'><i class='fa fa-comments-o' ></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
 
                         //Insert into oi-13
                         document.getElementById('oi-13').innerHTML = html;
                         //Display the whole modal
                         document.getElementById("orderItem").style.display="block";
+                    }
+                    function placeClosedOrder(index)
+                    {
+                        //This function is called when the user clicks "Place Order" on repository items in "Feed"
+                        //This function handles orders on items already in the repository
+                        //More specifically, it gets and pushes the order details () to the database and updates
+                        //All the related data bits
+                        
                     }
                     function catalogItem(i){
                         //This displays a modal with the item's details when the user clicks on one of the search
@@ -1216,7 +1225,7 @@ include "include.php";
             <input type="text" placeholder="Enter Username" name="phoneno" required>
 
             <label><b>Password</b></label><?php echo $upassword_error.'<br>' ?>
-            <input type="password" placeholder="Enter Password" name="upassword" required>
+            <input type="password" placeholder="current-password" name="upassword" required>
 
             <button type="submit">Login</button>
             <input type="checkbox" checked="checked"> Remember me
@@ -1276,10 +1285,10 @@ include "include.php";
             <textarea style="width: 100%" placeholder="About yourself..." name="about" value="<?php if(isset($_POST['about']) && $_POST['about'] != null) echo $_POST['about']; ?>"></textarea><br>
 
             <label><b>Password</b></label><span class="error"> * <?php echo " ".$upassword_error ?></span>
-            <input type="password" class="required" placeholder="Enter Password" name="upassword" required>
+            <input type="password" class="required" placeholder="Password" name="upassword" required>
 
             <label><b>Repeat Password</b></label><span class="error"> * </span><br>
-            <input type="password" class="required" placeholder="Repeat Password" name="upassword2" required>
+            <input type="password" class="required" placeholder="Repeat password" name="upassword2" required>
             <span class="warning">* = required</span><br>
             <input type="checkbox" checked="checked"> Remember me
             <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
@@ -1626,7 +1635,6 @@ include "include.php";
         xht.open("POST", "messages.php", true);
         xht.send(fd);
     }
-
 </script>
 </body>
 </html>

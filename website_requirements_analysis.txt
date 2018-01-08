@@ -257,29 +257,56 @@ MESSAGES
 -use php. Extract the larges, add 1 to get the next. I used mysql SERIAL.
 
 TODO (ISSUES)
-1. Create sign up & sign in interfaces CHECK!
-2. Create selector between guest & member sign up/sign in CHECK!
-3. Write PHP Scripts for signup/signin CHECK!
-4. Create messenger interface CHECK
-5. Write messenger php script
+1. In the very end, check that there aren't any "nodeList"s being shared in ways that they shouldn't
+5. Write messenger php script WORKING
 6. PAGINATION with mysql
-7. Deal with the undefined index error. CHECK
 8. Add option for browsing seller's other items.
 9. Complete the place_open_order() function
-10. mprofile.php line 546 FIXED
-11. Where does the ItemID come from to get the UserInfoNodeList? It must not be from the $_SESSION Superglobal
-12. Fix catalogItem(): The function that shows details of the items in the Catalog(!=Inventory)
-13. In the very end, check that there aren't any "nodeList"s being shared in ways that they shouldn't
+13. When listing orders on seller's side, add option to confirm orders (Like Amazon)
+16. Add provision to suggest new items. Allow uploading pictures.
+17. Always clear the messages model because it's shared!
+18. Finish placeClosedOrder() function
+
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
 
+OPEN ORDERS
+-Required info
+--OrderID
+--ItemID
+--Quantity
+--Maximum price
+--Units
+--ClientID
+--Latest date (Expiration date)
+--Remarks/comments
+--Delivery required
+--If delivery required, where
+--If capable of picking up, where?
+--A picture of required items, if available
+--OrderTime TIMESTAMP
 
-ORDERS
+-For each open order, search for the item in the repository and display the search results
+-In a separate div, suggest sellers who might have/had the desired item in the past with an option to contact them
+-If none of the above works, proceed to placing open order
+-On the sellers' side, after an open order has been placed, show them open orders they might be interested in and if
+ they're interested, they can contact the the client or just press "interested"
+
+CLOSED ORDERS
+-Required info
+--OrderID
+--RepID
+--Quantity
+--Maximum price
+--Units
+--ClientID
+--Latest date (Expiration date)
+--Remarks/comments
+--OrderTime TIMESTAMP
+
 1. User searches entire catalog for "orderable" items;
 2. Upon clicking, a model opens prompting details about the order
 3. Upon "finishing", the info is stored in the Orders table
-4. How do others(the sellers) access this info and how is it presented for them?
-
 
 
 
