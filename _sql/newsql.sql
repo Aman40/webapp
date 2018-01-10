@@ -55,16 +55,14 @@ CREATE TABLE IF NOT EXISTS ClosedOrders
 OrderID CHAR(14), /*Generated at the time "place order" is placed*/
 RepID CHAR(14),
 Quantity INT(9) NOT NULL,
-PriceMax DECIMAL(12,2) NOT NULL,
 Units VARCHAR(10) NOT NULL,
-ClientID CHAR(11) NOT NULL, /*The client's phone number*/
+ClientID CHAR(14) NOT NULL, /*The client's phone number*/
 Delivery CHAR(30) NOT NULL, /*The client's location*/
 ClientRemarks VARCHAR(255), /*the client's comments*/
 OrderTime TIMESTAMP NOT NULL,
 OrderExpiration DATETIME NOT NULL,
 PRIMARY KEY (OrderID),
-FOREIGN KEY (RepID) REFERENCES Repository(RepID),
-FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
+FOREIGN KEY (RepID) REFERENCES Repository(RepID)
 );
 CREATE TABLE IF NOT EXISTS OpenOrders
 (

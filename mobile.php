@@ -633,103 +633,192 @@ include "include.php";
                     function displaymodal(i) {
                         //This function sets the data in the modal template. i identifies the item's index in the
                         //itemNodeList array.
-                        var html=""; //in the itemNodeList
-                        html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";//Get image URI from node list
-                        document.getElementById('oi-11').innerHTML = html; //Insert image
-                        html="<h3>"+getValue(itemNodeList, i, 'ItemName')+"</h3>";//Get item name
-                        document.getElementById('oi-12').innerHTML = html; //Insert item name
+                        //object = {"nodeindex":<String>, "itemid": <String>, "function": function(object.nodeindex, units[])}
+                        var object = {
+                            "nodeindex": i,
+                            itemid: getValue(itemNodeList, i, "itemid"),
+                            "function": function (i, unitsNodeList) {
+                                var html=""; //in the itemNodeList
+                                html+="<img src='"+getValue(itemNodeList, i, 'ImageURI')+"'>";//Get image URI from node list
+                                document.getElementById('oi-11').innerHTML = html; //Insert image
+                                html="<h3>"+getValue(itemNodeList, i, 'ItemName')+"</h3>";//Get item name
+                                document.getElementById('oi-12').innerHTML = html; //Insert item name
 
-                        //Add the product and seller details to oi-13
-                        html="<table class='oi-table'>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Description: ";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=getValue(itemNodeList,i,'description')
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="<span title='Minimum and Maximum order size'>Min - Max</span> order size:";
-                        html+="</th>";
-                        html+="<td>";
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Price: ";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=getValue(itemNodeList, i, 'unitprice');
-                        html+="UGX/";
-                        html+=getValue(itemNodeList,i,'units');
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Places Deliverable: ";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=getValue(itemNodeList,i,'deliverableareas')
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Seller:";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=userInfoNode.getElementsByTagName('firstname')[0].childNodes[0].nodeValue;
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Location:";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=userInfoNode.getElementsByTagName('district')[0].childNodes[0].nodeValue;
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Contact Email:";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=userInfoNode.getElementsByTagName('email')[0].childNodes[0].nodeValue;
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Contact Phone No.:";
-                        html+="</th>";
-                        html+="<td>";
-                        html+=userInfoNode.getElementsByTagName('phoneno')[0].childNodes[0].nodeValue;
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="<tr>";
-                        html+="<th>";
-                        html+="Feedback:";
-                        html+="</th>";
-                        html+="<td>";
-                        html+="</td>";
-                        html+="</tr>";
-                        html+="</table>";
-                        html+="<button onclick='placeClosedOrder("+i+")'><i class='fa fa-plus-square-o' ></i> Place Order</button>";
-                        //Clicking the above should reveal an originally hidden div prompting order details, then the button should change to "Confirm order" or something.
-                        html+="<button onclick='messageClient("+i+")'><i class='fa fa-comments-o' ></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
+                                //Add the product and seller details to oi-13
+                                html="<table class='oi-table'>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Description: ";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=getValue(itemNodeList,i,'description');
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="<span title='Minimum and Maximum order size'>Min - Max</span> order size:";
+                                html+="</th>";
+                                html+="<td>";
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Price: ";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=getValue(itemNodeList, i, 'unitprice');
+                                html+="UGX/";
+                                html+=getValue(itemNodeList,i,'units');
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Places Deliverable: ";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=getValue(itemNodeList,i,'deliverableareas')
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Seller:";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=userInfoNode.getElementsByTagName('firstname')[0].childNodes[0].nodeValue;
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Location:";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=userInfoNode.getElementsByTagName('district')[0].childNodes[0].nodeValue;
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Contact Email:";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=userInfoNode.getElementsByTagName('email')[0].childNodes[0].nodeValue;
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Contact Phone No.:";
+                                html+="</th>";
+                                html+="<td>";
+                                html+=userInfoNode.getElementsByTagName('phoneno')[0].childNodes[0].nodeValue;
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>";
+                                html+="Feedback:";
+                                html+="</th>";
+                                html+="<td>";
+                                html+="</td>";
+                                html+="</tr>";
+                                html+="</table>";
 
-                        //Insert into oi-13
-                        document.getElementById('oi-13').innerHTML = html;
-                        //Display the whole modal
-                        document.getElementById("orderItem").style.display="block";
+                                var oi13 = document.getElementById('oi-13'); //These are placed here purposely to
+                                oi13.innerHTML = ""; //flush oi-13 before reuse
+
+                                var elmt = document.createElement('div'); //This will hold the table. One more for the buttons
+                                elmt.id = "oi-table-cont";
+                                elmt.innerHTML = html;
+                                document.getElementById('oi-13').appendChild(elmt);
+                                //Add a new empty div for prompting use info
+                                elmt = newElmt('div');
+                                var elmt2 = newElmt("div"); //For the input user data
+                                elmt2.id = "oi-detail-prompt";
+                                {
+                                    html = "<form action='' id='oi-det-frm'>";
+                                    html+="<label>Quantity:</label><br>";
+                                    html+="<input type='number' name='quantity' id='oi-form-quantity' min=0 max=999999>";
+                                    html+="<select name='units' id='oi-form-units'>";
+                                    {//The select options. Can't use i. It's claimed by the itemNodeList
+                                        for(var x = 0;x<unitsNodeList.length;x++) {
+                                            var unitname = unitsNodeList[x].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                                            html+="<option name='units' value='"+unitname.toLowerCase()+"'>"+unitname+"</option>";
+                                        }
+                                    }
+                                    html+="</select><br>";
+                                    html+="<label>Deliver by date:</label><br>";
+                                    html+="<input type='date' name='date' id='oi-form-date'><br>";
+                                    var delivers = getValue(itemNodeList, i, "deliverable");
+                                    if(delivers!=="N/A") {
+                                        html+="<label>Desirable Delivery:</label><br>"; //This should be add or not depending on whether the seller delivers at all
+                                        html+="<input name='delivery' id='oi-form-deliv' placeholder='e.g Wakiso, Mbarara, Nairobi, Dubai'><br>";
+                                    }
+                                    html+="<label>Special requests/Comments to seller:</label>";
+                                    html+="<textarea name='comments' id='oi-form-comm'></textarea><br>";
+                                    html+="</form>";
+                                }
+                                elmt2.innerHTML = html;
+                                elmt.appendChild(elmt2);
+
+                                elmt2 = newElmt('div'); //For the buttons
+                                elmt2.id = "oi-detail-buttons";
+                                html="<button onclick='placeClosedOrder("+i+")'><i class='fa fa-cart-plus' ></i> Place Order</button>";
+                                //Clicking the above should reveal an originally hidden div prompting order details, then the button should change to "Confirm order" or something.
+                                html+="<button onclick='messageClient("+i+")'><i class='fa fa-comments-o' ></i> Contact Seller</button>"; //URGENT Open chat btn user and seller
+                                elmt2.innerHTML = html; //buttons appended
+                                elmt.appendChild(elmt2);
+                                //Insert into oi-13
+                                oi13.appendChild(elmt);
+                                //Display the whole modal
+                                document.getElementById("orderItem").style.display="block";
+                            }
+                        };
+                        getUnits(object);
                     }
-                    function placeClosedOrder(index)
-                    {
+                    function placeClosedOrder(index) {
                         //This function is called when the user clicks "Place Order" on repository items in "Feed"
                         //This function handles orders on items already in the repository
                         //More specifically, it gets and pushes the order details () to the database and updates
                         //All the related data bits
-                        
+                        //get the form fields one by one and append them to a form data object
+                        var fd = new FormData();
+                        var field = document.getElementById('oi-form-quantity').value;
+                        fd.append("quantity", field);
+                        field = document.getElementById('oi-form-date').value;
+                        fd.append("expdate", field);
+                        field = document.getElementById('oi-form-deliv').value;
+                        fd.append("delivery", field);
+                        field = document.getElementById('oi-form-comm').value;
+                        fd.append("comments", field);
+                        field = document.getElementById('oi-form-units').value;
+                        fd.append("units", field);
+                        var repid = getValue(itemNodeList, index, "repid");
+                        fd.append("repid", repid);
+                        fd.append("table", "closedorder");
+                        //Send the form by AJAX
+                        var xhr = new XMLHttpRequest();
+                        xhr.responseType = "document";
+                        xhr.onreadystatechange = function (ev) {
+                            if(this.status===200 && this.readyState===4) { //Success
+                                var xmlDoc = this.responseXML;
+                                console.log(xmlDoc);
+                                var returnStatus = xmlDoc.getElementsByTagName('status')[0].childNodes[0].nodeValue;
+                                returnStatus = parseInt(returnStatus);
+                                if(returnStatus===0) {
+                                    //Can't order if not logged in. If logged in, proceed to show orders
+                                    console.log("Order was placed successfully. Add more code plz!");
+                                } else if (returnStatus===11) {
+                                    window.alert("You aren't logged in. Please log in or make an account");
+                                    location.reload();
+                                }
+                                else {
+                                    console.log("A problem occurred");
+                                    console.log("returnStatus:"+returnStatus);
+                                }
+                            } else {
+                                console.log(this.readyState);
+                                console.log(this.status);
+                            }
+                        };
+                        xhr.open("POST", "Profiles/xhttp.php", true);
+                        xhr.send(fd);
                     }
                     function catalogItem(i){
                         //This displays a modal with the item's details when the user clicks on one of the search
@@ -810,8 +899,8 @@ include "include.php";
                         getUnits(object);
                     }
                     function getUnits(object) {
-                        //The object parsed as the argument contains extra information and code to run depending on the function calling
-                        //this function. object = {"calling_function": <String>, "itemid": <String>, "function": function()}
+                        //The object parsed as the argument contains extra information and code to run
+                        //object = {"nodeindex":<String>, "itemid": <String>, "function": function(object.nodeindex, units[])}
                         //Function accesses database to retrieve all the Units associated with an item
                         //Calling_fn is a selector for use in an if statement to determine what to do with the returned data
                         //xtra_data is a structure that varies depending on the calling_fn. It's an object
@@ -824,22 +913,21 @@ include "include.php";
                                 console.log(xmlDoc);
                                 var return_status = xmlDoc.getElementsByTagName("status")[0].childNodes[0].nodeValue;
                                 return_status = parseInt(return_status);
-                                if(object.calling_function==="catalog_item") {
-                                    if(return_status===0) { //Success.
-                                        //Extract the data from the document.
-                                        var units = xmlDoc.getElementsByTagName("Unit");
-                                        //Run the code defined in the object's "function" attribute
-                                        object.function(object.nodeindex, units);
-                                    } else if(return_status ===1) {
-                                        console.log("No results were found");
-                                        //LATER
-                                    }
-                                    else {
-                                        console.log("A problem occured. Details comin' up.");
-                                        console.log(return_status);
-                                        //LATER
-                                    }
+                                if(return_status===0) { //Success.
+                                    //Extract the data from the document.
+                                    var units = xmlDoc.getElementsByTagName("Unit");
+                                    //Run the code defined in the object's "function" attribute
+                                    object.function(object.nodeindex, units);
+                                } else if(return_status ===1) {
+                                    console.log("No results were found");
+                                    //LATER
                                 }
+                                else {
+                                    console.log("A problem occured. Details comin' up.");
+                                    console.log(return_status);
+                                    //LATER
+                                }
+
                             } else {
                                 //Houston, we have a problem
                                 console.log("readystate: "+this.readyState);
@@ -1614,7 +1702,7 @@ include "include.php";
                                     elmt4.innerHTML = msgtext;
                                     elmt3.appendChild(elmt4);
                                 elmt2.appendChild(elmt3);
-                                var elmt3 = document.createElement("div"); //"seen". Will be implemented later
+                                elmt3 = document.createElement("div"); //"seen". Will be implemented later
                                 elmt3.id="cap_col_center_bottom";
                                 elmt2.appendChild(elmt3);
                             elmt.appendChild(elmt2);
@@ -1626,6 +1714,7 @@ include "include.php";
                 } else {
                     console.log("A problem with returnStatus "+returnStatus+" occured.");
                 }
+
             } else {
                 //Analyze the status and ready states
                 console.log(this.status);

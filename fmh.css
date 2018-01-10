@@ -299,7 +299,7 @@ body {
 	background-color: black;
 	min-height: 50px;
 	width: 100%;
-    background: linear-gradient(green, #154a1b);
+	background: linear-gradient(#007f00, #154a1b);
 }
 #search {
 	float: left;

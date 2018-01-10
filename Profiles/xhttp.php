@@ -8,7 +8,15 @@ if(isset($_SESSION['UserID'])) { //The User is logged in
 
     $table = filter($_REQUEST['table']);
 //Access the database in search for item var
-    _searchCatalog($table, $UserID);
+    if($table=="closedorder") {
+        placeClosedOrder($UserID);
+    } else {
+        _searchCatalog($table, $UserID);
+    }
+}
+else if(isset($_SESSION['ClientID'])) {
+    $ClientID = $_SESSION['ClientID'];
+    placeClosedOrder($ClientID);
 }
 else { //User is not logged in. I.e the fmh main dashboard.
     //Search the database for given item or all where q=""
@@ -91,7 +99,7 @@ function _search_all_db($str)
                 Transient.State AS State,
                 Transient.DateAdded AS DateAdded,
                 Transient.Description AS Description,
-                Transient.Deliverable AS Deliverabe,
+                Transient.Deliverable AS Deliverable,
                 Transient.DeliverableAreas AS DeliverableAreas,
                 ItemImages.ImageURI AS ImageURI
                 FROM
@@ -531,6 +539,37 @@ function cmp_itemid($reply, $result, $row1) {
         $reply.="</Item>";
         $reply.="</Items>";
         return $reply;
+    }
+}
+function placeClosedOrder($id) { //No distinciton between ClientID or UserID. All treated as "ClientID"
+    $servername = "localhost";
+    $username = "aman";
+    $password = "password";
+    $database = "test";
+    $conn = new mysqli($servername, $username, $password, $database);
+    if(!$conn->connect_error) {
+        //Get the form data: quantity, expdate, delivery, comments, itemid
+        $quantity = $_POST['quantity'];
+        $expdate = $_POST['expdate'];
+        $delivery = $_POST['delivery'];
+        $comments = $_POST['comments'];
+        $repid = $_POST['repid'];
+        $units = $_POST['units'];
+        //And now generate the dynamic data: orderid
+        $orderid = uniqid("c");
+        //Prepare the sql
+        $sql = "INSERT INTO ClosedOrders(OrderID, RepID, Quantity, Units, ClientID,
+                Delivery, ClientRemarks, OrderExpiration) VALUES 
+                ('".$orderid."', '".$repid."', '".$quantity."', '".$units."', '".$id."', '".$delivery."', '".$comments."', '".$expdate."')";
+        $result = $conn->query($sql);
+        if($result!==FALSE) {
+            echo "<status>0</status>";
+        } else {//Query failed
+            echo "<msg>".$conn->error."</msg>";
+            echo "<status>2</status>";
+        }
+    } else {
+        echo "<status>3</status>"; //There's a problem with the connection to the database
     }
 }
 //Return Statuses summary
