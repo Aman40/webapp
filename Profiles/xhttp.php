@@ -541,7 +541,8 @@ function cmp_itemid($reply, $result, $row1) {
         return $reply;
     }
 }
-function placeClosedOrder($id) { //No distinciton between ClientID or UserID. All treated as "ClientID"
+function placeClosedOrder($id) { //No distinction between ClientID or UserID. All treated as $id
+    //$id_type tells whether the id belongs to the client or
     $servername = "localhost";
     $username = "aman";
     $password = "password";
@@ -555,6 +556,7 @@ function placeClosedOrder($id) { //No distinciton between ClientID or UserID. Al
         $comments = $_POST['comments'];
         $repid = $_POST['repid'];
         $units = $_POST['units'];
+        $sellerid = $_POST['sellerid']; //This will be passed to the function that will update the users' new orders
         //And now generate the dynamic data: orderid
         $orderid = uniqid("c");
         //Prepare the sql
@@ -563,6 +565,8 @@ function placeClosedOrder($id) { //No distinciton between ClientID or UserID. Al
                 ('".$orderid."', '".$repid."', '".$quantity."', '".$units."', '".$id."', '".$delivery."', '".$comments."', '".$expdate."')";
         $result = $conn->query($sql);
         if($result!==FALSE) {
+            //Call the function that updates the users number of unseen orders
+            updateNewOrders($sellerid, $conn);
             echo "<status>0</status>";
         } else {//Query failed
             echo "<msg>".$conn->error."</msg>";
@@ -570,6 +574,37 @@ function placeClosedOrder($id) { //No distinciton between ClientID or UserID. Al
         }
     } else {
         echo "<status>3</status>"; //There's a problem with the connection to the database
+    }
+}
+function updateNewOrders($sellerid, $conn) {
+    //This function goes to the table "Users" and updates just one value; "NewOrders"
+    $sql = "SELECT NewOrders FROM Users WHERE UserID='".$sellerid."'";
+    $result = $conn->query($sql);
+    if($result!==false) {
+        if($result->num_rows>0) {
+            $curr_new_orders = $result->fetch_assoc()['NewOrders'];
+            if($curr_new_orders===null) {
+                $curr_new_orders = 1;
+            } else {
+                $curr_new_orders = $curr_new_orders+1; //increment
+            }
+            //Put back
+            $sql = "UPDATE Users SET NewOrders='".$curr_new_orders."' WHERE UserID='".$sellerid."'";
+            $rslt = $conn->query($sql); //No need to check the success/failure. Not important
+            if($rslt===false) {
+                echo "<msg>Something went wrong</msg>";
+                echo "<err>$conn->error</err>";
+            } else {
+                echo "<msg>Number of new orders updated successfully</msg>";
+            }
+        } else {
+            echo "<msg>Unable to update the new orders</msg>";
+            echo "<err>$conn->error</err>";
+        }
+    } else {
+        //Nothing much I can do. This isn't that important
+        echo "<msg>Unable to update the new orders</msg>";
+        echo "<err>$conn->error</err>";
     }
 }
 //Return Statuses summary

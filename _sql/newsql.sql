@@ -19,7 +19,7 @@ ProfilePic VARCHAR(255), /*uri to profile pic*/
 ResponseTime TIME,
 PrivacyBitmap VARCHAR(12),
 UnreadMessages SMALLINT UNSIGNED DEFAULT 0,
-NewOrders SMALLINT UNSIGNED,
+NewOrders SMALLINT UNSIGNED DEFAULT 0,
 UNIQUE (PhoneNo),
 PRIMARY KEY (UserID)
 );

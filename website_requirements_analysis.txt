@@ -266,9 +266,7 @@ TODO (ISSUES)
 16. Add provision to suggest new items. Allow uploading pictures.
 17. Always clear the messages model because it's shared!
 18. Finish placeClosedOrder() function
-19. Remove the PriceMax column from the ClosedOrders table
-20. Differentiate between Member and Client login sessions
-
+19.Prevent the user to place multiple of the same order.
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
 

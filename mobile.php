@@ -791,6 +791,8 @@ include "include.php";
                         fd.append("units", field);
                         var repid = getValue(itemNodeList, index, "repid");
                         fd.append("repid", repid);
+                        var sellerid = getValue(itemNodeList, index, "userid");
+                        fd.append("sellerid", sellerid);
                         fd.append("table", "closedorder");
                         //Send the form by AJAX
                         var xhr = new XMLHttpRequest();
