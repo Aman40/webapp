@@ -1063,8 +1063,25 @@ h3.dash_item_name {
 #prof-pictures {
     display: none;
 }
+.os-cap {
+    width: 100%;
+    height: 50px;
+}
+.od-cap-img-con {
+    width: 25%;
+}
+.od-cap-img {
 
+}
+.od-cap-dets {
+    width: 75%;
+}
+.od-cd-name {
 
+}
+.od-cd-other {
+
+}
 
 
 

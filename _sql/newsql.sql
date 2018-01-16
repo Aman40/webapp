@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS ClosedOrders
 (
 OrderID CHAR(14), /*Generated at the time "place order" is placed*/
 RepID CHAR(14),
+SellerID CHAR(14),
+ItemName VARCHAR(50) NOT NULL,
 Quantity INT(9) NOT NULL,
 Units VARCHAR(10) NOT NULL,
 ClientID CHAR(14) NOT NULL, /*The client's phone number*/
@@ -61,6 +63,8 @@ Delivery CHAR(30) NOT NULL, /*The client's location*/
 ClientRemarks VARCHAR(255), /*the client's comments*/
 OrderTime TIMESTAMP NOT NULL,
 OrderExpiration DATETIME NOT NULL,
+OrderSerial SERIAL,
+ImageURI VARCHAR(255),
 PRIMARY KEY (OrderID),
 FOREIGN KEY (RepID) REFERENCES Repository(RepID)
 );
@@ -78,6 +82,8 @@ CREATE TABLE IF NOT EXISTS OpenOrders
   OrderTime TIMESTAMP NOT NULL,
   DeliveryRequest CHAR(255),
   PickUpCapability CHAR(255), /*Where the client is capable of picking up*/
+  OrderSerial SERIAL,
+  ImageURI VARCHAR(255),
   PRIMARY KEY (OrderID),
   FOREIGN KEY (ItemID) REFERENCES Items(ItemID),
   FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)

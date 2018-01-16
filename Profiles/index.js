@@ -418,9 +418,6 @@ function submit_add_form(i) {
 function readval(id) {
     return	document.getElementById(id).value;
 };
-function place_order() {
-    var orderItem = document.getElementById("orderItem");
-}
 function change_prof_pic(event) {
     event.preventDefault();
     var file_input = document.getElementById("uploadprofpic"); //The real input button (hidden)
@@ -1537,6 +1534,96 @@ function loadMessages() {
         }
     };
     xht.open("POST", "../messages.php", true);
+    xht.send(fd);
+}
+var ordersNodeList; //For carrying user's orders from showClsoedOrders();
+function showClosedOrders(UserID) {
+    //Function searches for orders directed to user and displays them in the prof-orders div
+    //Pagination
+    //Function is called in the reveal1hide2345() in mprofile.php
+    //Takes UserID which is obtained from $_SESSION, so user must be logged in with member account
+    var prof_orders = document.getElementById('prof-orders');
+    var page_number = 0.5; //For pagination. NO. Will run out of scope and always reset to one. Make global or...
+    //Create FormData object to send the necessary data
+    var fd = new FormData();
+    fd.append("userid", UserID);
+    fd.append("page_number", page_number);
+    fd.append("table", "closed_orders");
+    //Send request to db via AJAX
+    var xht = new XMLHttpRequest();
+    xht.responseType = "document";
+    xht.onreadystatechange = function () {
+        if(this.status==200 && this.readyState==4) {
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var returnStatus = xmlDoc.getElementsByTagName('status')[0].childNodes[0].nodeValue;
+            returnStatus = parseInt(returnStatus);
+            if(returnStatus===0) {
+                ordersNodeList = xmlDoc.getElementsByTagName("order");
+                //Fill into the prof_orders element
+                prof_orders.innerHTML = ""; //Reset the div;
+                for(var i=0;i<ordersNodeList.length;i++) {
+                    //Insert data into "prof_orders
+                    var elmt = document.createElement('div'); //Outer wrap
+                    elmt.classList.add("os-cap"); //os is for "order summary", cap is for "capsule" coz it encapsulates
+                    elmt.index = i; //Index to reference the item in the ordersNodeList;
+                    {//The image div
+                        var imgdiv = document.createElement("div");
+                        imgdiv.classList.add("od-cap-img-con");
+                        {//The actual image
+                            var img = document.createElement("img");
+                            img.classList.add("od-cap-img");
+                            try {
+                                img.src = getValue(ordersNodeList, i, "imageuri");
+                            } catch(err) {
+                                html+="/var/www/html/HTML/icons/placeholder.png";
+                            }
+                        }
+                        elmt.appendChild(imgdiv);
+                        var dets = document.createElement("div");
+                        dets.classList.add("od-cap-dets"); //Order details. Limited
+                        {//name and other details
+                            var name = document.createElement("div");
+                            name.classList.add('od-cd-name');
+                            name.innerHTML = getValue(ordersNodeList, i, 'itemname');
+                            dets.appendChild(name);
+                            var other_dets = document.createElement('div');
+                            other_dets.classList.add('od-cd-other');
+                            {//The other details: Quantity and date
+                                var html = "";
+                                html+="<table class='od-cdo-tab'>";
+                                html+="<tr>";
+                                html+="<th>Quantity</th>";
+                                html+="<td>";
+                                html+=getValue(ordersNodeList, i, 'quantity')+" "+getValue(ordersNodeList, i, 'units');
+                                html+="</td>"
+                                html+="</tr>";
+                                html+="<tr>";
+                                html+="<th>Deadline</th>";
+                                html+="<td>";
+                                html+=getValue(ordersNodeList, i, 'expiration');
+                                html+="</td>"
+                                html+="</tr>";
+                                html+="</table>";
+                                other_dets.innerHTML = html;
+                            }
+                            dets.appendChild(other_dets);
+                        }
+                        elmt.appendChild(dets);
+                    }
+                    prof_orders.appendChild(elmt);
+                }
+            } else {
+                console.log("Failure: "+returnStatus);
+            }
+        } else {
+            if(this.status!==200) {
+                console.log(this.status);
+                console.log(this.readyState);
+            }
+        }
+    };
+    xht.open("POST", "xhttp.php", true);
     xht.send(fd);
 }
 //Caution:

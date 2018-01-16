@@ -443,6 +443,11 @@ include "../include.php";
                                 ?>
 
                             }
+                            if(div1==="prof-orders") {
+                                //Search the database for the user's orders in the ClosedOrders table
+                                //Use pagination
+                                showClosedOrders(<?php echo "'".$_SESSION['UserID']."'"; ?>);
+                            }
                         }
                     </script>
                 </div><!--prof-page-main-->

@@ -793,6 +793,9 @@ include "include.php";
                         fd.append("repid", repid);
                         var sellerid = getValue(itemNodeList, index, "userid");
                         fd.append("sellerid", sellerid);
+                        var itemname = getValue(itemNodeList, index, "itemname");
+                        fd.append("itemname", itemname);
+                        var imageuri = getValue(itemNodeList, index, "imageuri");
                         fd.append("table", "closedorder");
                         //Send the form by AJAX
                         var xhr = new XMLHttpRequest();

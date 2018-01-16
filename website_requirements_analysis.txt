@@ -258,7 +258,9 @@ MESSAGES
 
 TODO (ISSUES)
 1. In the very end, check that there aren't any "nodeList"s being shared in ways that they shouldn't
+2. For members who add email addresses, send them an email about the order details.
 5. Write messenger php script WORKING
+6. In free time, a python function that parses HTML and produces javascript
 6. PAGINATION with mysql
 8. Add option for browsing seller's other items.
 9. Complete the place_open_order() function
@@ -266,7 +268,11 @@ TODO (ISSUES)
 16. Add provision to suggest new items. Allow uploading pictures.
 17. Always clear the messages model because it's shared!
 18. Finish placeClosedOrder() function
-19.Prevent the user to place multiple of the same order.
+19. Prevent the user to place multiple of the same order.
+20. When a user logs in, show their orders in the "Orders" section of the Profiles + number of new orders
+21. Find a way around "page_number"
+22. Set the default expiration date for an order to 2 weeks from the order date. Same thing backend just in case
+23. Change pagination
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
 

@@ -11,14 +11,15 @@ if(isset($_SESSION['UserID'])) { //The User is logged in
     if($table=="closedorder") {
         placeClosedOrder($UserID);
     } else {
-        _searchCatalog($table, $UserID);
+        _searchCatalog($table, $UserID); //'_searchCatalog is kind of a misnomer. Function is more of a selector
     }
 }
 else if(isset($_SESSION['ClientID'])) {
     $ClientID = $_SESSION['ClientID'];
     placeClosedOrder($ClientID);
 }
-else { //User is not logged in. I.e the fmh main dashboard.
+else {
+    //User is not logged in. I.e the fmh main dashboard.
     //Search the database for given item or all where q=""
 	//Create a function to probe the database regardless of whether or not the user is logged in
     //Check the "table" value
@@ -187,11 +188,13 @@ function _getuserinfo($userid) { //SHOULD IT ECHO TO OUTPUT OR RETURN TO CALLING
     //END HERE
 }
 function _searchCatalog($table, $UserID) {
+    //Function is only accessible only if user with "member account" is logged in
+    //Function name is sort of a misnomer. It's more of a selector, responding to different requests
+    //depending on context specified in $table.
     $servername = "localhost"; //This is bound  change when I upload to the real website.
     $username = "aman";
     $password = "password";
     $database = "test";
-    $reply="<Items>";
     $conn = new mysqli($servername, $username, $password, $database);
     if(!$conn->connect_error) {  //Connection successful. Do stuff
         if($table=="Items") { //Browsing Items catalogue before adding items to the repository
@@ -451,11 +454,71 @@ function _searchCatalog($table, $UserID) {
                 echo "<status>2</status>";
             }
         }
+        else if($table=="closed_orders") {
+            //Fetches the user's order 10 at a time starting with newest.
+            getClosedOrders($conn);
+        }
+        else {
+            echo "<status>4</status>";
+            echo "<err>There's no code for the provided context ('table')</err>";
+        }
         //There's no problem in trying to close an already closed connection. It generates an error but that's all.
         $conn->close();
     }
     else {
         echo "<status>3</status>"; //There's a problem with the connection to the database
+    }
+}
+function getClosedOrders($conn) {
+    //Access "ClosedOrders" and get all data there for this user
+    $offset = $_POST['page_number'];
+    $UserID = $_SESSION['UserID'];
+    $sql = "SELECT Transient.OrderID AS OrderID,
+            Transient.RepID AS RepID,
+            Transient.ItemName AS ItemName,
+            Transient.Quantity AS Quantity,
+            Transient.Units AS Units,
+            Transient.ClientID AS ClientID,
+            Transient.Delivery AS Delivery,
+            Transient.ClientRemarks AS ClientRemarks,
+            Transient.OrderTime AS OrderTime,
+            Transient.OrderExpiration AS OrderExpiration,
+            Transient.OrderSerial AS OrderSerial,
+            Transient.ImageURI AS ImageURI
+            FROM
+            (SELECT * FROM ClosedOrders WHERE SellerID='".$UserID."')
+            AS Transient WHERE Transient.OrderSerial>".$offset." ORDER BY OrderSerial ASC LIMIT 10";
+    $result = $conn->query($sql);
+    if($result!==false) {
+        if($result->num_rows>0) {
+            $reply = "<orders>";
+            while($row = $result->fetch_assoc()) {
+                $reply.="<order>";
+                $reply.="<orderid>".setdefault('OrderID', '', $row)."</orderid>";
+                $reply.="<repid>".setdefault('RepID', '', $row)."</repid>";
+                $reply.="<itemname>".setdefault('ItemName', '', $row)."</itemname>";
+                $reply.="<quantity>".setdefault('Quantity', '', $row)."</quantity>";
+                $reply.="<units>".setdefault('Units', '', $row)."</units>";
+                $reply.="<clientid>".setdefault('ClientID', '', $row)."</clientid>";
+                $reply.="<delivery>".setdefault('Delivery', '', $row)."</delivery>";
+                $reply.="<clientremarks>".setdefault('ClientRemarks', '', $row)."</clientremarks>";
+                $reply.="<ordertime>".setdefault('OrderTime', '', $row)."</ordertime>";
+                $reply.="<expiration>".setdefault('OrderExpiration', '', $row)."</expiration>";
+                $reply.="<orderserial>".setdefault('OrderSerial', '', $row)."</orderserial>";
+                $reply.="<imageuri>".setdefault('ImageURI', 'N/A', $row)."</imageuri>";
+                $reply.="</order>";
+            }
+            $reply.="</orders>";
+            echo $reply;
+            echo "<status>0</status>"; //Successfully completed!
+            } else {
+            //No results found
+            echo "<status>1</status>";
+        }
+    } else {
+        //Query failed
+        echo "<err>".$conn->error."</err>";
+        echo "<status>2</status>";
     }
 }
 //$reply is already initialized to "<Items><Item><Images>"
@@ -550,19 +613,21 @@ function placeClosedOrder($id) { //No distinction between ClientID or UserID. Al
     $conn = new mysqli($servername, $username, $password, $database);
     if(!$conn->connect_error) {
         //Get the form data: quantity, expdate, delivery, comments, itemid
-        $quantity = $_POST['quantity'];
-        $expdate = $_POST['expdate'];
-        $delivery = $_POST['delivery'];
+        $quantity = setdefault("quantity", "1", $_POST);
+        $expdate = setdefault("expdate", "2018-01-16", $_POST); //Default date will be set in javascript
+        $delivery =  $_POST['delivery'];
         $comments = $_POST['comments'];
         $repid = $_POST['repid'];
         $units = $_POST['units'];
+        $itemname = $_POST['itemname'];
         $sellerid = $_POST['sellerid']; //This will be passed to the function that will update the users' new orders
+        $imageuri = $_POST['imageuri'];
         //And now generate the dynamic data: orderid
         $orderid = uniqid("c");
         //Prepare the sql
-        $sql = "INSERT INTO ClosedOrders(OrderID, RepID, Quantity, Units, ClientID,
-                Delivery, ClientRemarks, OrderExpiration) VALUES 
-                ('".$orderid."', '".$repid."', '".$quantity."', '".$units."', '".$id."', '".$delivery."', '".$comments."', '".$expdate."')";
+        $sql = "INSERT INTO ClosedOrders(OrderID, RepID, SellerID, ItemName, Quantity, Units, ClientID,
+                Delivery, ClientRemarks, OrderExpiration, ImageURI) VALUES 
+                ('".$orderid."', '".$repid."', '".$sellerid."', '".$itemname."', '".$quantity."', '".$units."', '".$id."', '".$delivery."', '".$comments."', '".$expdate."', '".$imageuri."')";
         $result = $conn->query($sql);
         if($result!==FALSE) {
             //Call the function that updates the users number of unseen orders
@@ -612,6 +677,7 @@ function updateNewOrders($sellerid, $conn) {
 //1. Query was successful, results not found
 //2. Query was unsuccessful
 //3. Connection to database failed
+//4. No methods provided for given context "table"
 //11. Context "table" not set. Programmer error
 //Flags for improvement and completion
 //1. INCOMPLETE
