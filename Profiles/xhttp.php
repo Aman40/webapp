@@ -66,10 +66,10 @@ function filter($entry) {
     return $entry; //Sanitized input
 }
 //When optional fields are empty, fill in default values
-function setdefault($value, $default, $array) {
+function setdefault($key, $default, $array) {
     //If a value is null, set it with the default given in the second parameter.
-    if(isset($array[$value])) {
-        return $array[$value];
+    if(isset($array[$key])) {
+        return $array[$key];
     } else {
         return $default;
     }
@@ -123,7 +123,7 @@ function _search_all_db($str)
                  WHERE ItemName LIKE '%".$str."%' OR Aliases LIKE '%".$str."%')
                  AS TempTable JOIN Repository ON TempTable.ItemID = Repository.ItemID)
                  AS Transient LEFT JOIN ItemImages ON Transient.ItemID = ItemImages.ItemID
-                ORDER BY ItemID"
+                ORDER BY RepID"
 					  ;
         $result = $conn->query($sql);
         if($result!=false) { //Query executed successfully
@@ -131,7 +131,7 @@ function _search_all_db($str)
                 echo "<status>0</status>";
                 $row1 = $result->fetch_assoc();
                 $reply="<Items><Item><Images>";
-                $reply=cmp_itemid($reply, $result, $row1);
+                $reply=cmp_uid($reply, $result, $row1, "RepID");
                 echo $reply;
             } else { //No results were found
                 echo "<status>1</status>";
@@ -222,7 +222,7 @@ function _searchCatalog($table, $UserID) {
                     //It gets complicated from here. A recursive function inside recursive function
                     $row1 = $result->fetch_assoc();
                     $reply="<Items><Item><Images>";
-                    $reply=cmp_itemid($reply, $result, $row1);
+                    $reply=cmp_uid($reply, $result, $row1, "ItemID");
                     //return the XML document to the requesting page
                     echo $reply;
                 } else { //O results found
@@ -267,17 +267,18 @@ function _searchCatalog($table, $UserID) {
 					TempTable.Description AS Description,
 					TempTable.Deliverable AS Deliverable,
 					TempTable.DeliverableAreas AS DeliverableAreas
-					 FROM (SELECT * FROM Repository WHERE UserID='".$UserID."')
+					 FROM (SELECT * FROM Repository WHERE UserID='".$UserID."') 
 					 AS TempTable JOIN Items ON TempTable.ItemID = Items.ItemID)
 					 AS Transient LEFT JOIN ItemImages ON ItemImages.ItemID = Transient.ItemID
-					 ORDER BY ItemID";
+					 ORDER BY RepID";
             $result = $conn->query($sql);
             if($result!=false) { //If everything went well
                 if($result->num_rows>0) { //non-zero results found
                     echo "<status>0</status>";
+                    echo "<res_total>$result->num_rows</res_total>";
                     $row1 = $result->fetch_assoc();
                     $reply="<Items><Item><Images>";
-                    $reply=cmp_itemid($reply, $result, $row1);
+                    $reply=cmp_uid($reply, $result, $row1, "RepID");
                     echo $reply;
                 } else { //No results were found
                     echo "<status>1</status>";
@@ -345,7 +346,7 @@ function _searchCatalog($table, $UserID) {
                     //It gets complicated from here. A recursive function inside recursive function
                     $row1 = $result->fetch_assoc();
                     $reply="<Items><Item><Images>";
-                    $reply=cmp_itemid($reply, $result, $row1);
+                    $reply=cmp_uid($reply, $result, $row1, "ItemID");
                     //return the XML document to the requesting page
                     echo $reply;
                 } else { //O results found
@@ -462,8 +463,6 @@ function _searchCatalog($table, $UserID) {
             echo "<status>4</status>";
             echo "<err>There's no code for the provided context ('table')</err>";
         }
-        //There's no problem in trying to close an already closed connection. It generates an error but that's all.
-        $conn->close();
     }
     else {
         echo "<status>3</status>"; //There's a problem with the connection to the database
@@ -494,17 +493,17 @@ function getClosedOrders($conn) {
             $reply = "<orders>";
             while($row = $result->fetch_assoc()) {
                 $reply.="<order>";
-                $reply.="<orderid>".setdefault('OrderID', '', $row)."</orderid>";
-                $reply.="<repid>".setdefault('RepID', '', $row)."</repid>";
-                $reply.="<itemname>".setdefault('ItemName', '', $row)."</itemname>";
-                $reply.="<quantity>".setdefault('Quantity', '', $row)."</quantity>";
-                $reply.="<units>".setdefault('Units', '', $row)."</units>";
-                $reply.="<clientid>".setdefault('ClientID', '', $row)."</clientid>";
-                $reply.="<delivery>".setdefault('Delivery', '', $row)."</delivery>";
-                $reply.="<clientremarks>".setdefault('ClientRemarks', '', $row)."</clientremarks>";
-                $reply.="<ordertime>".setdefault('OrderTime', '', $row)."</ordertime>";
-                $reply.="<expiration>".setdefault('OrderExpiration', '', $row)."</expiration>";
-                $reply.="<orderserial>".setdefault('OrderSerial', '', $row)."</orderserial>";
+                $reply.="<orderid>".setdefault('OrderID', 'N/A', $row)."</orderid>";
+                $reply.="<repid>".setdefault('RepID', 'N/A', $row)."</repid>";
+                $reply.="<itemname>".setdefault('ItemName', 'N/A', $row)."</itemname>";
+                $reply.="<quantity>".setdefault('Quantity', 'N/A', $row)."</quantity>";
+                $reply.="<units>".setdefault('Units', 'N/A', $row)."</units>";
+                $reply.="<clientid>".setdefault('ClientID', 'N/A', $row)."</clientid>";
+                $reply.="<delivery>".setdefault('Delivery', 'N/A', $row)."</delivery>";
+                $reply.="<clientremarks>".setdefault('ClientRemarks', 'N/A', $row)."</clientremarks>";
+                $reply.="<ordertime>".setdefault('OrderTime', 'N/A', $row)."</ordertime>";
+                $reply.="<expiration>".setdefault('OrderExpiration', 'N/A', $row)."</expiration>";
+                $reply.="<orderserial>".setdefault('OrderSerial', 'N/A', $row)."</orderserial>";
                 $reply.="<imageuri>".setdefault('ImageURI', 'N/A', $row)."</imageuri>";
                 $reply.="</order>";
             }
@@ -523,18 +522,19 @@ function getClosedOrders($conn) {
 }
 //$reply is already initialized to "<Items><Item><Images>"
 //Further TESTING needed
-function cmp_itemid($reply, $result, $row1) {
+function cmp_uid($reply, $result, $row1, $uid) {
+    //$uid is either "ItemID" or "RepID" depending on the calling function. It's hard to explain why. Good luck future me.
     $row2=$result->fetch_assoc();
     if($row2!=NULL) {
         //compare the ItemIDs
-        if($row1['ItemID']==$row2['ItemID']) {
+        if($row1[$uid]==$row2[$uid]) {
             //Same ItemID, different Image
             $reply.="<ImageData>";
             $reply.="<ImageID>".setdefault('ImageID', 'N/A', $row1)."</ImageID>";
             $reply.="<ImageURI>".setdefault('ImageURI',"icons/placeholder.png", $row1)."</ImageURI>";
             $reply.="</ImageData>";
             $row1=$row2;
-            $reply=cmp_itemid($reply, $result, $row1);
+            $reply=cmp_uid($reply, $result, $row1, $uid);
             return $reply;
         } else {
             //New ItemID
@@ -552,6 +552,7 @@ function cmp_itemid($reply, $result, $row1) {
             $reply.="<Description>".setdefault('Description', 'N/A', $row1)."</Description>";
 
             $reply.="<UserID>".setdefault('UserID', 'N/A', $row1)."</UserID>";
+            $reply.="<DefaultDescription>".setdefault('DefaultDescription', 'N/A', $row1)."</DefaultDescription>";
             $reply.="<RepID>".setdefault('RepID', 'N/A', $row1)."</RepID>";
             $reply.="<Quantity>".setdefault('Quantity', 'N/A', $row1)."</Quantity>";
             $reply.="<Units>".setdefault('Units', 'N/A', $row1)."</Units>";
@@ -567,7 +568,7 @@ function cmp_itemid($reply, $result, $row1) {
             $reply.="<Item>";
             $reply.="<Images>";
             $row1=$row2;
-            $reply=cmp_itemid($reply, $result, $row1);
+            $reply=cmp_uid($reply, $result, $row1, $uid);
             return $reply;
         }
     } else {

@@ -435,11 +435,7 @@ include "../include.php";
                                 add_to_inventory();//Switches the visibilities of inventory-update and inventory-
                                 //display back and forth.
                                 <?php
-                                if($session_exists) {
-                                    echo "_getInventory(); //Retrieves database items"; //_getInventory doesn't return!! WHY?? Because it
-                                    //runs an asynchronous function
-                                    echo "console.log('The _getInventory() function returned');";
-                                }
+                                    if($session_exists) echo "_getInventory(); //Retrieves database items";
                                 ?>
 
                             }

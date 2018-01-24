@@ -890,7 +890,8 @@ h3.dash_item_name {
 }
 .inbox-slide {
     width: 100%;
-    margin: 5px 0px;
+    background-color: beige;
+    padding:  5px 0px;
 }
 .ib-prof {
     width: 15%;
@@ -1065,23 +1066,46 @@ h3.dash_item_name {
 }
 .os-cap {
     width: 100%;
-    height: 50px;
+    margin: 5px 0px;
+    background-color: beige;
 }
 .od-cap-img-con {
     width: 25%;
+    display: inline-block;
 }
 .od-cap-img {
-
+    border-radius: 50px;
+    height: auto;
+    width: 100%;
+    margin: auto;
+    display: block;
 }
 .od-cap-dets {
     width: 75%;
+    display: inline-block;
+    padding-left: 10px;
 }
 .od-cd-name {
-
+    width: 100%;
+    display: block;
+    font-size:  1.5em;
+    color: indianred;
 }
 .od-cd-other {
-
+    width: 100%;
 }
-
+.od-cdo-tab {
+    display: inline-block;
+}
+.rep_item_btns_cntn, .conf-mod-btn-cnt {
+    display: flex;
+    width: 100%
+}
+.rep_item_btn, .conf_mod_btn {
+    width: 49%;
+    height: 30px;
+    padding: 4px 35px;
+    cursor: pointer;
+}
 
 

@@ -268,11 +268,14 @@ TODO (ISSUES)
 16. Add provision to suggest new items. Allow uploading pictures.
 17. Always clear the messages model because it's shared!
 18. Finish placeClosedOrder() function
-19. Prevent the user to place multiple of the same order.
+19. Prevent the user to place multiple of the same order. //This only happened because of an error
 20. When a user logs in, show their orders in the "Orders" section of the Profiles + number of new orders
 21. Find a way around "page_number"
 22. Set the default expiration date for an order to 2 weeks from the order date. Same thing backend just in case
 23. Change pagination
+24. Editing and Deleting items from the Repository is not available for the mobile platform
+25. Allow sellers to define their own custom names
+
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
 

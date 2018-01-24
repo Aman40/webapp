@@ -242,69 +242,156 @@ function inventoryItemDetails(elmt, nodelist) {
         var table = document.createElement('table');
         table.classList.add("rep_item_details");
         contentDiv.appendChild(table);
+        {//Table
             var tbody = document.createElement('tbody');
             table.appendChild(tbody);
-                var nameRow = document.createElement('tr');
-                tbody.appendChild(nameRow);
-                    var data = document.createElement('th');
-                        data.innerHTML = "Name:";
-                    nameRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML=getValue(nodelist, i, "itemname");
-                    nameRow.appendChild(data);
-                var otherNamesRow = document.createElement('tr');
-                tbody.appendChild(otherNamesRow);
-                    var data = document.createElement('th');
-                        data.innerHTML="Alias:";
-                    otherNamesRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML=getValue(nodelist, i, "aliases");
-                    otherNamesRow.appendChild(data);
-                var descriptionRow = document.createElement('tr');
-                tbody.appendChild(descriptionRow);
-                    var data = document.createElement('th');
-                        data.innerHTML="Description:";
-                    descriptionRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML=getValue(nodelist, i, "defaultdescription");
-                        data.innerHTML+=getValue(nodelist, i, "description");
-                    descriptionRow.appendChild(data);
-                var quantityRow = document.createElement('tr');
-                tbody.appendChild(quantityRow);
-                    var data = document.createElement('th');
-                        data.innerHTML="Quantity:";
-                    quantityRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML=getValue(nodelist, i, "quantity");
-                    quantityRow.appendChild(data);
-                var priceRow = document.createElement('tr');
-                tbody.appendChild(priceRow);
-                    var data = document.createElement('th');
-                        data.innerHTML="Price:";
-                    priceRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML = getValue(nodelist, i, "unitprice")+"/"+getValue(nodelist, i, "units");
-                    priceRow.appendChild(data);
-                var dateRow = document.createElement('tr');
-                tbody.appendChild(dateRow);
-                    var data = document.createElement('th');
-                        data.innerHTML="Date Added:";
-                    dateRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML=getValue(nodelist, i, "dateadded");
-                    dateRow.appendChild(data);
-                var deliverRow = document.createElement('tr');
-                tbody.appendChild(deliverRow);
-                    var data = document.createElement('th');
-                        data.innerHTML="Delivery:";
-                    deliverRow.appendChild(data);
-                    data = document.createElement('td');
-                        data.innerHTML=getValue(nodelist, i, "deliverableareas");
-                    deliverRow.appendChild(data);
+            var nameRow = document.createElement('tr');
+            tbody.appendChild(nameRow);
+            var data = document.createElement('th');
+            data.innerHTML = "Name:";
+            nameRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(nodelist, i, "itemname");
+            nameRow.appendChild(data);
+            var otherNamesRow = document.createElement('tr');
+            tbody.appendChild(otherNamesRow);
+            var data = document.createElement('th');
+            data.innerHTML="Alias:";
+            otherNamesRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(nodelist, i, "aliases");
+            otherNamesRow.appendChild(data);
+            var descriptionRow = document.createElement('tr');
+            tbody.appendChild(descriptionRow);
+            var data = document.createElement('th');
+            data.innerHTML="Description:";
+            descriptionRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(nodelist, i, "defaultdescription");
+            data.innerHTML+=getValue(nodelist, i, "description");
+            descriptionRow.appendChild(data);
+            var quantityRow = document.createElement('tr');
+            tbody.appendChild(quantityRow);
+            var data = document.createElement('th');
+            data.innerHTML="Quantity:";
+            quantityRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(nodelist, i, "quantity");
+            quantityRow.appendChild(data);
+            var priceRow = document.createElement('tr');
+            tbody.appendChild(priceRow);
+            var data = document.createElement('th');
+            data.innerHTML="Price:";
+            priceRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML = getValue(nodelist, i, "unitprice")+"/"+getValue(nodelist, i, "units");
+            priceRow.appendChild(data);
+            var dateRow = document.createElement('tr');
+            tbody.appendChild(dateRow);
+            var data = document.createElement('th');
+            data.innerHTML="Date Added:";
+            dateRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(nodelist, i, "dateadded");
+            dateRow.appendChild(data);
+            var deliverRow = document.createElement('tr');
+            tbody.appendChild(deliverRow);
+            var data = document.createElement('th');
+            data.innerHTML="Delivery:";
+            deliverRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(nodelist, i, "deliverableareas");
+            deliverRow.appendChild(data);
+        }
+        //Create a div with the buttons and add it.
+    var btnDiv = document.createElement('div');
+        btnDiv.classList.add('rep_item_btns_cntn'); //two btns flex box
+    var editBtn = document.createElement('div');
+        editBtn.classList.add('rep_item_btn')
+        editBtn.innerHTML = "Edit Item";
+        editBtn.addEventListener("click", function () {
+            //open a modal for editing the item. Should be similar to the one used to
+            edit_rep_item(i);
+        })
+        btnDiv.appendChild(editBtn);
+    var delBtn = document.createElement('div');
+        delBtn.classList.add('rep_item_btn');
+        delBtn.innerHTML = "Delete Item";
+        delBtn.addEventListener("click", function (event) {
+            //Create an object with the function to run if yes. Pass that object to "sure_u_wanna()"
+            var promptText = "Are you sure you want to delete "+getValue(itemNodeListr, i, 'itemname')+"?";
+            var obj = {"promptText": promptText,"indexno": i, "function":function (indexno) {
+                    rem_rep_item(indexno)
+                } };
+            sure_u_wanna(obj); //GENIUS! :)
+        })
+        btnDiv.appendChild(delBtn);
+    contentDiv.appendChild(btnDiv);
     document.getElementsByTagName("body")[0].appendChild(modal);
     modal.style.display="block";
 }
+function edit_rep_item(index) {
+    //Called in inventoryItemDetails() in mprofile.php
+    //Uses "index" argument to get items's itemID from itemNodeListr and "UPDATE"S item details in Repository
+    //Depends on send_updated_item_details() (not yet written)
 
+
+}
+function sure_u_wanna(obj) {
+    //Displays a modal prompting for confirmation. Upon confirmation, function runs the code in the object
+    //The object must take the structure {"promptText": string, "indexno": integer, "function": function(){}}
+    // Otherwise, it just closes the modal and destroys it completely
+    var modal = document.createElement('div');
+    modal.width = "100%";
+    modal.classList.add("modal");
+    modal.id = "sure-u-wanna";
+    var modal_content = document.createElement('div'); //width: 100%
+    modal.appendChild(modal_content);
+    var contentDiv = document.createElement('div');
+    modal_content.appendChild(contentDiv);
+    //Add add an X inside a span to close the modal
+    var closeButton = document.createElement('span'); //INCOMPLETE: STYLE THE CLOSE BUTTON OR REMOVE IT
+    closeButton.innerHTML = "X";
+    //Add an event listener to the span
+    closeButton.onclick = function (event) {
+        modal.remove();
+    };
+    modal.onclick = function (event) {//Event listener to close the modal if user clicks anywhere outside the modal content
+        modal.remove();
+    };
+    modal.appendChild(closeButton);
+    modal_content.classList.add("modal-content");
+    //Create prompt text
+    var promptText = document.createElement('div');
+    try { //Just in case the prompt text isn't set because I'm stupid
+        promptText.innerHTML = obj.promptText;
+    } catch (err) {
+        promptText.innerHTML = "Are you sure you want to proceed";
+    }
+    contentDiv.appendChild(promptText);
+    //Create a container for the buttons
+    var btnDiv = document.createElement('div');
+    btnDiv.classList.add('conf-mod-btn-cnt'); //Confirmation modal. Two btns flex box
+    var okBtn = document.createElement('div');
+    okBtn.classList.add('conf_mod_btn')
+    okBtn.innerHTML = "PROCEED";
+    okBtn.addEventListener('click', function (event) {
+        //Call the function in object. Period. It should be self contained.
+        console.log("Calling the function from the object.")
+        obj.function(obj.indexno);
+    })
+    btnDiv.appendChild(okBtn);
+    var noBtn = document.createElement('div');
+    noBtn.classList.add('conf_mod_btn');
+    noBtn.innerHTML = "CANCEL";
+    noBtn.addEventListener("click", function (event) {
+        modal.remove();
+    })
+    btnDiv.appendChild(noBtn);
+    contentDiv.appendChild(btnDiv);
+    document.getElementsByTagName("body")[0].appendChild(modal);
+    modal.style.display="block";
+}
 //Script 2
 function hide_show(elmtId) {
     var element = document.getElementById(elmtId);
@@ -389,31 +476,80 @@ function getradio(option) {
     }
 }
 function submit_add_form(i) {
+    var fd = new FormData();
     var quantity=readval("quantity");
+    fd.append("quantity", quantity);
     var units=readval("units");
+    fd.append("units", units);
     var state=readval("state");
+    fd.append("state", state);
     var price=readval("price");
+    fd.append("price", price);
     var description=readval("description");
+    fd.append("description", description);
     var dplace=readval("dplace");
+    fd.append("dplace", dplace);
     var itemID = getValue(itemNodeList, i, "itemID");
+    fd.append("itemID", itemID);
+    fd.append("context", "add_item");
 
     xhttp = new XMLHttpRequest();
+    xhttp.responseType = "document";
     xhttp.onreadystatechange = function () { //When we get a reply from the webserver
         //Display success/failure status
         if(this.readyState ===4 && this.status ===200){
-            console.log(this.responseText);
-            if(this.responseText ===true){ //Success. Close the modal
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var returnStatus = xmlDoc.getElementsByTagName('returnstatus')[0].childNodes[0].nodeValue;
+            returnStatus = parseInt(returnStatus);
+            if(returnStatus===0) { //Success
                 document.getElementById("editAddItem").style.display="none";
                 window.alert("Item successfully added");
-            } else { //Failure. alert an error
-                window.alert("There was a problem");
+            } else {
+                window.alert("There was a problem. Check the console for details.");
             }
         }
     }
-    xhttp.open("GET", "add_item.php?itemID="+itemID+"&quantity="+quantity+"&units="+units+"&state="+
-        state+"&price="+price+"&description="+description+"&deliverable="+deliverable+
-        "&dplace="+dplace, true);
-    xhttp.send();
+    xhttp.open("GET", "add_item.php", true);
+    xhttp.send(fd);
+}
+function submit_edit_form(i) {
+    var fd = new FormData();
+    var quantity=readval("quantity");
+    fd.append("quantity", quantity);
+    var units=readval("units");
+    fd.append("units", units);
+    var state=readval("state");
+    fd.append("state", state);
+    var price=readval("price");
+    fd.append("price", price);
+    var description=readval("description");
+    fd.append("description", description);
+    var dplace=readval("dplace");
+    fd.append("dplace", dplace);
+    var itemID = getValue(itemNodeList, i, "itemID");
+    fd.append("itemID", itemID);
+    fd.append("context", "edit_item");
+
+    xhttp = new XMLHttpRequest();
+    xhttp.responseType = "document";
+    xhttp.onreadystatechange = function () { //When we get a reply from the webserver
+        //Display success/failure status
+        if(this.readyState ===4 && this.status ===200){
+            var xmlDoc = this.responseXML;
+            console.log(xmlDoc);
+            var returnStatus = xmlDoc.getElementsByTagName('returnstatus')[0].childNodes[0].nodeValue;
+            returnStatus = parseInt(returnStatus);
+            if(returnStatus===0) { //Success
+                document.getElementById("editAddItem").style.display="none";
+                window.alert("Item successfully added");
+            } else {
+                window.alert("There was a problem. Check the console for details.");
+            }
+        }
+    }
+    xhttp.open("GET", "add_item.php", true);
+    xhttp.send(fd);
 }
 function readval(id) {
     return	document.getElementById(id).value;
@@ -767,6 +903,7 @@ function sendformdata(fd, context) {
 function edit_added_item(query) {
     //Non-distinct here means the function returns multiple images, if available for the items searched
     //In contrast the _searchdb() function only returns one image per Item
+    //Called in dbeditor.php
     var xhr = new XMLHttpRequest();
     xhr.responseType = "document";
     xhr.onreadystatechange = function () {
@@ -1576,8 +1713,9 @@ function showClosedOrders(UserID) {
                             try {
                                 img.src = getValue(ordersNodeList, i, "imageuri");
                             } catch(err) {
-                                html+="/var/www/html/HTML/icons/placeholder.png";
+                                img.src="/HTML/icons/placeholder.png";
                             }
+                            imgdiv.appendChild(img);
                         }
                         elmt.appendChild(imgdiv);
                         var dets = document.createElement("div");
