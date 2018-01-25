@@ -6,10 +6,17 @@ if(isset($_SESSION['UserID'])) {
 }
 include "customErrorHandler.php";
 set_error_handler("customErrorHandler");
-if(isset($_REQUEST['context'])) {
-	$context = $_REQUEST['context'];
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+
+if(isset($_POST['context'])) {
+	$context = $_POST['context'];
 } else {
-	echo "<err>Context is not set</err>";
+	echo "<err>Context HAS NOT BEEN SET</err>";
+    foreach($_REQUEST as $key=>$value) {
+        echo "<key>$key</key>";
+        echo "<value>$value</value>";
+    }
+    echo "<method>".$_SERVER['REQUEST_METHOD']."</method>";
 	die("<returnstatus>1</returnstatus>");
 }
 if($context==='add_item') {
@@ -19,44 +26,39 @@ if($context==='add_item') {
 }
 function edit_item() {
     $problem=false;
-    if(isset($_GET['itemID'])) {
-        $itemID = filter($_GET['itemID']);
+    if(isset($_POST['repID'])) {
+        $repID = filter($_POST['repID']);
     } else {
-        echo "<err>The field 'itemid' is not set</err>";
+        echo "<err>The field 'repid' is not set</err>";
         $problem = true;
     }
-    if(isset($_GET['quantity'])) {
-        $quantity=filter($_GET['quantity']);
+    if(isset($_POST['quantity'])) {
+        $quantity=filter($_POST['quantity']);
     } else {
         echo "<err>The field 'quantity' is not set</err>";
         $problem = true;
     }
-    if(isset($_GET['units'])) {
-        $units = filter($_GET['units']);
+    if(isset($_POST['units'])) {
+        $units = filter($_POST['units']);
     } else {
         echo "<err>The field 'units' is not set</err>";
         $problem = true;
     }
-    $state = setdefault('state', 'N/A', $_GET);
-    if(isset($_GET['price'])) {
-        $price = filter($_GET['price']);
+    $state = setdefault('state', 'N/A', $_POST);
+    if(isset($_POST['price'])) {
+        $price = filter($_POST['price']);
     } else {
         echo "<err>price is not set</err>";
         $problem = true;
     }
-    $description = setdefault('description', "None", $_GET);
-    if(isset($_GET['deliverable'])) {
-        $deliverable = filter($_GET['deliverable']);
+    $description = setdefault('description', "None", $_POST);
+    if(isset($_POST['deliverable'])) {
+        $deliverable = filter($_POST['deliverable']);
     } else {
         $problem = true;
     }
-    $dplace = setdefault('dplace', "None", $_GET);
-    if(isset($_GET['repid'])) {
-        $repID = filter($_GET['repid']);
-    } else {
-    	echo "<err>repid is not set</err>";
-        $problem = true;
-    }
+    $dplace = setdefault('dplace', "None", $_POST);
+
 //Get user ID from $_SESSION
     $userID = $_SESSION['UserID'];
 //Get the current date from with php
@@ -69,9 +71,7 @@ function edit_item() {
     if($problem==false) { //If there's no problem with the data extraction
         $conn = new mysqli($servername, $username, $password, $database);
         if(!$conn->connect_error) {
-            $sql = "UPDATE TABLE Repository SET RepID='".$repID."', 
-            UserID='".$userID."', 
-            ItemID='".$itemID."', 
+            $sql = "UPDATE Repository SET
             Quantity=".$quantity.", 
             Units='".$units."', 
             UnitPrice=".$price.", 
@@ -79,16 +79,19 @@ function edit_item() {
             DateAdded='".$date."', 
             Description='".$description."', 
             Deliverable='".$deliverable."', 
-            DeliverableAreas='".$dplace."'";
+            DeliverableAreas='".$dplace."'
+			WHERE RepID = '".$repID."' AND UserID='".$userID."'";
             $result = $conn->query($sql);
             if($result) { //Successful
                 echo "<returnstatus>0</returnstatus>";
             } else { //Failure
                 echo "<err>The query failed</err>";
+                echo "<err>$conn->error</err>";
                 echo "<returnstatus>2</returnstatus>";
             }
         } else {
             echo "<err>Connection to the database failed</err>";
+            echo "<err>$conn->error</err>";
             die ("<returnstatus>4</returnstatus>");
         }
     } else {
@@ -98,38 +101,39 @@ function edit_item() {
 }
 function add_item() {
     $problem=false;
-    if(isset($_GET['itemID'])) {
-        $itemID = filter($_GET['itemID']);
+    if(isset($_POST['itemID'])) {
+        $itemID = filter($_POST['itemID']);
     } else {
         echo "<err>The field 'itemid' is not set</err>";
         $problem = true;
     }
-    if(isset($_GET['quantity'])) {
-        $quantity=filter($_GET['quantity']);
+    if(isset($_POST['quantity'])) {
+        $quantity=filter($_POST['quantity']);
     } else {
         echo "<err>The field 'quantity' is not set</err>";
         $problem = true;
     }
-    if(isset($_GET['units'])) {
-        $units = filter($_GET['units']);
+    if(isset($_POST['units'])) {
+        $units = filter($_POST['units']);
     } else {
         echo "<err>The field 'units' is not set</err>";
         $problem = true;
     }
-    $state = setdefault('state', 'N/A', $_GET);
-    if(isset($_GET['price'])) {
-        $price = filter($_GET['price']);
+    $state = setdefault('state', 'N/A', $_POST);
+    if(isset($_POST['price'])) {
+        $price = filter($_POST['price']);
     } else {
         echo "<err>price is not set</err>";
         $problem = true;
     }
-    $description = setdefault('description', "None", $_GET);
-    if(isset($_GET['deliverable'])) {
-        $deliverable = filter($_GET['deliverable']);
+    $description = setdefault('description', "None", $_POST);
+    if(isset($_POST['deliverable'])) {
+        $deliverable = filter($_POST['deliverable']);
     } else {
+        echo "<err>'description' is not set</err>";
         $problem = true;
     }
-    $dplace = setdefault('dplace', "None", $_GET);
+    $dplace = setdefault('dplace', "None", $_POST);
 
 //Get user ID from $_SESSION
     $userID = $_SESSION['UserID'];
@@ -150,6 +154,7 @@ function add_item() {
                 echo "<returnstatus>0</returnstatus>";
             } else { //Failure
 				echo "<err>The query failed</err>";
+				echo "<err>$conn->error</err>";
                 echo "<returnstatus>2</returnstatus>";
             }
         } else {

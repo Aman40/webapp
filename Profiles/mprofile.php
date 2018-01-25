@@ -562,8 +562,8 @@ function _selected($var) {
                 <label>Item Description</label><br>
                 <input type="text" name="description" id="description"><br>
                 <label>Do you deliver?</label><br>
-                <input type="radio" name="deliverable" value="yes" onclick='getradio("yes")'>Yes<br>
-                <input type="radio" name="deliverable" value="no" onclick='getradio("no")'>No<br>
+                <input id="ei-radio-yes" type="radio" name="deliverable" value="yes">Yes<br>
+                <input id="ei-radio-no" type="radio" name="deliverable" value="no">No<br>
                 <label>Deliverable Places</label><br>
                 <input type="text" name="dplace" id="dplace"><br>
                 <span id="item_submit_button"></span>

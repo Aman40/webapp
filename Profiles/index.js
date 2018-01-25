@@ -333,9 +333,64 @@ function inventoryItemDetails(elmt, nodelist) {
 function edit_rep_item(index) {
     //Called in inventoryItemDetails() in mprofile.php
     //Uses "index" argument to get items's itemID from itemNodeListr and "UPDATE"S item details in Repository
-    //Depends on send_updated_item_details() (not yet written)
+    //First opens a modal similar to the one used for adding items with the item details filled in in advance
+    //Depends on submit_edit_form()
+    //Since the modal is an already existing template, fill in the details from itemNodeListr then
+    //Call displaymodal(i) to finish the job.
+    var quantity = document.getElementById('quantity');
+    quantity.value = getValue(itemNodeListr, index, 'quantity')
+    var units = document.getElementById('units');
+    units.value = getValue(itemNodeListr, index, 'units')
+    var state = document.getElementById('state');
+    state.value = getValue(itemNodeListr, index, 'state');
+    var price = document.getElementById('price');
+    price.value = getValue(itemNodeListr, index, 'unitprice');
+    var description = document.getElementById('description');
+    description.value = getValue(itemNodeListr, index, 'description');
+    var eiRadioYes = document.getElementById('ei-radio-yes');
+    var eiRadioNo = document.getElementById('ei-radio-no');
+    var deliverable = getValue(itemNodeListr, index, 'deliverable');
+    if(deliverable==='Y') {
+        eiRadioYes.checked = true;
+    } else {
+        eiRadioNo.checked = true;
+    }
+    var dplace = document.getElementById('dplace');
+    dplace.value = getValue(itemNodeListr, index, 'deliverableareas')
+    //All preliminary data set. Now call displaymodal(i). Nah, I'll just copy its code
+    var html=""; //in the itemNodeList
+    html="<div width=100%>";
+    html+="<img src='"+getValue(itemNodeListr, index, 'ImageURI')+"'>";
+    html+="</div>";
+    document.getElementById("eAI-11").innerHTML=html;
+    html="<div width=100%>";
+    html+="<span size=6em position='center'>"+getValue(itemNodeListr, index, 'ItemName')+"</span>";
+    html+="<br>Other names:\t"+getValue(itemNodeListr, index, 'Aliases');
+    html+="<br>Description:\t"+getValue(itemNodeListr, index, 'Description');
+    html+="</div>";
+    document.getElementById("item_submit_button").innerHTML="<button type='submit' onclick='submit_edit_form("+index+")'><i class='fa fa-plus-square-o'></i>  Edit Item</button>";
+    document.getElementById("eAI-12").innerHTML=html;
 
-
+    //Get the <select> Element and put the unit as <option>s
+    var object = {
+        "calling_function": "display_modal",
+        "itemid":getValue(itemNodeListr, index, 'ItemID'),//Should be a string
+        "function": function(unitsNodeList) {
+            var selectElmt = document.getElementById("units");
+            selectElmt.innerHTML = "";
+            //Get the list of units into a list
+            console.log(unitsNodeList);
+            for(var i=0;i<unitsNodeList.length;i++) {
+                var option = document.createElement('option');
+                var value = unitsNodeList[i].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                option.value = value.toLowerCase();
+                option.innerHTML = unitsNodeList[i].getElementsByTagName('UnitName')[0].childNodes[0].nodeValue;
+                selectElmt.appendChild(option);
+            }
+            document.getElementById("editAddItem").style.display="block";
+        } // A function
+    }
+    getunits(object)
 }
 function sure_u_wanna(obj) {
     //Displays a modal prompting for confirmation. Upon confirmation, function runs the code in the object
@@ -465,16 +520,6 @@ window.onclick = function(event) {
             modalup.style.display = "none";
         }
     }
-//Script5
-var deliverable="";
-function getradio(option) {
-    console.log("getting radio");
-    if(option ==="yes") {
-        deliverable="Y";
-    } else if(option==="no") {
-        deliverable="N";
-    }
-}
 function submit_add_form(i) {
     var fd = new FormData();
     var quantity=readval("quantity");
@@ -487,6 +532,14 @@ function submit_add_form(i) {
     fd.append("price", price);
     var description=readval("description");
     fd.append("description", description);
+    var deliverable = "";
+    eiRadioYes = document.getElementById('ei-radio-yes');
+    eiRadioNo = document.getElementById('ei-radio-no');
+    if(eiRadioYes.checked===true) {
+        deliverable = "Y";
+    } else {
+        deliverable = "N";
+    }
     var dplace=readval("dplace");
     fd.append("dplace", dplace);
     var itemID = getValue(itemNodeList, i, "itemID");
@@ -510,7 +563,7 @@ function submit_add_form(i) {
             }
         }
     }
-    xhttp.open("GET", "add_item.php", true);
+    xhttp.open("POST", "add_item.php", true);
     xhttp.send(fd);
 }
 function submit_edit_form(i) {
@@ -525,10 +578,19 @@ function submit_edit_form(i) {
     fd.append("price", price);
     var description=readval("description");
     fd.append("description", description);
+    var deliverable = "";
+    eiRadioYes = document.getElementById('ei-radio-yes');
+    eiRadioNo = document.getElementById('ei-radio-no');
+    if(eiRadioYes.checked===true) {
+        deliverable = "Y";
+    } else {
+        deliverable = "N";
+    }
+    fd.append("deliverable", deliverable);
     var dplace=readval("dplace");
     fd.append("dplace", dplace);
-    var itemID = getValue(itemNodeList, i, "itemID");
-    fd.append("itemID", itemID);
+    var repID = getValue(itemNodeListr, i, "repID");
+    fd.append("repID", repID);
     fd.append("context", "edit_item");
 
     xhttp = new XMLHttpRequest();
@@ -548,7 +610,7 @@ function submit_edit_form(i) {
             }
         }
     }
-    xhttp.open("GET", "add_item.php", true);
+    xhttp.open("POST", "add_item.php", true);
     xhttp.send(fd);
 }
 function readval(id) {

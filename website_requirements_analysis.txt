@@ -264,6 +264,7 @@ TODO (ISSUES)
 6. PAGINATION with mysql
 8. Add option for browsing seller's other items.
 9. Complete the place_open_order() function
+10. use elmt.remove() to completely remove dynamically created shared modals as opposed to style.display="off"
 13. When listing orders on seller's side, add option to confirm orders (Like Amazon)
 16. Add provision to suggest new items. Allow uploading pictures.
 17. Always clear the messages model because it's shared!
@@ -274,7 +275,8 @@ TODO (ISSUES)
 22. Set the default expiration date for an order to 2 weeks from the order date. Same thing backend just in case
 23. Change pagination
 24. Editing and Deleting items from the Repository is not available for the mobile platform
-25. Allow sellers to define their own custom names
+25. Allow sellers to define their own custom names of products
+
 
 PROBLEMS
 1. Errors cross boundary between signup and sign in modals. SOLUTION: Use different variable names.
