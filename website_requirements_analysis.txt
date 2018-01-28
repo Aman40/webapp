@@ -197,7 +197,7 @@ SCENARIOS (EVENTS)
 					+--Get order ID as a result
 
 Functionality goals for fmh.php
--Add funcion to probe the database for available items and display some of them to the user - CHECK
+-Add function to probe the database for available items and display some of them to the user - CHECK
 -Set the function to run as soon as the website loads CHECK
 -Write shell script or php to access the database and update the urls of the items. 
 -Or just use phpmyadmin
@@ -274,8 +274,10 @@ TODO (ISSUES)
 21. Find a way around "page_number"
 22. Set the default expiration date for an order to 2 weeks from the order date. Same thing backend just in case
 23. Change pagination
-24. Editing and Deleting items from the Repository is not available for the mobile platform
 25. Allow sellers to define their own custom names of products
+26. After displaying the order details, allow for confirmation or denial of the order, after
+    which an email is to be sent to the client regarding their order status.
+27. Append a repository UID for the seller, based on the last digits of the RepID
 
 
 PROBLEMS

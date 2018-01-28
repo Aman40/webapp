@@ -483,7 +483,8 @@ function getClosedOrders($conn) {
             Transient.OrderTime AS OrderTime,
             Transient.OrderExpiration AS OrderExpiration,
             Transient.OrderSerial AS OrderSerial,
-            Transient.ImageURI AS ImageURI
+            Transient.ImageURI AS ImageURI,
+            Transient.ConfirmationStatus as Confirmation
             FROM
             (SELECT * FROM ClosedOrders WHERE SellerID='".$UserID."')
             AS Transient WHERE Transient.OrderSerial>".$offset." ORDER BY OrderSerial ASC LIMIT 10";
@@ -505,6 +506,7 @@ function getClosedOrders($conn) {
                 $reply.="<expiration>".setdefault('OrderExpiration', 'N/A', $row)."</expiration>";
                 $reply.="<orderserial>".setdefault('OrderSerial', 'N/A', $row)."</orderserial>";
                 $reply.="<imageuri>".setdefault('ImageURI', 'N/A', $row)."</imageuri>";
+                $reply.="<confirmation>".setdefault('Confirmation', 'N/A', $row)."</confirmation>";
                 $reply.="</order>";
             }
             $reply.="</orders>";

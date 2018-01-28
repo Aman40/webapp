@@ -227,9 +227,7 @@ function inventoryItemDetails(elmt, nodelist) {
     var closeButton = document.createElement('span'); //INCOMPLETE: STYLE THE CLOSE BUTTON OR REMOVE IT
     closeButton.innerHTML = "X";
     //Add an event listener to the span
-    closeButton.onclick = function (event) {
-        modal.style.display = "none";
-    };
+    closeButton.onclick = function (event) {modal.remove();};
     modal.onclick = function (event) {//Event listener to close the modal if user clicks anywhere outside the modal content
         modal.style.display = "none";
     };
@@ -1563,6 +1561,7 @@ function messageClient(elmt) {
         xht.onreadystatechange = function () {
             if(this.status===200 && this.readyState===4) {
                 var xmlDoc = this.responseXML;
+                console.log(xmlDoc);
                 var returnStatus = xmlDoc.getElementsByTagName("returnStatus")[0].childNodes[0].nodeValue;
                 returnStatus = parseInt(returnStatus);
                 if(returnStatus===0) {
@@ -1763,7 +1762,10 @@ function showClosedOrders(UserID) {
                 prof_orders.innerHTML = ""; //Reset the div;
                 for(var i=0;i<ordersNodeList.length;i++) {
                     //Insert data into "prof_orders
-                    var elmt = document.createElement('div'); //Outer wrap
+                    var elmt = document.createElement('div'); //Outer wrap Put a click event listener
+                    elmt.addEventListener("click", function (event) { //Call a function that displays the order details
+                        displayClosedOrderDetails(this); //Element is passes. Index is hard coded onto element as elmt.index
+                    })
                     elmt.classList.add("os-cap"); //os is for "order summary", cap is for "capsule" coz it encapsulates
                     elmt.index = i; //Index to reference the item in the ordersNodeList;
                     {//The image div
@@ -1825,6 +1827,117 @@ function showClosedOrders(UserID) {
     };
     xht.open("POST", "xhttp.php", true);
     xht.send(fd);
+}
+function displayClosedOrderDetails(elmt) {
+    //Triggered by click on order summary "capsule" in prof-orders.
+    //Called in showClosedOrders()
+    //Uses the ordersNodeList
+    var indexno = elmt.index; //Fetch details from ordersNodeList
+    //Create the modal template
+    var modal = document.createElement('div');
+    modal.width = "100%";
+    modal.classList.add("modal");
+    modal.id = "closed_order_details_id";
+    var modal_content = document.createElement('div');
+    modal.appendChild(modal_content);
+    var closeButton = document.createElement('span'); //INCOMPLETE: STYLE THE CLOSE BUTTON OR REMOVE IT
+    closeButton.innerHTML = "X";
+    //Add an event listener to the span
+    closeButton.onclick = function (ev) { modal.remove(); }
+    modal.onclick = function (ev) { modal.remove(); };
+    modal.appendChild(closeButton);
+    modal_content.classList.add('modal-content');
+    var imgDiv = document.createElement('div'); //width: inherit
+    modal_content.appendChild(imgDiv);
+    var contentDiv = document.createElement('div');
+    modal_content.appendChild(contentDiv);
+        var table = document.createElement('table');
+        table.classList.add("order-item-details");
+        contentDiv.appendChild(table);
+        {//Table
+            var tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+            var nameRow = document.createElement('tr');
+            tbody.appendChild(nameRow);
+            var data = document.createElement('th');
+            data.innerHTML = "Name:";                           //ItemName
+            nameRow.appendChild(data);
+            data = document.createElement('td');
+            console.log("Index number: "+indexno);
+            data.innerHTML=getValue(ordersNodeList, indexno, "itemname");
+            nameRow.appendChild(data);
+
+            var quantityRow = document.createElement('tr');
+            tbody.appendChild(quantityRow);
+            var data = document.createElement('th');
+            data.innerHTML="Quantity:";                         //Quantity
+            quantityRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(ordersNodeList, indexno, "quantity")+" "+getValue(ordersNodeList, indexno, "units");
+            quantityRow.appendChild(data);
+
+            var priceRow = document.createElement('tr');
+            tbody.appendChild(priceRow);
+            var data = document.createElement('th');
+            data.innerHTML="Delivery deadline:";                            //Price (?)
+            priceRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML = getValue(ordersNodeList, indexno, "expiration");
+            priceRow.appendChild(data);
+
+            var deliverRow = document.createElement('tr');
+            tbody.appendChild(deliverRow);
+            var data = document.createElement('th');
+            data.innerHTML="Delivery Request:";                        //Delivery status
+            deliverRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(ordersNodeList, indexno, "delivery");
+            deliverRow.appendChild(data);
+
+            var deliverRow = document.createElement('tr');
+            tbody.appendChild(deliverRow);
+            var data = document.createElement('th');
+            data.innerHTML="Client Remarks:";                        //Delivery status
+            deliverRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(ordersNodeList, indexno, "clientremarks");
+            deliverRow.appendChild(data);
+
+            var deliverRow = document.createElement('tr');
+            tbody.appendChild(deliverRow);
+            var data = document.createElement('th');
+            data.innerHTML="Time of order:";                        //Delivery status
+            deliverRow.appendChild(data);
+            data = document.createElement('td');
+            data.innerHTML=getValue(ordersNodeList, indexno, "ordertime");
+            deliverRow.appendChild(data);
+        } //Add an option to message the Client
+    var btnDiv = document.createElement('div');
+    btnDiv.classList.add('order_item_btns_cntn'); //two btns flex box. "Confirm Order", "Msg Client"
+    btnDiv.classList.add('rep_item_btns_div')
+    var msgBtn = document.createElement('div'); //The message button
+        msgBtn.classList.add("order_item_btn");
+        msgBtn.classList.add('rep_item_btn');
+        msgBtn.clientID = getValue(ordersNodeList, indexno, "clientid")
+        msgBtn.innerHTML = "Message Client";
+        msgBtn.addEventListener("click", function () {
+           //Open messageClient(elmt). RecepID must be attached to elmt, just like IndexNo
+            messageClient(this);
+        });
+        btnDiv.appendChild(msgBtn);
+    var cnfBtn = document.createElement('div');
+        cnfBtn.classList.add("order_item_btn");
+        cnfBtn.classList.add('rep_item_btn');
+        cnfBtn.innerHTML = "Confirm Order"; //This should read "unconfirm order" if it's been confirmed
+        cnfBtn.addEventListener("click", function (event) {
+           //Launch the confirmOrder(index) function to change the status in the db.
+            //The function should negate the status, whatever it is.
+            confirmOrder(elmt); //Use the indexno attatched to the element.
+        });
+        btnDiv.appendChild(cnfBtn);
+    contentDiv.appendChild(btnDiv);
+    document.getElementsByTagName('body')[0].appendChild(modal);
+    modal.style.display = "block";
 }
 //Caution:
 //I've used a about 3 different node list arrays, all with global scope. Hope they don't get mixed up.

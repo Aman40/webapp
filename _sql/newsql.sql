@@ -65,6 +65,7 @@ OrderTime TIMESTAMP NOT NULL,
 OrderExpiration DATETIME NOT NULL,
 OrderSerial SERIAL,
 ImageURI VARCHAR(255),
+ConfirmationStatus BOOL DEFAULT FALSE,
 PRIMARY KEY (OrderID),
 FOREIGN KEY (RepID) REFERENCES Repository(RepID)
 );
