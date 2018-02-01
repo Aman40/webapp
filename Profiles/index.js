@@ -1918,7 +1918,7 @@ function displayClosedOrderDetails(elmt) {
     var msgBtn = document.createElement('div'); //The message button
         msgBtn.classList.add("order_item_btn");
         msgBtn.classList.add('rep_item_btn');
-        msgBtn.clientID = getValue(ordersNodeList, indexno, "clientid")
+        msgBtn.recepID = getValue(ordersNodeList, indexno, "clientid")
         msgBtn.innerHTML = "Message Client";
         msgBtn.addEventListener("click", function () {
            //Open messageClient(elmt). RecepID must be attached to elmt, just like IndexNo

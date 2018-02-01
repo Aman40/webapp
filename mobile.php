@@ -328,7 +328,7 @@ include "include.php";
                                                 console.log(this.readyState);
                                                 console.log(this.status);
                                             }
-                                        }
+                                        };
                                         xmlhttp.open("GET", "xhttp.php?table=delete_item&RepID="+RepID, true);
                                         xmlhttp.send();
                                     }

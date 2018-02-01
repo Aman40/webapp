@@ -4,6 +4,7 @@ include "customErrorHandler.php";
 set_error_handler(customErrorHandler); //Setting error handler
 //Start session
 session_start();
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 //Check for already existing sessionID
 if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set appropriate session id
     //A session already exists.
@@ -172,6 +173,7 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
         //get the recepID and offset
         $recepID = filter($_POST['recepID']) or die("<msg>recepID is not set!</msg><returnstatus>2</returnstatus>");
         //open a connection
+        echo "<recepID>$recepID</recepID>";
         $servername = "localhost";
         $username = "aman";
         $password = "password";
@@ -192,6 +194,7 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                     //query was successful
                     $row = $result->fetch_assoc();
                     $reply.="<recepname>".$row['DisplayName']."</recepname>";
+                    echo "<returnstatus>0</returnstatus>"; //Perfection!!
                 }
                 else {
                     echo "<msg>Recepient name query unsuccessful for Client</msg>";
@@ -213,6 +216,8 @@ if(isset($_SESSION["UserID"]) || isset($_SESSION["ClientID"])) { //URGENT: Set a
                     echo "<msg>Recepient name query unsuccessful for Client</msg>";
                     echo "<returnstatus>2</returnstatus>";
                 }
+            } else {
+                echo "<err>There is a problem with the recepID</err>";
             }
         } else {
             echo "<msg>Connection Error</msg>";
